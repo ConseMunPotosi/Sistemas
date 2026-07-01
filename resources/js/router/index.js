@@ -1,28 +1,27 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../pages/Home.vue'
-import Login from '../pages/Login.vue'
-import Register from '../pages/Register.vue'
-import Dashboard from '../pages/Dashboard.vue'
+import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
-    { path: '/', component: Home },
-    { path: '/login', component: Login },
-    { path: '/register', component: Register },
-    { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true } },
-]
+    { path: '/', name: 'inicio', component: () => import('../pages/Inicio.vue') },
+    { path: '/directiva', name: 'directiva', component: () => import('../pages/Directiva.vue') },
+    { path: '/concejales', name: 'concejales', component: () => import('../pages/Concejales.vue') },
+    { path: '/comisiones', name: 'comisiones', component: () => import('../pages/Comisiones.vue') },
+    { path: '/leyes', name: 'leyes', component: () => import('../pages/Leyes.vue') },
+    { path: '/resoluciones', name: 'resoluciones', component: () => import('../pages/Resoluciones.vue') },
+    { path: '/ordenanzas', name: 'ordenanzas', component: () => import('../pages/Ordenanzas.vue') },
+    { path: '/noticias', name: 'noticias', component: () => import('../pages/Noticias.vue') },
+    { path: '/sesiones', name: 'sesiones', component: () => import('../pages/Sesiones.vue') },
+];
 
 const router = createRouter({
     history: createWebHistory(),
     routes,
-})
+    scrollBehavior(to, from, savedPosition) {
+        if (savedPosition) {
+            return savedPosition;
+        } else {
+            return { top: 0 };
+        }
+    },
+});
 
-router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem('token')
-    if (to.meta.requiresAuth && !token) {
-        next('/login')
-    } else {
-        next()
-    }
-})
-
-export default router
+export default router;
