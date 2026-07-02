@@ -101,7 +101,7 @@ export default {
 
 <style scoped>
 .navbar {
-    background: linear-gradient(135deg, #ec1e1e 0%, #f70101 100%);
+    background: linear-gradient(135deg, #ff0000 0%, #f70101 100%);
     padding: 12px 0;
 }
 

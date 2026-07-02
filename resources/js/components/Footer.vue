@@ -64,7 +64,7 @@ export default {
 
 <style scoped>
 footer {
-    margin-top: 50px !important;
+    margin-top: 0px !important;
 }
 
 footer .text-muted {
@@ -134,7 +134,7 @@ footer .text-muted:hover {
         text-align: center !important;
         margin-bottom: 2rem;
     }
-    
+
     .col-md-4.text-end {
         text-align: center !important;
     }
