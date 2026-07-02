@@ -1,21 +1,20 @@
 <template>
     <footer class="bg-dark text-white mt-5">
         <div class="container-fluid py-4">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="contenedor-mayor">
-                        <div class="div-izquierdo escudo">
-                            <img src="../../../public/images/escudo-potosi.png" alt="Escudo" class="escudo">
-                        </div>
-                        <div class="div-derecho">
-                            <h5>Concejo Municipal de Potosí</h5>
-                            <p class="text-muted">
-                                El Concejo Municipal de Potosí es el Órgano Legislativo, Deliberativo y Fiscalizador del Gobierno Municipal de Potosí. Está compuesto por 11 concejalas y concejales elegidos en votación universal, directa y secreta por un período de cinco años.
-                            </p>
-                        </div>
-                    </div>
+            <div class="row align-items-start">
+                <!-- Columna Izquierda -->
+                <div class="col-md-4 text-start">
+                    <h5>Concejo Municipal de Potosí</h5>
+                    <p class="text-muted">
+                        El Concejo Municipal de Potosí es el Órgano Legislativo, Deliberativo y Fiscalizador del Gobierno Municipal de Potosí. Está compuesto por 11 concejalas y concejales elegidos en votación universal, directa y secreta por un período de cinco años.
+                    </p>
                 </div>
-                <div class="col-md-4 justify-content:center align-items:center">
+
+                <!-- Columna Centro -->
+                <div class="col-md-4 d-flex flex-column align-items-center">
+                    <div>
+                        <img src="../../../public/images/escudo-potosi.png" alt="Escudo" class="escudo">
+                    </div>
                     <div class="social-icons-group">
                         <button class="social-icon youtube" aria-label="Youtube">
                             <i class="bi bi-youtube"></i>
@@ -34,15 +33,18 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Columna Derecha -->
                 <div class="col-md-4 text-end">
-                    <h6>Contáctenos</h6>
+                    <h6>CONTÁCTENOS</h6>
                     <p class="text-muted">
-                        <i class="fas fa-map-marker-alt me-2"></i> Av. Naciones Unidas #123<br>
-                        <i class="fas fa-phone me-2"></i> (02) 1234567<br>
-                        <i class="fas fa-envelope me-2"></i> info@concejopotosí.bo
+                        <i class="fas fa-map-marker-alt me-2" style="color: #ff6b6b;"></i> Plaza 10 de noviembre, Edificio Municipal Planta Alta<br>
+                        <i class="fas fa-phone me-2" style="color: #ff6b6b;"></i> (2) 6223142<br>
+                        <i class="fas fa-envelope me-2" style="color: #ff6b6b;"></i> info@concejomunicipalpotosí.gob.bo
                     </p>
                 </div>
             </div>
+
             <hr class="bg-secondary">
             <div class="text-center text-muted">
                 Unidad de Sistemas&copy; 2026 Concejo Municipal de Potosí. Todos los derechos reservados.
@@ -64,54 +66,74 @@ footer {
 
 footer .text-muted {
     color: #adb5bd !important;
+    transition: color 0.3s ease;
 }
 
 footer .text-muted:hover {
     color: #ffffff !important;
 }
+
 .escudo {
-  height: 120px;
-  width: auto;
-  object-fit: contain;
-  transition: transform 0.3s ease;
-}
-.contenedor-mayor {
-  display: flex;
-  width: auto;
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
 }
 
-.div-izquierdo {
-  flex: 1;
-  height: auto;
+.escudo:hover {
+    transform: scale(1.05);
 }
 
-.div-derecho {
-  flex: 2;
-  height: auto;
-}
 .social-icons-group {
-  margin-top: 1.5rem;
-  display: flex;
-  gap: 1rem;
+    margin-top: 0.5rem; /* Reducido para menos separación */
+    display: flex;
+    gap: 0.8rem; /* Espacio entre iconos */
 }
 
 .social-icon {
-  background: transparent;
-  cursor: pointer;
-  border: none;
-  padding: 0;
-  align-items: center;
+    background: transparent;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
 }
 
 .social-icon i {
-  color: #ffffff;
-  font-size: 1.5rem;
-  transition: all 0.3s ease;
+    color: #ffffff;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
 }
 
-.social-icon.facebook:hover i { color: #1877f2; transform: scale(1.1); }
-.social-icon.youtube:hover i { color: #ff0000; transform: scale(1.1); }
-.social-icon.instagram:hover i { color: #e4405f; transform: scale(1.1); }
-.social-icon.twitter-x:hover i { color: #1da1f2; transform: scale(1.1); }
-.social-icon.whatsapp:hover i { color: #25d366; transform: scale(1.1); }
+.social-icon:hover i {
+    transform: scale(1.2);
+}
+
+.social-icon.facebook:hover i { color: #1877f2; }
+.social-icon.youtube:hover i { color: #ff0000; }
+.social-icon.instagram:hover i { color: #e4405f; }
+.social-icon.twitter-x:hover i { color: #1da1f2; }
+.social-icon.whatsapp:hover i { color: #25d366; }
+
+/* Asegurar que el contenido de la columna centro esté centrado */
+.col-md-4.d-flex {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .col-md-4 {
+        text-align: center !important;
+        margin-bottom: 2rem;
+    }
+    
+    .col-md-4.text-end {
+        text-align: center !important;
+    }
+}
 </style>
