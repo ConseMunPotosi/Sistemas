@@ -35,7 +35,7 @@
                 </div>
 
                 <!-- Columna Derecha -->
-                <div class="col-md-4 text-end">
+                <div class="col-md-4 text-center">
                     <h6>CONTÁCTENOS</h6>
                     <p class="text-muted">
                         <i class="fas fa-map-marker-alt me-2" style="color: #ff6b6b;"></i> Plaza 10 de noviembre, Edificio Municipal Planta Alta<br>
@@ -47,7 +47,10 @@
 
             <hr class="bg-secondary">
             <div class="text-center text-muted">
-                Unidad de Sistemas&copy; 2026 Concejo Municipal de Potosí. Todos los derechos reservados.
+                Unidad de Sistemas &copy; 2026 Concejo Municipal de Potosí. <br/>
+                Todos los derechos reservados.<br/>
+                Gestión Administrativa 2026 - 2031<br/>
+                Potosí - Bolivia
             </div>
         </div>
     </footer>
