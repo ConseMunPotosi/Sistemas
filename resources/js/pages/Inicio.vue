@@ -70,95 +70,26 @@
     </div>
     <!-- Modal -->
     <div v-if="modalVisible" class="modal-overlay" @click.self="cerrarModal">
-      <div class="modal-container">
+    <!-- Añadida la clase 'modal-pdf' para controlar las dimensiones del visor -->
+    <div class="modal-container modal-pdf">
         <button class="modal-close" @click="cerrarModal">
-          <i class="bi bi-x-lg"></i>
+        <i class="bi bi-x-lg"></i>
         </button>
 
         <div class="modal-content">
-          <h2 class="modal-titulo">
-            <i class="bi bi-info-circle-fill"></i>
-            Concejo Municipal de Potosí
-          </h2>
+        <h2 class="modal-titulo">
+            Concejo Municipal de Potosí - Ley Municipal 067/2015
+        </h2>
 
-          <div class="modal-cuerpo">
-            <p class="modal-texto">
-              El Concejo Municipal de Potosí es el órgano legislativo, deliberativo y fiscalizador
-              del Gobierno Autónomo Municipal de Potosí. Está conformado por concejales electos
-              democráticamente que representan a los diferentes distritos de la ciudad.
-            </p>
-
-            <p class="modal-texto">
-              <strong>Funciones principales:</strong>
-            </p>
-            <ul class="modal-lista">
-              <li><i class="bi bi-check-circle-fill"></i> Legislar sobre asuntos municipales</li>
-              <li><i class="bi bi-check-circle-fill"></i> Fiscalizar la gestión del Ejecutivo Municipal</li>
-              <li><i class="bi bi-check-circle-fill"></i> Aprobar el presupuesto municipal</li>
-              <li><i class="bi bi-check-circle-fill"></i> Controlar el uso de recursos públicos</li>
-              <li><i class="bi bi-check-circle-fill"></i> Representar a la ciudadanía</li>
-            </ul>
-
-            <p class="modal-texto">
-              Trabajamos día a día para construir una ciudad más justa, transparente y desarrollada,
-              escuchando las necesidades de todos los ciudadanos y velando por el bienestar común.
-            </p>
-
-            <div class="modal-info">
-              <i class="bi bi-clock-history"></i>
-              <span>Atención: Lunes a Viernes de 8:30 a 12:00 y de 14:30 a 16:00</span>
-            </div>
-          </div>
-
+        <!-- Cuerpo modificado para albergar el iframe del PDF -->
+        <div class="modal-cuerpo pdf-container">
+            <!-- Reemplaza 'ruta-de-tu-archivo.pdf' por tu variable de Vue (ej. :src="pdfUrl") o tu enlace estático -->
+            <iframe src="/pdf/LeyMunicipal_067-2015.pdf" type="application/pdf"></iframe>
         </div>
-      </div>
+        </div>
+    </div>
     </div>
   </div>
-  <!-- Modal -->
-    <div v-if="modalVisible" class="modal-overlay" @click.self="cerrarModal">
-      <div class="modal-container">
-        <button class="modal-close" @click="cerrarModal">
-          <i class="bi bi-x-lg"></i>
-        </button>
-
-        <div class="modal-content">
-          <h2 class="modal-titulo">
-            <i class="bi bi-info-circle-fill"></i>
-            Concejo Municipal de Potosí
-          </h2>
-
-          <div class="modal-cuerpo">
-            <p class="modal-texto">
-              El Concejo Municipal de Potosí es el órgano legislativo, deliberativo y fiscalizador
-              del Gobierno Autónomo Municipal de Potosí. Está conformado por concejales electos
-              democráticamente que representan a los diferentes distritos de la ciudad.
-            </p>
-
-            <p class="modal-texto">
-              <strong>Funciones principales:</strong>
-            </p>
-            <ul class="modal-lista">
-              <li><i class="bi bi-check-circle-fill"></i> Legislar sobre asuntos municipales</li>
-              <li><i class="bi bi-check-circle-fill"></i> Fiscalizar la gestión del Ejecutivo Municipal</li>
-              <li><i class="bi bi-check-circle-fill"></i> Aprobar el presupuesto municipal</li>
-              <li><i class="bi bi-check-circle-fill"></i> Controlar el uso de recursos públicos</li>
-              <li><i class="bi bi-check-circle-fill"></i> Representar a la ciudadanía</li>
-            </ul>
-
-            <p class="modal-texto">
-              Trabajamos día a día para construir una ciudad más justa, transparente y desarrollada,
-              escuchando las necesidades de todos los ciudadanos y velando por el bienestar común.
-            </p>
-
-            <div class="modal-info">
-              <i class="bi bi-clock-history"></i>
-              <span>Atención: Lunes a Viernes de 8:30 a 12:00 y de 14:30 a 16:00</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
 </template>
 
 <script setup>
@@ -416,7 +347,7 @@ const explorar = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
@@ -427,12 +358,12 @@ const explorar = () => {
 
 .modal-container {
   position: relative;
-  max-width: 600px;
+  max-width: 800px;
   width: 90%;
   max-height: 85vh;
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border-radius: 20px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
   animation: slideInUp 0.4s ease;
   overflow: hidden;
 }
@@ -479,10 +410,13 @@ const explorar = () => {
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: 0.8rem;
   border-bottom: 2px solid #cc0000;
   padding-bottom: 0.8rem;
 }
+
 
 .modal-titulo i {
   font-size: 1.8rem;
@@ -684,4 +618,37 @@ const explorar = () => {
     padding: 1rem;
   }
 }
+/* Incrementa el tamaño del contenedor para que el PDF sea legible */
+.modal-container.modal-pdf {
+  width: 95%;
+  max-width: 1000px;
+  height: 90vh; /* Ocupa el 90% del alto de la pantalla */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ajusta el contenido interno para que use flexbox */
+.modal-container.modal-pdf .modal-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Evita scrolls dobles fuera del PDF */
+}
+
+/* Contenedor del PDF (reemplaza a tu antiguo modal-cuerpo) */
+.pdf-container {
+  flex: 1; /* Se estira para ocupar todo el alto disponible */
+  padding: 0 !important; /* Quita paddings para aprovechar los bordes */
+  margin-top: 15px;
+  overflow: hidden;
+}
+
+/* Estilos obligatorios para el iframe */
+.pdf-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0 0 20px 20px; /* Sigue la curvatura de tu modal */
+}
+
 </style>
