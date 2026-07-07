@@ -1,44 +1,37 @@
 <template>
   <div class="page-container">
+    <!-- Imágenes decorativas -->
     <img src="../../../public/images/home/img1.png" class="img img1" />
     <img src="../../../public/images/home/img2.png" class="img img2" />
     <img src="../../../public/images/home/img3.png" class="img img3" />
     <img src="../../../public/images/home/img4.png" class="img img4" />
+
+    <!-- Logo -->
     <div class="imagenLogo">
-        <img src="../../../public/images/Logo_negativo.png" class="logo" />
+      <img src="../../../public/images/Logo_negativo.png" class="logo" />
     </div>
+
+    <!-- Contenido principal -->
     <div class="texto">
-        <h1 class="titulo align:center">Concejo Municipal de Potosí</h1>
-        <p class="descripcion">
-          El Concejo Municipal de Potosí constituye el Órgano Legislativo,
-          Deliberativo y Fiscalizador del Gobierno Autónomo Municipal de
-          Potosí. Está conformado por once (11) concejalas y concejales,
-          elegidos mediante sufragio universal, directo y secreto, para
-          un periodo de gestión de cinco años. Actualmente, la institución
-          se encuentra en el ejercicio del periodo constitucional 2026–2031.
-        </p>
-        <div class="hero-botones">
-            <button class="btn-primario" @click="abrirModal">
-              Ver más
-              <i class="bi bi-arrow-right"></i>
-            </button>
-        </div>
+      <h1 class="titulo">Concejo Municipal de Potosí</h1>
+      <p class="descripcion">
+        El Concejo Municipal de Potosí constituye el Órgano Legislativo,
+        Deliberativo y Fiscalizador del Gobierno Autónomo Municipal de
+        Potosí. Está conformado por once (11) concejalas y concejales,
+        elegidos mediante sufragio universal, directo y secreto, para
+        un periodo de gestión de cinco años. Actualmente, la institución
+        se encuentra en el ejercicio del periodo constitucional 2026–2031.
+      </p>
+      <div class="hero-botones">
+        <button class="btn-primario" @click="abrirModal">
+          Ver más
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
     </div>
+
+    <!-- Estadísticas -->
     <div class="bienvenida-stats">
-      <div class="stat">
-        <i class="bi bi-geo-alt-fill"></i>
-        <div class="stat-info">
-          <span class="stat-number">4.067 m.s.n.m.</span>
-          <span class="stat-label">Altitud</span>
-        </div>
-      </div>
-      <div class="stat">
-        <i class="bi bi-person-standing"></i>
-        <div class="stat-info">
-          <span class="stat-number">1</span>
-          <span class="stat-label">Alcalde</span>
-        </div>
-      </div>
       <div class="stat">
         <i class="bi bi-people-fill"></i>
         <div class="stat-info">
@@ -47,9 +40,16 @@
         </div>
       </div>
       <div class="stat">
+        <i class="bi bi-diagram-3"></i>
+        <div class="stat-info">
+          <span class="stat-number">10</span>
+          <span class="stat-label">Comisiones</span>
+        </div>
+      </div><br/>
+      <div class="stat">
         <i class="bi bi-geo-alt"></i>
         <div class="stat-info">
-            <span class="stat-number">20</span>
+          <span class="stat-number">20</span>
           <span class="stat-label">Distritos</span>
         </div>
       </div>
@@ -68,26 +68,22 @@
         </div>
       </div>
     </div>
+
     <!-- Modal -->
     <div v-if="modalVisible" class="modal-overlay" @click.self="cerrarModal">
-    <!-- Añadida la clase 'modal-pdf' para controlar las dimensiones del visor -->
-    <div class="modal-container modal-pdf">
+      <div class="modal-container modal-pdf">
         <button class="modal-close" @click="cerrarModal">
-        <i class="bi bi-x-lg"></i>
+          <i class="bi bi-x-lg"></i>
         </button>
-
         <div class="modal-content">
-        <h2 class="modal-titulo">
+          <h2 class="modal-titulo">
             Concejo Municipal de Potosí - Ley Municipal 067/2015
-        </h2>
-
-        <!-- Cuerpo modificado para albergar el iframe del PDF -->
-        <div class="modal-cuerpo pdf-container">
-            <!-- Reemplaza 'ruta-de-tu-archivo.pdf' por tu variable de Vue (ej. :src="pdfUrl") o tu enlace estático -->
+          </h2>
+          <div class="modal-cuerpo pdf-container">
             <iframe src="/pdf/LeyMunicipal_067-2015.pdf" type="application/pdf"></iframe>
+          </div>
         </div>
-        </div>
-    </div>
+      </div>
     </div>
   </div>
 </template>
@@ -100,20 +96,17 @@ const modalVisible = ref(false)
 
 const abrirModal = () => {
   modalVisible.value = true
-  document.body.style.overflow = 'hidden' // Evitar scroll del body
+  document.body.style.overflow = 'hidden'
 }
 
 const cerrarModal = () => {
   modalVisible.value = false
-  document.body.style.overflow = '' // Restaurar scroll
-}
-
-const explorar = () => {
-  abrirModal()
+  document.body.style.overflow = ''
 }
 </script>
 
 <style scoped>
+/* ========== CONTENEDOR PRINCIPAL ========== */
 .page-container {
   position: relative;
   width: 100%;
@@ -122,11 +115,10 @@ const explorar = () => {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
   overflow: hidden;
 }
 
-/* BASE */
+/* ========== IMÁGENES DECORATIVAS ========== */
 .img {
   position: absolute;
   max-width: 100%;
@@ -162,6 +154,8 @@ const explorar = () => {
   z-index: 1;
   animation: entrarAbajo 2s ease-out forwards;
 }
+
+/* ========== LOGO ========== */
 .imagenLogo {
   max-width: 700px;
   margin-left: 70%;
@@ -170,7 +164,7 @@ const explorar = () => {
   animation: entrarArriba 2s ease-out forwards;
 }
 
-/* BIENVENIDA */
+/* ========== TEXTO PRINCIPAL ========== */
 .texto {
   max-width: 700px;
   margin-top: 1%;
@@ -184,7 +178,7 @@ const explorar = () => {
   color: #cc0000;
   margin-bottom: 1.5rem;
   line-height: 1.2;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   animation: fadeInLeft 0.8s ease;
 }
 
@@ -225,14 +219,15 @@ const explorar = () => {
   box-shadow: 0 10px 20px rgba(204, 0, 0, 0.3);
 }
 
-.btn-primario i {
-  transition: transform 0.3s ease;
-}
-
 .btn-primario:hover i {
   transform: translateX(5px);
 }
 
+.btn-primario i {
+  transition: transform 0.3s ease;
+}
+
+/* ========== ESTADÍSTICAS ========== */
 .bienvenida-stats {
   align-items: center;
   margin-top: 2%;
@@ -256,7 +251,7 @@ const explorar = () => {
 
 .stat:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   background: white;
 }
 
@@ -281,65 +276,6 @@ const explorar = () => {
   color: #666;
 }
 
-/* RESPONSIVE TABLET */
-@media (max-width: 1024px) {
-  .img1 { width: 60vw; }
-  .img2 { width: 35vw; left: 30vw; }
-  .img3 { width: 25vw; left: 25vw; }
-  .img4 { width: 20vw; left: 45vw; top: 10vw;}
-}
-
-/* RESPONSIVE MÓVIL */
-@media (max-width: 600px) {
-  .page-container {
-    min-height: 120vw;
-  }
-
-  .img1 {
-    width: 90vw;
-    left: 5vw;
-    top: 0;
-  }
-
-  .img2 {
-    width: 70vw;
-    left: 15vw;
-    top: 20vh;
-  }
-
-  .img3 {
-    width: 60vw;
-    left: 20vw;
-    top: 45vh;
-  }
-
-  .img4 {
-    width: 50vw;
-    left: 25vw;
-    top: 30vw;
-  }
-}
-
-/* ANIMACIONES */
-@keyframes entrarIzquierda {
-  from { transform: translateX(-200px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes entrarDerecha {
-  from { transform: translateX(200px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes entrarArriba {
-  from { transform: translateY(-200px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes entrarAbajo {
-  from { transform: translateY(200px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
 /* ========== MODAL ========== */
 .modal-overlay {
   position: fixed;
@@ -360,7 +296,7 @@ const explorar = () => {
   position: relative;
   max-width: 800px;
   width: 90%;
-  max-height: 85vh;
+  max-height: 65vh;
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border-radius: 20px;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
@@ -408,107 +344,86 @@ const explorar = () => {
   font-weight: 800;
   color: #cc0000;
   margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   text-align: center;
-  gap: 0.8rem;
   border-bottom: 2px solid #cc0000;
   padding-bottom: 0.8rem;
 }
 
-
-.modal-titulo i {
-  font-size: 1.8rem;
-}
-
-.modal-cuerpo {
-  max-height: 55vh;
-  overflow-y: auto;
-  padding-right: 0.5rem;
-}
-
-.modal-cuerpo::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-cuerpo::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.modal-cuerpo::-webkit-scrollbar-thumb {
-  background: #cc0000;
-  border-radius: 10px;
-}
-
-.modal-texto {
-  font-size: 1rem;
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 1rem;
-}
-
-.modal-lista {
-  list-style: none;
-  padding: 0;
-  margin: 1rem 0;
-}
-
-.modal-lista li {
+/* ========== PDF ========== */
+.modal-container.modal-pdf {
+  width: 95%;
+  max-width: 1000px;
+  height: 100vh;
   display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  padding: 0.6rem 0;
-  color: #333;
-  font-size: 0.95rem;
+  flex-direction: column;
 }
 
-.modal-lista li i {
-  color: #cc0000;
-  font-size: 1rem;
-}
-
-.modal-info {
-  background: #f0f0f0;
-  padding: 1rem;
-  border-radius: 12px;
+.modal-container.modal-pdf .modal-content {
+  height: 100%;
   display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin: 1rem 0;
-  color: #333;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.modal-info i {
-  font-size: 1.2rem;
-  color: #cc0000;
+.pdf-container {
+  flex: 1;
+  padding: 0 !important;
+  margin-top: 15px;
+  overflow: hidden;
 }
 
-.modal-boton {
+.pdf-container iframe {
   width: 100%;
-  background: linear-gradient(135deg, #cc0000, #990000);
-  color: white;
+  height: 100%;
   border: none;
-  padding: 0.8rem;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-  margin-top: 1.5rem;
+  border-radius: 0 0 20px 20px;
 }
 
-.modal-boton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(204, 0, 0, 0.3);
+/* ========== ANIMACIONES ========== */
+@keyframes entrarIzquierda {
+  from {
+    transform: translateX(-200px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
-/* Animaciones */
+@keyframes entrarDerecha {
+  from {
+    transform: translateX(200px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes entrarArriba {
+  from {
+    transform: translateY(-200px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes entrarAbajo {
+  from {
+    transform: translateY(200px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 @keyframes fadeInLeft {
   from {
     opacity: 0;
@@ -541,9 +456,36 @@ const explorar = () => {
 }
 
 /* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+  .img1 {
+    width: 60vw;
+  }
+  .img2 {
+    width: 35vw;
+    left: 30vw;
+  }
+  .img3 {
+    width: 25vw;
+    left: 25vw;
+  }
+  .img4 {
+    width: 20vw;
+    left: 45vw;
+    top: 10vw;
+  }
+}
+
 @media (max-width: 768px) {
-  .contenido {
-    padding: 2rem 1.5rem;
+  .texto {
+    max-width: 90%;
+    margin-left: 5%;
+    margin-top: 2%;
+  }
+
+  .imagenLogo {
+    max-width: 90%;
+    margin-left: 5%;
+    margin-top: 2%;
   }
 
   .titulo {
@@ -555,6 +497,7 @@ const explorar = () => {
   }
 
   .bienvenida-stats {
+    margin-left: 5%;
     gap: 1rem;
   }
 
@@ -573,19 +516,45 @@ const explorar = () => {
   .modal-content {
     padding: 1.5rem;
   }
-
-  .modal-texto {
-    font-size: 0.9rem;
-  }
-
-  .modal-lista li {
-    font-size: 0.85rem;
-  }
 }
 
 @media (max-width: 480px) {
-  .contenido {
-    padding: 1.5rem 1rem;
+  .page-container {
+    min-height: 120vw;
+  }
+
+  .img1 {
+    width: 90vw;
+    left: 5vw;
+    top: 0;
+  }
+
+  .img2 {
+    width: 70vw;
+    left: 15vw;
+    top: 20vh;
+  }
+
+  .img3 {
+    width: 60vw;
+    left: 20vw;
+    top: 45vh;
+  }
+
+  .img4 {
+    width: 50vw;
+    left: 25vw;
+    top: 30vw;
+  }
+
+  .texto {
+    margin-left: 5%;
+    margin-top: 5%;
+  }
+
+  .imagenLogo {
+    margin-left: 5%;
+    margin-top: 5%;
   }
 
   .titulo {
@@ -618,37 +587,4 @@ const explorar = () => {
     padding: 1rem;
   }
 }
-/* Incrementa el tamaño del contenedor para que el PDF sea legible */
-.modal-container.modal-pdf {
-  width: 95%;
-  max-width: 1000px;
-  height: 90vh; /* Ocupa el 90% del alto de la pantalla */
-  display: flex;
-  flex-direction: column;
-}
-
-/* Ajusta el contenido interno para que use flexbox */
-.modal-container.modal-pdf .modal-content {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* Evita scrolls dobles fuera del PDF */
-}
-
-/* Contenedor del PDF (reemplaza a tu antiguo modal-cuerpo) */
-.pdf-container {
-  flex: 1; /* Se estira para ocupar todo el alto disponible */
-  padding: 0 !important; /* Quita paddings para aprovechar los bordes */
-  margin-top: 15px;
-  overflow: hidden;
-}
-
-/* Estilos obligatorios para el iframe */
-.pdf-container iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  border-radius: 0 0 20px 20px; /* Sigue la curvatura de tu modal */
-}
-
 </style>
