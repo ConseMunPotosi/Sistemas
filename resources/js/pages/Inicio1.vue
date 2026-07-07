@@ -1,79 +1,75 @@
 <template>
   <div class="page-container">
-    <!-- Imagen decorativa -->
-    <div class="imagenes-decorativas">
-      <img src="/images/home/imagen1.png" class="img img1" alt="Decoración" />
+    <!-- Imágenes decorativas -->
+     <div class="imagenes-decorativas">
+      <img src="/public/images/imagen1.png" class="img img1" />
+    </div>
+    <!-- Logo -->
+    <div class="imagenLogo">
+      <img src="/public/images/Logo_negativo.png"/>
     </div>
 
     <!-- Contenido principal -->
-    <div class="contenido-principal">
-      <!-- Logo -->
-      <div class="imagenLogo">
-        <img src="/images/Logo_negativo.png" class="logo" alt="Logo Concejo Municipal" />
+    <div class="texto">
+      <h1 class="titulo">Concejo Municipal de Potosí</h1>
+      <p class="descripcion">
+        El Concejo Municipal de Potosí constituye el Órgano Legislativo,
+        Deliberativo y Fiscalizador del Gobierno Autónomo Municipal de
+        Potosí. Está conformado por once (11) concejalas y concejales,
+        elegidos mediante sufragio universal, directo y secreto, para
+        un periodo de gestión de cinco años. Actualmente, la institución
+        se encuentra en el ejercicio del periodo constitucional 2026–2031.
+      </p>
+      <div class="hero-botones">
+        <button class="btn-primario" @click="abrirModal">
+          Ver más
+          <i class="bi bi-arrow-right"></i>
+        </button>
       </div>
+    </div>
 
-      <!-- Texto -->
-      <div class="texto">
-        <h1 class="titulo">Concejo Municipal de Potosí</h1>
-        <p class="descripcion">
-          El Concejo Municipal de Potosí constituye el Órgano Legislativo,
-          Deliberativo y Fiscalizador del Gobierno Autónomo Municipal de
-          Potosí. Está conformado por once (11) concejalas y concejales,
-          elegidos mediante sufragio universal, directo y secreto, para
-          un periodo de gestión de cinco años. Actualmente, la institución
-          se encuentra en el ejercicio del periodo constitucional 2026–2031.
-        </p>
-        <div class="hero-botones">
-          <button class="btn-primario" @click="abrirModal">
-            Ver más
-            <i class="bi bi-arrow-right"></i>
-          </button>
+    <!-- Estadísticas -->
+    <div class="bienvenida-stats">
+      <div class="stat">
+        <i class="bi bi-people-fill"></i>
+        <div class="stat-info">
+          <span class="stat-number">11</span>
+          <span class="stat-label">Concejales</span>
         </div>
       </div>
-
-      <!-- Estadísticas -->
-      <div class="bienvenida-stats">
-        <div class="stat">
-          <i class="bi bi-people-fill"></i>
-          <div class="stat-info">
-            <span class="stat-number">11</span>
-            <span class="stat-label">Concejales</span>
-          </div>
+      <div class="stat">
+        <i class="bi bi-diagram-3"></i>
+        <div class="stat-info">
+          <span class="stat-number">10</span>
+          <span class="stat-label">Comisiones</span>
         </div>
-        <div class="stat">
-          <i class="bi bi-diagram-3"></i>
-          <div class="stat-info">
-            <span class="stat-number">10</span>
-            <span class="stat-label">Comisiones</span>
-          </div>
+      </div><br>
+      <div class="stat">
+        <i class="bi bi-geo-alt"></i>
+        <div class="stat-info">
+          <span class="stat-number">20</span>
+          <span class="stat-label">Distritos</span>
         </div>
-        <div class="stat">
-          <i class="bi bi-geo-alt"></i>
-          <div class="stat-info">
-            <span class="stat-number">20</span>
-            <span class="stat-label">Distritos</span>
-          </div>
+      </div>
+      <div class="stat">
+        <i class="bi bi-flag"></i>
+        <div class="stat-info">
+          <span class="stat-number">287</span>
+          <span class="stat-label">Juntas Vecinales</span>
         </div>
-        <div class="stat">
-          <i class="bi bi-flag"></i>
-          <div class="stat-info">
-            <span class="stat-number">287</span>
-            <span class="stat-label">Juntas Vecinales</span>
-          </div>
-        </div>
-        <div class="stat">
-          <i class="bi bi-person-standing"></i>
-          <div class="stat-info">
-            <span class="stat-number">218.336</span>
-            <span class="stat-label">Ciudadanos</span>
-          </div>
+      </div>
+      <div class="stat">
+        <i class="bi bi-person-standing"></i>
+        <div class="stat-info">
+          <span class="stat-number">218.336</span>
+          <span class="stat-label">Ciudadanos</span>
         </div>
       </div>
     </div>
 
     <!-- Modal -->
     <div v-if="modalVisible" class="modal-overlay" @click.self="cerrarModal">
-      <div class="modal-container">
+      <div class="modal-container modal-pdf">
         <button class="modal-close" @click="cerrarModal">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -81,7 +77,7 @@
           <h2 class="modal-titulo">
             Concejo Municipal de Potosí - Ley Municipal 067/2015
           </h2>
-          <div class="pdf-container">
+          <div class="modal-cuerpo pdf-container">
             <iframe src="/pdf/LeyMunicipal_067-2015.pdf" type="application/pdf"></iframe>
           </div>
         </div>
@@ -112,96 +108,88 @@ const cerrarModal = () => {
 .page-container {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  background-image: url('/images/fondo.png');
+  background-image: url('/public/images/fondo.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  padding: 2rem 4rem;
 }
 
-/* ========== CONTENIDO PRINCIPAL ========== */
-.contenido-principal {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* ========== IMAGEN DECORATIVA ========== */
+/* ========== CONTENEDOR DE IMÁGENES DECORATIVAS ========== */
 .imagenes-decorativas {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
+  pointer-events: none; /* Permite hacer clic a través de las imágenes */
   z-index: 1;
-  overflow: hidden;
 }
 
-.img1 {
+/* ========== IMÁGENES DECORATIVAS ========== */
+.img {
   position: absolute;
-  width: 35%;
-  left: -5%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Versión mejorada con porcentajes responsivos */
+.img1 {
+  width: 45%; /* 88vh convertido a porcentaje */
+  left: 0;
   top: 0;
-  animation: slideLeft 1.5s ease-out forwards;
-  opacity: 0;
+  z-index: 1;
+  animation: entrarIzquierda 1.5s ease-out forwards;
 }
 
 /* ========== LOGO ========== */
 .imagenLogo {
-  max-width: 280px;
-  margin-bottom: 1rem;
-  animation: fadeIn 0.8s ease forwards;
+  max-width: 700px;
+  margin-left: 65%;
+  margin-top: 5%;
+  text-align: center;
+  animation: entrarArriba 2s ease-out forwards;
 }
 
-.logo {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* ========== TEXTO ========== */
+/* ========== TEXTO PRINCIPAL ========== */
 .texto {
-  max-width: 600px;
-  animation: fadeIn 0.8s ease 0.3s both;
+  max-width: 800px;
+  margin-top: 1%;
+  margin-left: 50%;
+  text-align: justify;
+  animation: entrarDerecha 1.8s ease-out forwards;
 }
 
 .titulo {
-  font-size: 2.5rem;
   font-weight: 800;
   color: #cc0000;
   margin-bottom: 1.5rem;
   line-height: 1.2;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  animation: fadeInLeft 0.8s ease;
 }
 
 .descripcion {
-  font-size: 1.05rem;
-  color: #2c3e50;
+  font-size: 1.2rem;
+  color: #000000;
   margin-bottom: 2rem;
-  line-height: 1.8;
-  background: rgba(255, 255, 255, 0.85);
-  padding: 1.5rem;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  line-height: 1.6;
+  animation: fadeInLeft 0.8s ease 0.2s both;
 }
 
 .hero-botones {
   display: flex;
   gap: 1rem;
+  justify-content: flex-start;
   flex-wrap: wrap;
+  animation: fadeInLeft 0.8s ease 0.4s both;
 }
 
 .btn-primario {
   background: #cc0000;
   color: white;
-  padding: 0.8rem 2rem;
+  padding: 1rem 2rem;
   border: none;
   border-radius: 50px;
   font-size: 1rem;
@@ -211,13 +199,12 @@ const cerrarModal = () => {
   align-items: center;
   gap: 0.5rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(204, 0, 0, 0.3);
 }
 
 .btn-primario:hover {
   background: #990000;
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(204, 0, 0, 0.4);
+  box-shadow: 0 10px 20px rgba(204, 0, 0, 0.3);
 }
 
 .btn-primario:hover i {
@@ -228,46 +215,37 @@ const cerrarModal = () => {
   transition: transform 0.3s ease;
 }
 
-/* ========== ESTADÍSTICAS ========== */
+/* ========== DATOS ========== */
 .bienvenida-stats {
-  left: 50%;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
-  max-width: 700px;
-  margin-top: 2rem;
+  align-items: center;
+  margin-top: 2%;
+  margin-left: 50%;
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  animation: entrarAbajo 2s ease-out forwards;
 }
 
 .stat {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 1rem;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
-  padding: 0.8rem 1.2rem;
+  padding: 1rem 1.5rem;
   border-radius: 12px;
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  animation: fadeIn 0.6s ease forwards;
-  opacity: 0;
 }
-
-.stat:nth-child(1) { animation-delay: 0.2s; }
-.stat:nth-child(2) { animation-delay: 0.4s; }
-.stat:nth-child(3) { animation-delay: 0.6s; }
-.stat:nth-child(4) { animation-delay: 0.8s; }
-.stat:nth-child(5) { animation-delay: 1.0s; }
 
 .stat:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   background: white;
 }
 
 .stat i {
-  font-size: 1.8rem;
+  font-size: 2rem;
   color: #cc0000;
-  flex-shrink: 0;
 }
 
 .stat-info {
@@ -276,16 +254,14 @@ const cerrarModal = () => {
 }
 
 .stat-number {
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: #2c3e50;
-  line-height: 1.2;
 }
 
 .stat-label {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: #666;
-  font-weight: 500;
 }
 
 /* ========== MODAL ========== */
@@ -295,36 +271,33 @@ const cerrarModal = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   animation: fadeIn 0.3s ease;
-  padding: 1rem;
 }
 
 .modal-container {
   position: relative;
-  width: 100%;
-  max-width: 1000px;
-  max-height: 90vh;
-  background: white;
+  max-width: 800px;
+  width: 90%;
+  max-height: 65vh;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border-radius: 20px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.4s ease;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+  animation: slideInUp 0.4s ease;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
 .modal-close {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   background: rgba(204, 0, 0, 0.1);
   border: none;
@@ -337,9 +310,8 @@ const cerrarModal = () => {
 }
 
 .modal-close i {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: #cc0000;
-  transition: all 0.3s ease;
 }
 
 .modal-close:hover {
@@ -353,53 +325,117 @@ const cerrarModal = () => {
 
 .modal-content {
   padding: 2rem;
-  flex: 1;
+}
+
+.modal-titulo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #cc0000;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  border-bottom: 2px solid #cc0000;
+  padding-bottom: 0.8rem;
+}
+
+/* ========== PDF ========== */
+.modal-container.modal-pdf {
+  width: 95%;
+  max-width: 1000px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-container.modal-pdf .modal-content {
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.modal-titulo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #cc0000;
-  margin-bottom: 1rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 2px solid #cc0000;
-  flex-shrink: 0;
-}
-
 .pdf-container {
   flex: 1;
-  min-height: 400px;
+  padding: 0 !important;
+  margin-top: 15px;
   overflow: hidden;
-  border-radius: 8px;
-  background: #f5f5f5;
 }
 
 .pdf-container iframe {
   width: 100%;
   height: 100%;
-  min-height: 500px;
   border: none;
+  border-radius: 0 0 20px 20px;
 }
 
 /* ========== ANIMACIONES ========== */
-@keyframes slideLeft {
+@keyframes entrarIzquierda {
   from {
-    transform: translateX(-100%);
+    transform: translateX(-200px);
     opacity: 0;
   }
   to {
     transform: translateX(0);
-    opacity: 0.5;
+    opacity: 1;
+  }
+}
+
+@keyframes entrarDerecha {
+  from {
+    transform: translateX(200px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes entrarArriba {
+  from {
+    transform: translateY(-200px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes entrarAbajo {
+  from {
+    transform: translateY(200px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
   }
   to {
     opacity: 1;
@@ -407,210 +443,108 @@ const cerrarModal = () => {
   }
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(50px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* ========== RESPONSIVE ========== */
+/* ========== RESPONSIVE MEJORADO ========== */
 
 /* Tablets y pantallas medianas */
 @media (max-width: 1024px) {
-  .page-container {
-    padding: 2rem;
-  }
-
   .img1 {
     width: 45%;
-    left: -10%;
   }
 
   .texto {
-    max-width: 500px;
-  }
-
-  .titulo {
-    font-size: 2.2rem;
-  }
-}
-
-/* Tablets pequeñas */
-@media (max-width: 768px) {
-  .page-container {
-    padding: 1.5rem;
-    min-height: auto;
-  }
-
-  .img1 {
-    width: 60%;
-    left: -20%;
-    opacity: 0.3 !important;
+    margin-left: 50%;
+    max-width: 600px;
   }
 
   .imagenLogo {
-    max-width: 200px;
+    margin-left: 50%;
+  }
+
+  .bienvenida-stats {
+    margin-left: 50%;
+  }
+}
+
+/* Tablets pequeñas y móviles grandes */
+@media (max-width: 768px) {
+  .img1 {
+    width: 120%;
+    opacity: 0.8;
   }
 
   .texto {
-    max-width: 100%;
+    margin-left: 5%;
+    max-width: 90%;
+    margin-top: 2%;
+  }
+
+  .imagenLogo {
+    margin-left: 5%;
+    max-width: 90%;
+    margin-top: 2%;
+  }
+
+  .bienvenida-stats {
+    margin-left: 5%;
+    gap: 1rem;
   }
 
   .titulo {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 
   .descripcion {
     font-size: 1rem;
-    padding: 1rem;
-  }
-
-  .bienvenida-stats {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 100%;
-  }
-
-  .stat {
-    padding: 0.7rem 1rem;
-  }
-
-  .stat i {
-    font-size: 1.5rem;
-  }
-
-  .stat-number {
-    font-size: 1.1rem;
   }
 }
 
-/* Móviles - UNA SOLA COLUMNA */
+/* Móviles pequeños */
 @media (max-width: 480px) {
   .page-container {
-    padding: 1rem;
+    min-height: 10vw;
   }
 
   .img1 {
-    width: 80%;
-    left: -30%;
-    opacity: 0.2 !important;
+    width: 100%;
+    left: 20%;
+    top: 0;
+    opacity: 0.6;
+  }
+
+
+  .texto {
+    margin-left: 5%;
+    margin-top: 5%;
+    max-width: 95%;
   }
 
   .imagenLogo {
-    max-width: 150px;
-    margin: 0 auto 1rem;
-  }
-
-  .texto {
-    text-align: center;
+    margin-left: 5%;
+    margin-top: 5%;
+    max-width: 95%;
   }
 
   .titulo {
-    font-size: 1.6rem;
-    text-align: center;
-  }
-
-  .descripcion {
-    font-size: 0.9rem;
-    padding: 0.8rem;
-    text-align: justify;
-  }
-
-  .hero-botones {
-    justify-content: center;
-  }
-
-  .btn-primario {
-    width: 100%;
-    justify-content: center;
-    padding: 0.7rem 1.5rem;
-    font-size: 0.9rem;
-  }
-
-  /* Estadísticas en UNA SOLA COLUMNA */
-  .bienvenida-stats {
-    grid-template-columns: 1fr;
-    gap: 0.6rem;
-    max-width: 100%;
-  }
-
-  .stat {
-    width: 100%;
-    padding: 0.7rem 1rem;
-    justify-content: flex-start;
-  }
-
-  .stat i {
     font-size: 1.4rem;
   }
 
-  .stat-number {
-    font-size: 1.1rem;
-  }
-
-  .stat-label {
-    font-size: 0.7rem;
-  }
-
-  /* Modal responsive */
-  .modal-container {
-    max-height: 95vh;
-    border-radius: 12px;
-  }
-
-  .modal-content {
-    padding: 1rem;
-  }
-
-  .modal-titulo {
-    font-size: 1.1rem;
-  }
-
-  .pdf-container {
-    min-height: 300px;
-  }
-
-  .pdf-container iframe {
-    min-height: 350px;
-  }
-
-  .modal-close {
-    width: 32px;
-    height: 32px;
-    top: 0.5rem;
-    right: 0.5rem;
-  }
-
-  .modal-close i {
-    font-size: 1rem;
-  }
-}
-
-/* Móviles muy pequeños */
-@media (max-width: 360px) {
-  .titulo {
-    font-size: 1.3rem;
-  }
-
   .descripcion {
-    font-size: 0.8rem;
-    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .btn-primario {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .bienvenida-stats {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 5%;
   }
 
   .stat {
-    padding: 0.5rem 0.8rem;
-  }
-
-  .stat i {
-    font-size: 1.2rem;
-  }
-
-  .stat-number {
-    font-size: 1rem;
+    width: 100%;
   }
 }
 </style>
