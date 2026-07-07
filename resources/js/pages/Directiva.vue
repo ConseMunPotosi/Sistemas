@@ -1,11 +1,11 @@
 <template>
-    <div class="container py-5">
-        <div class="text-center mb-5">
-            <h2 class="display-4 fw-bold text-primary">
-                <i class="fas fa-user-tie me-3"></i>Directiva del Concejo
-            </h2>
-            <p class="lead text-muted">Equipo directivo que lidera el Concejo Municipal de Potosí</p>
-        </div>
+  <div class="container py-5">
+    <div class="text-center mb-5">
+      <h2 class="titulo">
+        <i class="fas fa-user-tie me-3"></i>Directiva del Concejo
+      </h2>
+      <p class="lead text-muted">Equipo directivo que lidera el Concejo Municipal de Potosí</p>
+     </div>
 
         <div class="row g-4 justify-content-center">
             <div class="col-lg-4 col-md-6" v-for="miembro in directiva" :key="miembro.id">
@@ -114,5 +114,12 @@ export default {
 .btn-outline-info:hover {
     transform: scale(1.1);
     transition: transform 0.3s ease;
+}
+.titulo {
+  font-weight: 800;
+  color: #CC0000; /* Rojo institucional */
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 </style>

@@ -1,11 +1,12 @@
 <template>
   <div class="page-container">
     <!-- Imágenes decorativas -->
-    <img src="../../../public/images/home/img1.png" class="img img1" />
-    <img src="../../../public/images/home/img2.png" class="img img2" />
-    <img src="../../../public/images/home/img3.png" class="img img3" />
-    <img src="../../../public/images/home/img4.png" class="img img4" />
-
+     <div class="imagenes-decorativas">
+      <img src="../../../public/images/home/img1.png" class="img img1" />
+      <img src="../../../public/images/home/img2.png" class="img img2" />
+      <img src="../../../public/images/home/img3.png" class="img img3" />
+      <img src="../../../public/images/home/img4.png" class="img img4" />
+    </div>
     <!-- Logo -->
     <div class="imagenLogo">
       <img src="../../../public/images/Logo_negativo.png" class="logo" />
@@ -45,7 +46,7 @@
           <span class="stat-number">10</span>
           <span class="stat-label">Comisiones</span>
         </div>
-      </div><br/>
+      </div><br>
       <div class="stat">
         <i class="bi bi-geo-alt"></i>
         <div class="stat-info">
@@ -118,15 +119,28 @@ const cerrarModal = () => {
   overflow: hidden;
 }
 
+/* ========== CONTENEDOR DE IMÁGENES DECORATIVAS ========== */
+.imagenes-decorativas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Permite hacer clic a través de las imágenes */
+  z-index: 1;
+}
+
 /* ========== IMÁGENES DECORATIVAS ========== */
 .img {
   position: absolute;
   max-width: 100%;
   height: auto;
+  object-fit: contain;
 }
 
+/* Versión mejorada con porcentajes responsivos */
 .img1 {
-  width: 88vh;
+  width: 45%; /* 88vh convertido a porcentaje */
   left: 0;
   top: 0;
   z-index: 1;
@@ -134,23 +148,25 @@ const cerrarModal = () => {
 }
 
 .img2 {
-  width: 18vw;
-  left: 34vw;
+  width: 18%;
+  left: 36%;
+  top: 0;
   z-index: 3;
   animation: entrarDerecha 1.8s ease-out forwards;
 }
 
 .img3 {
-  width: 18vw;
-  left: 26vw;
+  width: 18%;
+  left: 27%;
+  top: 0;
   z-index: 2;
   animation: entrarArriba 2s ease-out forwards;
 }
 
 .img4 {
-  width: 8vw;
-  left: 39vw;
-  top: 63vh;
+  width: 8%;
+  left: 41%;
+  top: 65%;
   z-index: 1;
   animation: entrarAbajo 2s ease-out forwards;
 }
@@ -455,37 +471,86 @@ const cerrarModal = () => {
   }
 }
 
-/* ========== RESPONSIVE ========== */
+/* ========== RESPONSIVE MEJORADO ========== */
+
+/* Tablets y pantallas medianas */
 @media (max-width: 1024px) {
   .img1 {
-    width: 60vw;
+    width: 45%;
   }
+  
   .img2 {
-    width: 35vw;
-    left: 30vw;
+    width: 20%;
+    left: 35%;
+    top: 0;
   }
+  
   .img3 {
-    width: 25vw;
-    left: 25vw;
+    width: 20%;
+    left: 25%;
+    top: 40%;
   }
+  
   .img4 {
-    width: 20vw;
-    left: 45vw;
-    top: 10vw;
+    width: 12%;
+    left: 45%;
+    top: 55%;
+  }
+
+  .texto {
+    margin-left: 50%;
+    max-width: 600px;
+  }
+
+  .imagenLogo {
+    margin-left: 50%;
+  }
+
+  .bienvenida-stats {
+    margin-left: 50%;
   }
 }
 
+/* Tablets pequeñas y móviles grandes */
 @media (max-width: 768px) {
+  .img1 {
+    width: 120%;
+    opacity: 0.8;
+  }
+  
+  .img2 {
+    width: 15%;
+    left: 40%;
+    top: 0;
+  }
+  
+  .img3 {
+    width: 25%;
+    left: 30%;
+    top: 0;
+  }
+  
+  .img4 {
+    width: 15%;
+    left: 50%;
+    top: 0;
+  }
+
   .texto {
-    max-width: 90%;
     margin-left: 5%;
+    max-width: 90%;
     margin-top: 2%;
   }
 
   .imagenLogo {
-    max-width: 90%;
     margin-left: 5%;
+    max-width: 90%;
     margin-top: 2%;
+  }
+
+  .bienvenida-stats {
+    margin-left: 5%;
+    gap: 1rem;
   }
 
   .titulo {
@@ -495,66 +560,49 @@ const cerrarModal = () => {
   .descripcion {
     font-size: 1rem;
   }
-
-  .bienvenida-stats {
-    margin-left: 5%;
-    gap: 1rem;
-  }
-
-  .stat {
-    padding: 0.8rem 1rem;
-  }
-
-  .stat-number {
-    font-size: 1.2rem;
-  }
-
-  .modal-titulo {
-    font-size: 1.4rem;
-  }
-
-  .modal-content {
-    padding: 1.5rem;
-  }
 }
 
+/* Móviles pequeños */
 @media (max-width: 480px) {
   .page-container {
-    min-height: 120vw;
+    min-height: 10vw;
   }
 
   .img1 {
-    width: 90vw;
-    left: 5vw;
+    width: 100%;
+    left: 20%;
     top: 0;
+    opacity: 0.6;
   }
-
+  
   .img2 {
-    width: 70vw;
-    left: 15vw;
-    top: 20vh;
+    width: 35%;
+    left: 45%;
+    top: 15%;
   }
-
+  
   .img3 {
-    width: 60vw;
-    left: 20vw;
-    top: 45vh;
+    width: 35%;
+    left: 30%;
+    top: 50%;
   }
-
+  
   .img4 {
-    width: 50vw;
-    left: 25vw;
-    top: 30vw;
+    width: 20%;
+    left: 50%;
+    top: 45%;
   }
 
   .texto {
     margin-left: 5%;
     margin-top: 5%;
+    max-width: 95%;
   }
 
   .imagenLogo {
     margin-left: 5%;
     margin-top: 5%;
+    max-width: 95%;
   }
 
   .titulo {
@@ -573,18 +621,11 @@ const cerrarModal = () => {
   .bienvenida-stats {
     flex-direction: column;
     align-items: flex-start;
+    margin-left: 5%;
   }
 
   .stat {
     width: 100%;
-  }
-
-  .modal-titulo {
-    font-size: 1.2rem;
-  }
-
-  .modal-content {
-    padding: 1rem;
   }
 }
 </style>
