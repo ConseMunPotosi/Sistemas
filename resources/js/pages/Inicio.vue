@@ -3,7 +3,7 @@
     <div class="responsive-grid">
       <!-- Imagen -->
       <div class="image-wrapper">
-        <img src="/public/images/concejo1.png" alt="Fondo del concejo" class="card-image" />
+        <img src="/public/images/concejo.png" alt="Fondo del concejo" class="card-image" />
       </div>
 
       <!-- Contenido -->
