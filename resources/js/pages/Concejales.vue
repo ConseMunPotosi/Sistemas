@@ -1,10 +1,8 @@
 <template>
-  <div class="container py-5">
-    <div class="text-center mb-5">
-      <h2 class="display-4 fw-bold text-primary">
-      <i class="fas fa-users me-3"></i>Concejales de Potosí
-      </h2>
-      <p class="lead text-muted">Los 11 concejales que representan a nuestra ciudad</p>
+  <div class="principal">
+    <div class="concejales-header">
+      <h2 class="concejales-titulo">Miembros del Honorable Concejo Municipal de Potosí</h2>
+      <p class="concejales-subtitulo">Elegidos por voto popular directo, los 11 concejales del Honorable Concejo Municipal de Potosí ejercerán sus funciones por un período de cinco años, comprendido entre las gestiones 2026 y 2031.</p>
     </div>
     <div class="row g-4">
       <div class="col-lg-4 col-md-6" v-for="concejal in concejales" :key="concejal.id">
@@ -50,17 +48,125 @@ export default {
             concejales: [
                 {
                     id: 1,
-                    nombre: 'Dra. Ana María Rodríguez',
-                    cargo: 'Concejal - Oficialía Mayor',
-                    imagen: '/images/concejales/concejal1.jpg',
-                    descripcion: 'Abogada especializada en derechos humanos y políticas sociales. Promueve la participación ciudadana.',
+                    nombre: 'Abog. Germán Antonio Vidaurre Villanueva',
+                    cargo: 'Concejal - Presidente',
+                    imagen: '/images/concejales/Antonio_Vidaurre.png',
+                    descripcion: 'Experiencia profesional en gestión municipal, 25 años de experiencia en medios de comunicación, 23 años los desempeñó en Radio Fides Potosí (Bolivia); Voz reconocida en el ámbito informativo local.',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
                     linkedin: '#'
                 },
-                // Agregar los 10 concejales restantes
-                // ...
+                {
+                    id: 2,
+                    nombre: 'Claudio German Clemente Vedia',
+                    cargo: 'Concejal - Vicepresidente',
+                    imagen: '/images/concejales/Claudio_Clemente.png',
+                    descripcion: 'A detallar',
+                    facebook: '#',
+                    twitter: '#',
+                    instagram: '#',
+                    linkedin: '#'
+                },
+                {
+                    id: 3,
+                    nombre: 'Maria del Carmen Michel Araujo',
+                    cargo: 'Concejal - Secretaria',
+                    imagen: '/images/concejales/Carmen_Michel.png',
+                    descripcion: 'A detallar',
+                    facebook: '#',
+                    twitter: '#',
+                    instagram: '#',
+                    linkedin: '#'
+                },
+                {
+                    id: 4,
+                    nombre: 'Ariel Jiménez Gómez',
+                    cargo: 'Concejal',
+                    imagen: '/images/concejales/Ariel_Jimenez.png',
+                    descripcion: 'A detallar',
+                    facebook: '#',
+                    twitter: '#',
+                    instagram: '#',
+                    linkedin: '#'
+                },
+                {
+                    id: 5,
+                    nombre: 'Ing. Manuel Alejandro Calizaya Limachi',
+                    cargo: 'Concejal',
+                    imagen: '/images/concejales/Manuel_Calizaya.png',
+                    descripcion: 'A detallar',
+                    facebook: '#',
+                    twitter: '#',
+                    instagram: '#',
+                    linkedin: '#'
+                },
+                {
+                    id: 6,
+                    nombre: 'Ing. Guido Armando Cruz Mora',
+                    cargo: 'Concejal',
+                    imagen: '/images/concejales/Guido_Cruz.png',
+                    descripcion: 'A detallar',
+                    facebook: '#',
+                    twitter: '#',
+                    instagram: '#',
+                    linkedin: '#'
+                },
+                {
+                    id: 7,
+                    nombre: 'Ing. Clementina Aroni Mamani',
+                    cargo: 'Concejal',
+                    imagen: '/images/concejales/Clementina_Aroni.png',
+                    descripcion: 'A detallar',
+                    facebook: '#',
+                    twitter: '#',
+                    instagram: '#',
+                    linkedin: '#'
+                },
+                {
+                    id: 8,
+                    nombre: 'Christie Mónica Chacón Duran',
+                    cargo: 'Concejal',
+                    imagen: '/images/concejales/Monica_Chacon.png',
+                    descripcion: 'A detallar',
+                    facebook: '#',
+                    twitter: '#',
+                    instagram: '#',
+                    linkedin: '#'
+                },
+                {
+                    id: 9,
+                    nombre: 'Jacqueline Lourdes Gutierrez Carrasco',
+                    cargo: 'Concejal',
+                    imagen: '/images/concejales/Jacqueline_Gutierrez.png',
+                    descripcion: 'A detallar',
+                    facebook: '#',
+                    twitter: '#',
+                    instagram: '#',
+                    linkedin: '#'
+                },
+                {
+                    id: 10,
+                    nombre: 'Eddy Fernandez Fuertes',
+                    cargo: 'Concejal',
+                    imagen: '/images/concejales/Eddy_Fernandez.png',
+                    descripcion: 'A detallar',
+                    facebook: '#',
+                    twitter: '#',
+                    instagram: '#',
+                    linkedin: '#'
+                },
+                {
+                    id: 11,
+                    nombre: 'A designar',
+                    cargo: 'Concejal',
+                    imagen: '/images/concejales/A_designar.png',
+                    descripcion: 'A detallar',
+                    facebook: '#',
+                    twitter: '#',
+                    instagram: '#',
+                    linkedin: '#'
+                },
             ]
         };
     }
@@ -68,6 +174,31 @@ export default {
 </script>
 
 <style scoped>
+/* ========== CONTENEDOR PRINCIPAL ========== */
+.principal {
+  margin: 0 auto;
+  padding: 1rem;
+  background-image: url('/images/fondo.png');
+  background-size: cover;
+  background-position: center;
+}
+.concejales-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 1rem;
+  color: red;
+}
+.concejales-titulo {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: 1px;
+}
+.concejales-subtitulo {
+  font-size: 1.2rem;
+  margin: 0;
+  color: #555;
+}
 .card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border-radius: 12px;
