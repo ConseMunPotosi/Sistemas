@@ -17,6 +17,8 @@
                 <h5 class="card-title fw-bold">{{ concejal.nombre }}</h5>
                 <h6 class="text-primary mb-2">{{ concejal.cargo }}</h6>
                 <p class="card-text text-muted small">{{ concejal.descripcion }}</p>
+                <b><p>Responsable de distritos:</p></b>
+                <p class="card-text text-muted small">{{ concejal.distritos }}</p>
                 <div class="mt-2">
                   <a :href="concejal.facebook" class="text-primary me-2" v-if="concejal.facebook">
                     <i class="fab fa-facebook-f"></i>
@@ -52,6 +54,7 @@ export default {
                     cargo: 'Concejal - Presidente',
                     imagen: '/images/concejales/Antonio_Vidaurre.png',
                     descripcion: 'Experiencia profesional en gestión municipal, 25 años de experiencia en medios de comunicación, 23 años los desempeñó en Radio Fides Potosí (Bolivia); Voz reconocida en el ámbito informativo local.',
+                    distritos: 'Ninguno',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -63,6 +66,7 @@ export default {
                     cargo: 'Concejal - Vicepresidente',
                     imagen: '/images/concejales/Claudio_Clemente.png',
                     descripcion: 'A detallar',
+                    distritos: 'Ninguno',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -74,6 +78,7 @@ export default {
                     cargo: 'Concejal - Secretaria',
                     imagen: '/images/concejales/Carmen_Michel.png',
                     descripcion: 'A detallar',
+                    distritos: 'Ninguno',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -81,10 +86,11 @@ export default {
                 },
                 {
                     id: 4,
-                    nombre: 'Ariel Jiménez Gómez',
+                    nombre: 'Ing. Manuel Alejandro Calizaya Limachi',
                     cargo: 'Concejal',
-                    imagen: '/images/concejales/Ariel_Jimenez.png',
+                    imagen: '/images/concejales/Manuel_Calizaya.png',
                     descripcion: 'A detallar',
+                    distritos: '9 - 12',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -92,10 +98,11 @@ export default {
                 },
                 {
                     id: 5,
-                    nombre: 'Ing. Manuel Alejandro Calizaya Limachi',
+                    nombre: 'Ariel Jiménez Gómez',
                     cargo: 'Concejal',
-                    imagen: '/images/concejales/Manuel_Calizaya.png',
+                    imagen: '/images/concejales/Ariel_Jimenez.png',
                     descripcion: 'A detallar',
+                    distritos: '1 - 17 - 19',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -103,10 +110,11 @@ export default {
                 },
                 {
                     id: 6,
-                    nombre: 'Ing. Guido Armando Cruz Mora',
+                    nombre: 'Ing. Clementina Aroni Mamani',
                     cargo: 'Concejal',
-                    imagen: '/images/concejales/Guido_Cruz.png',
+                    imagen: '/images/concejales/Clementina_Aroni.png',
                     descripcion: 'A detallar',
+                    distritos: '5 - 16',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -114,10 +122,11 @@ export default {
                 },
                 {
                     id: 7,
-                    nombre: 'Ing. Clementina Aroni Mamani',
+                    nombre: 'Ing. Guido Armando Cruz Mora',
                     cargo: 'Concejal',
-                    imagen: '/images/concejales/Clementina_Aroni.png',
+                    imagen: '/images/concejales/Guido_Cruz.png',
                     descripcion: 'A detallar',
+                    distritos: '8 - 20 - 21',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -125,10 +134,11 @@ export default {
                 },
                 {
                     id: 8,
-                    nombre: 'Christie Mónica Chacón Duran',
+                    nombre: 'Jacqueline Lourdes Gutierrez Carrasco',
                     cargo: 'Concejal',
-                    imagen: '/images/concejales/Monica_Chacon.png',
+                    imagen: '/images/concejales/Jacqueline_Gutierrez.png',
                     descripcion: 'A detallar',
+                    distritos: '6 - 7 - 11',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -136,10 +146,11 @@ export default {
                 },
                 {
                     id: 9,
-                    nombre: 'Jacqueline Lourdes Gutierrez Carrasco',
+                    nombre: 'Christie Mónica Chacón Duran',
                     cargo: 'Concejal',
-                    imagen: '/images/concejales/Jacqueline_Gutierrez.png',
+                    imagen: '/images/concejales/Monica_Chacon.png',
                     descripcion: 'A detallar',
+                    distritos: '3 - 10',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -151,6 +162,7 @@ export default {
                     cargo: 'Concejal',
                     imagen: '/images/concejales/Eddy_Fernandez.png',
                     descripcion: 'A detallar',
+                    distritos: '13 - 14 -18',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -162,6 +174,7 @@ export default {
                     cargo: 'Concejal',
                     imagen: '/images/concejales/A_designar.png',
                     descripcion: 'A detallar',
+                    distritos: 'No asignado',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',

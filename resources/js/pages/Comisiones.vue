@@ -17,13 +17,16 @@
                 style="display: block; margin: 0 auto; object-fit: cover; min-height: 60px;">
             <h5 class="card-title mt-3 fw-bold">{{ comision.nombre }}</h5>
             <p class="card-text text-muted" style="text-align: justify;">{{ comision.descripcion }}</p>
+            <b><p>Presidente de Comisión</p></b>
             <span class="responsable-trigger">
               {{ comision.responsable }}
               <div class="tooltip-foto">
                 <img :src="comision.foto_responsable"
                     :alt="comision.responsable"
                     style="width:120px; height:120px; object-fit:cover; border-radius:50%;">
-                <br><small>{{ comision.responsable }}</small>
+                <br><small>{{ comision.responsable }}
+                    <p><b>Presidente de la Comisión</b></p>
+                </small>
               </div>
             </span>
           </div>
@@ -42,73 +45,82 @@ name: 'Comisiones',
                 {
                     id: 1,
                     nombre: 'Comisión Jurídica y Desarrollo Institucional',
-                    descripcion: 'Tiene como objetivo velar por la legalidad, constitucionalidad y transparencia de los actos del Gobierno Municipal, promoviendo además el fortalecimiento institucional a través de la fiscalización normativa, administrativa y organizacional. Su accionar se orienta a garantizar el cumplimiento de la normativa vigente y mejorar la gestión municipal mediante políticas, estrategias y planes institucionales.',
+                    descripcion: 'Vela por la legalidad, constitucionalidad y transparencia de los actos del Gobierno Municipal, promoviendo además el fortalecimiento institucional a través de la fiscalización normativa, administrativa y organizacional. Su accionar se orienta a garantizar el cumplimiento de la normativa vigente y mejorar la gestión municipal mediante políticas, estrategias y planes institucionales.',
                     logo: '/images/iconos/juridica.png',
-                    responsable: 'Ing. Guido Armando Cruz Mora',
+                    responsable: 'Cjal. Guido Armando Cruz Mora',
                     foto_responsable: '/images/concejales/Guido_Cruz.png',
                 },
                 {
                     id: 2,
-                    nombre: 'Comisión de Educación y Cultura',
-                    descripcion: 'Fomenta la educación, cultura y patrimonio histórico de Potosí.',
-                    logo: '/images/comisiones/comision2.jpg',
-                    integrantes: 4
+                    nombre: 'Comisión Económica, Financiera',
+                    descripcion: 'Analiza, evalúa y fiscaliza la gestión financiera, tributaria y presupuestaria del Gobierno Municipal, asegurando el cumplimiento de la normativa vigente, la eficiencia en el uso de los recursos públicos y la transparencia en la administración económico-financiera municipal',
+                    logo: '/images/iconos/economica.png',
+                    responsable: 'Cjal. A designar',
+                    foto_responsable: '/images/concejales/A_designar.png',
                 },
                 {
                     id: 3,
-                    nombre: 'Comisión de Salud y Medio Ambiente',
-                    descripcion: 'Promueve políticas de salud pública y protección del medio ambiente.',
-                    logo: '/images/comisiones/comision3.jpg',
-                    integrantes: 4
+                    nombre: 'Comisión de Desarrollo Territorial y Límites',
+                    descripcion: 'Realiza el seguimiento, evaluación y fiscalización de la planificación territorial del Municipio, promoviendo la adecuada delimitación urbano-rural, el cumplimiento de normas urbanísticas y catastrales, así como la resolución de conflictos de límites internos y externos, en el marco de las competencias municipales y la normativa vigente. ',
+                    logo: '/images/iconos/limites.png',
+                    responsable: 'Cjal. Maria del Carmen Michel Araujo',
+                    foto_responsable: '/images/concejales/Carmen_Michel.png',
                 },
                 {
                     id: 4,
-                    nombre: 'Comisión de Desarrollo Económico',
-                    descripcion: 'Impulsa el desarrollo económico y el empleo en la ciudad.',
-                    logo: '/images/comisiones/comision4.jpg',
-                    integrantes: 4
+                    nombre: 'Comisión Técnica',
+                    descripcion: 'Analiza, fiscaliza y coordina el cumplimiento técnico de los proyectos de inversión municipal, asegurando su adecuación a normas urbanísticas, catastrales y de planificación territorial. Además, supervisa la ejecución técnica de obras y proyectos, promueve el desarrollo sostenible, y representa al Concejo en instancias de formulación de políticas y planificación técnica regional.',
+                    logo: '/images/iconos/tecnica.png',
+                    responsable: 'Cjal. Manuel Alejandro Calizaya Limachi',
+                    foto_responsable: '/images/concejales/Manuel_Calizaya.png',
                 },
                 {
                     id: 5,
-                    nombre: 'Comisión de Infraestructura',
-                    descripcion: 'Supervisa proyectos de infraestructura y obras públicas.',
-                    logo: '/images/comisiones/comision5.jpg',
-                    integrantes: 5
+                    nombre: 'Comisión de Desarrollo Humano',
+                    descripcion: 'Analiza, fiscaliza y promueve la correcta gestión de los servicios de salud, educación, deportes y recreación en el municipio. Su labor se orienta a garantizar el mantenimiento adecuado de la infraestructura, la asignación eficiente de recursos y la supervisión de los programas sociales que contribuyan al bienestar de la comunidad.',
+                    logo: '/images/iconos/humano.png',
+                    responsable: 'Cjal. Eddy Fernandez Fuertes',
+                    foto_responsable: '/images/concejales/Eddy_Fernandez.png',
                 },
                 {
                     id: 6,
-                    nombre: 'Comisión de Derechos Humanos',
-                    descripcion: 'Vela por el respeto de los derechos humanos en la ciudad.',
-                    logo: '/images/comisiones/comision6.jpg',
-                    integrantes: 3
+                    nombre: 'Comisión de Género Generacional',
+                    descripcion: 'Analiza, fiscaliza y promueve la protección de los derechos y el desarrollo integral de grupos prioritarios como mujeres, niñas, niños, adolescentes, personas adultas mayores, personas con discapacidad, familias y pueblos indígena originario campesinos. Su accionar está orientado a garantizar la equidad, la inclusión y la calidad en los servicios que el Gobierno Municipal brinda a estos sectores, mediante la supervisión de programas, servicios y normativas específicas.',
+                    logo: '/images/iconos/genero.png',
+                    responsable: 'Cjal. Christie Mónica Chacón Duran',
+                    foto_responsable: '/images/concejales/Monica_Chacon.png',
                 },
                 {
                     id: 7,
-                    nombre: 'Comisión de Juventud y Deportes',
-                    descripcion: 'Promueve la participación juvenil y el desarrollo deportivo.',
-                    logo: '/images/comisiones/comision7.jpg',
-                    integrantes: 3
+                    nombre: 'DesarrolloEconómico, Productivo y Agropecuario',
+                    descripcion: 'Promueve, coordina y fiscaliza políticas, programas y proyectos que fomenten el desarrollo económico local, productivo y agropecuario en áreas urbanas y rurales. Su enfoque está orientado a la inclusión de estos sectores dentro de la planificación y presupuesto municipal, contribuyendo al desarrollo sostenible y equitativo del Municipio, alineado con las normativas nacionales y municipales.',
+                    logo: '/images/iconos/productivo.png',
+                    responsable: 'Cjal. Ariel Jiménez Gómez',
+                    foto_responsable: '/images/concejales/Ariel_Jimenez.png',
                 },
                 {
                     id: 8,
-                    nombre: 'Comisión de Transparencia',
-                    descripcion: 'Garantiza la transparencia y rendición de cuentas.',
-                    logo: '/images/comisiones/comision8.jpg',
-                    integrantes: 3
+                    nombre: 'Comisión de Turnismo, Cultura y Preservación de Áreas Históricas',
+                    descripcion: 'Fomentar la protección, preservación, promoción y difusión del patrimonio histórico, cultural y turístico del Municipio, garantizando el desarrollo sostenible de las actividades culturales y turísticas, respetando las normativas municipales, nacionales e internacionales en la materia.',
+                    logo: '/images/iconos/turismo.png',
+                    responsable: 'Cjal. Jacqueline Lourdes Gutiérrez Carrasco',
+                    foto_responsable: '/images/concejales/Jacqueline_Gutierrez.png',
                 },
                 {
                     id: 9,
-                    nombre: 'Comisión de Desarrollo Social',
-                    descripcion: 'Atiende las necesidades de los grupos más vulnerables.',
-                    logo: '/images/comisiones/comision9.jpg',
-                    integrantes: 4
+                    nombre: 'Comisión de Medio Ambiente, Minería y Forestación',
+                    descripcion: 'Fiscaliza, promueve y recomienda políticas, normas y acciones en las áreas de medio ambiente, minería y recursos forestales, en el marco de la legislación vigente y el desarrollo sostenible del Municipio. Su accionar busca preservar los recursos naturales, garantizar el uso racional del territorio, y promover una gestión pública ambientalmente responsable.',
+                    logo: '/images/iconos/mineria.png',
+                    responsable: 'Cjal. Clementina Aroni Mamani',
+                    foto_responsable: '/images/concejales/Clementina_Aroni.png',
                 },
                 {
                     id: 10,
-                    nombre: 'Comisión de Relaciones Internacionales',
-                    descripcion: 'Fomenta hermanamientos y cooperación internacional.',
-                    logo: '/images/comisiones/comision10.jpg',
-                    integrantes: 3
+                    nombre: 'Comisión de Servicios Públicos',
+                    descripcion: 'Brindar asesoramiento técnico especializado en la formulación, fiscalización y seguimiento de políticas, normativas y proyectos orientados a garantizar el acceso equitativo y eficiente a los servicios públicos en la jurisdicción municipal, en cumplimiento del marco normativo vigente.',
+                    logo: '/images/iconos/publicos.png',
+                    responsable: 'Cjal. Claudio German Clemente Vedia',
+                    foto_responsable: '/images/concejales/Claudio_Clemente.png',
                 }
             ]
         };
