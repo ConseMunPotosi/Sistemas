@@ -1,10 +1,10 @@
 <template>
     <div class="container py-5">
-        <div class="text-center mb-5">
-            <h2 class="display-4 fw-bold text-primary">
-                <i class="fas fa-newspaper me-3"></i>Noticias
+        <div class="noticias-header">
+            <h2 class="noticias-titulo">
+            Noticias
             </h2>
-            <p class="lead text-muted">Últimas noticias del Concejo Municipal de Potosí</p>
+            <p class="noticias-subtitulo">El Concejo Municipal de Potosí ya cuenta con un espacio digital dinámico y confiable, cuyo objetivo central es mantener a la ciudadanía informada sobre la actividad legislativa y de fiscalización que se desarrolla en el municipio. </p>
         </div>
 
         <div class="row g-4">
@@ -59,6 +59,49 @@ export default {
 </script>
 
 <style scoped>
+/* ========== CONTENEDOR PRINCIPAL ========== */
+.container {
+  margin: 0 auto;
+  padding: 1rem;
+  min-height: 100vh;
+  background-image: url('/images/fondo.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+}
+
+/* ========== HEADER ========== */
+.noticias-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+}
+
+.noticias-titulo {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: 1px;
+  color: #cc0000;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ========== SUBTÍTULO ========== */
+.noticias-subtitulo {
+  font-size: 1.1rem;
+  color: #000000 !important;
+  margin: 0;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: 1px 1px 4px rgba(255, 255, 255, 0.8);
+  text-align: justify;
+  text-justify: inter-word;
+}
+
 .card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border-radius: 12px;
