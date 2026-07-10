@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <!-- ========== MODAL PERSONALIZADO ========== -->
+    <!-- ========== MODAL CON GALERÍA DE IMÁGENES ========== -->
     <div
       class="modal-overlay"
       v-if="modalVisible"
@@ -45,13 +45,53 @@
         </div>
 
         <div class="modal-body-custom">
-          <!-- Imagen de la noticia -->
-          <div class="modal-img-wrapper">
-            <img
-              :src="noticiaSeleccionada.imagen"
-              class="img-fluid"
-              :alt="noticiaSeleccionada.titulo"
-            >
+          <!-- ===== GALERÍA DE IMÁGENES ===== -->
+          <div class="galeria-container">
+            <!-- Imagen principal -->
+            <div class="modal-img-wrapper">
+              <img
+                :src="imagenActual"
+                class="img-fluid"
+                :alt="noticiaSeleccionada.titulo"
+              >
+
+              <!-- Contador de imágenes -->
+              <div class="contador-imagenes" v-if="noticiaSeleccionada.imagenes && noticiaSeleccionada.imagenes.length > 1">
+                <span>{{ indiceActual + 1 }} / {{ noticiaSeleccionada.imagenes.length }}</span>
+              </div>
+
+              <!-- Botones de navegación -->
+              <button
+                class="btn-nav btn-nav-izquierda"
+                v-if="noticiaSeleccionada.imagenes && noticiaSeleccionada.imagenes.length > 1"
+                @click="cambiarImagenNavegacion(-1)"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button
+                class="btn-nav btn-nav-derecha"
+                v-if="noticiaSeleccionada.imagenes && noticiaSeleccionada.imagenes.length > 1"
+                @click="cambiarImagenNavegacion(1)"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+
+            <!-- Miniaturas -->
+            <div class="miniaturas-container" v-if="noticiaSeleccionada.imagenes && noticiaSeleccionada.imagenes.length > 1">
+              <div
+                v-for="(img, index) in noticiaSeleccionada.imagenes"
+                :key="index"
+                class="miniatura-item"
+                :class="{ activa: imagenActual === img }"
+                @click="cambiarImagen(img)"
+              >
+                <img
+                  :src="img"
+                  :alt="`Imagen ${index + 1}`"
+                >
+              </div>
+            </div>
           </div>
 
           <!-- Metadatos -->
@@ -92,6 +132,8 @@ export default {
   data() {
     return {
       modalVisible: false,
+      imagenActual: '',
+      indiceActual: 0,
       noticiaSeleccionada: {
         id_noticia: null,
         titulo: '',
@@ -99,7 +141,8 @@ export default {
         contenido: '',
         fecha: '',
         categoria: '',
-        imagen: ''
+        imagen: '',
+        imagenes: []
       },
       noticias: [
         {
@@ -109,16 +152,27 @@ export default {
           contenido: 'Con el objetivo de optimizar la planificación, promoción y desarrollo de la Festividad de Chutillos, la concejal municipal Lic. Jacqueline Lourdes Gutiérrez Carrasco, presidenta de la Comisión de Turismo, Cultura y Preservación de Áreas Históricas junto al personal del presidente de la comisión Jurídica y Desarrollo Institucional que preside el Ing. Guido Armando Cruz Mora, participaron en la reunión estratégica de socialización y coordinación interinstitucional organizada junto al Órgano Ejecutivo Municipal y sus distintas secretarías. El encuentro contó con la participación activa de representantes de la Federación de Empresarios Privados de Potosí FEPP, la Cámara de Mujeres Empresarias de Bolivia CAMEBOL filial Potosí, la Cámara Hotelera, así como de diversas agencias y operadoras de turismo. El propósito central de la reunión, fue unificar esfuerzos sectoriales para garantizar una organización eficiente y de alto impacto para esta festividad, la cual ostenta el título de Patrimonio Cultural Inmaterial de la Humanidad, declarada por la UNESCO. Durante su intervención, la Lic. Jaqueline Lourdes Gutiérrez Carrasco, destacó que la articulación entre el turismo, la cultura y la economía regional es clave para consolidar un trabajo responsable y ordenado. Asimismo, enfatizó el compromiso de la comisión para realzar una de las expresiones culturales más representativas del municipio potosino, Chutillos.',
           fecha: '10/07/2026',
           categoria: 'Turismo y Cultura',
-          imagen: '/images/noticias/chutillos.jpg'
+          imagen: '/images/noticias/chutillos.jpg',
+          imagenes: [
+            '/images/noticias/chutillos.jpg',
+            '/images/noticias/chutillos2.jpg',
+            '/images/noticias/chutillos3.jpg',
+            '/images/noticias/chutillos4.jpg'
+          ]
         },
         {
           id_noticia: 2,
-          titulo: 'Nuevo reglamento de tránsito en debate',
-          resumen: 'Los concejales iniciaron el debate del nuevo reglamento de tránsito que busca mejorar la movilidad urbana...',
-          contenido: 'En la sesión de este martes, los concejales dieron inicio al debate del nuevo reglamento de tránsito que busca actualizar las normas de movilidad urbana en la ciudad. El proyecto incluye medidas para reducir la congestión vehicular, promover el uso de bicicletas y mejorar la seguridad vial. Se espera que el reglamento sea aprobado en las próximas semanas luego de una serie de audiencias públicas con la participación de la ciudadanía.',
-          fecha: '18/06/2026',
-          categoria: 'Legislación',
-          imagen: '/images/noticias/noticia2.jpg'
+          titulo: 'CONCEJAL ASIGNADO AL DISTRITO 20 REALIZA GESTIONES CON EL EJECUTIVO Y EL CONTROL SOCIAL',
+          resumen: 'Con el objetivo de gestionar la atención de las demandas del distrito 20,  el concejal asignado a este importante sector de la ciudad, Ing. Guido Armando Cruz Mora, sostuvo... ',
+          contenido: 'Con el objetivo de gestionar la atención de las demandas del distrito 20,  el concejal asignado a este importante sector de la ciudad, Ing. Guido Armando Cruz Mora, sostuvo  reunión con la participación del Secretario General y el  responsable de salud del municipio, como  representantes vecinales. En esta importante reunión,   se conoció y  evaluó el tema de predios destinados a la construcción de la nueva infraestructura de la Unidad Educativa Evo Morales,  ubicada en la zona de Rollo Kucho, asimismo la necesidad de proyectar la edificación del nuevo Centro de Salud Ambulatorio en Cantumarca. Temas que serán atendidos en el marco de las competencias.',
+          fecha: '10/07/2026',
+          categoria: 'Gestión',
+          imagen: '/images/noticias/gestionD-20.jpg',
+          imagenes: [
+            '/images/noticias/gestionD-20-1.jpg',
+            '/images/noticias/gestionD-20-2.jpg',
+            '/images/noticias/gestionD-20-3.jpg'
+          ]
         },
         {
           id_noticia: 3,
@@ -127,7 +181,10 @@ export default {
           contenido: 'El Concejo Municipal recibió el proyecto de modernización administrativa que propone la implementación de un sistema digital para agilizar los trámites municipales. Este proyecto contempla la digitalización de todos los procesos, la creación de una plataforma en línea para la atención al ciudadano y la capacitación del personal municipal en nuevas tecnologías. Se estima que la implementación completa tomará aproximadamente 6 meses.',
           fecha: '15/06/2026',
           categoria: 'Modernización',
-          imagen: '/images/noticias/noticia3.jpg'
+          imagen: '/images/noticias/noticia3.jpg',
+          imagenes: [
+            '/images/noticias/noticia3.jpg'
+          ]
         },
         {
           id_noticia: 4,
@@ -136,7 +193,11 @@ export default {
           contenido: 'El Concejo Municipal convoca a todos los ciudadanos a participar en la audiencia pública que se realizará para tratar el proyecto de obras de alcantarillado en las zonas periurbanas de la ciudad. El proyecto beneficiará a más de 5,000 familias que actualmente no cuentan con este servicio básico. Durante la audiencia se presentarán los planos, el cronograma de ejecución y se responderán las preguntas de los vecinos.',
           fecha: '10/06/2026',
           categoria: 'Obras Públicas',
-          imagen: '/images/noticias/noticia4.jpg'
+          imagen: '/images/noticias/noticia4.jpg',
+          imagenes: [
+            '/images/noticias/noticia4.jpg',
+            '/images/noticias/noticia4_1.jpg'
+          ]
         }
       ]
     };
@@ -153,14 +214,40 @@ export default {
   methods: {
     abrirModal(noticia) {
       this.noticiaSeleccionada = { ...noticia };
+      // Establecer la imagen actual como la primera del array o la principal
+      if (noticia.imagenes && noticia.imagenes.length > 0) {
+        this.imagenActual = noticia.imagenes[0];
+        this.indiceActual = 0;
+      } else {
+        this.imagenActual = noticia.imagen;
+        this.indiceActual = 0;
+        // Si no hay array de imágenes, crear uno con la imagen principal
+        if (!noticia.imagenes) {
+          this.noticiaSeleccionada.imagenes = [noticia.imagen];
+        }
+      }
       this.modalVisible = true;
-      // Evitar scroll en el body cuando el modal está abierto
       document.body.style.overflow = 'hidden';
     },
     cerrarModal() {
       this.modalVisible = false;
-      // Restaurar scroll
       document.body.style.overflow = '';
+    },
+    cambiarImagen(img) {
+      this.imagenActual = img;
+      this.indiceActual = this.noticiaSeleccionada.imagenes.indexOf(img);
+    },
+    cambiarImagenNavegacion(direccion) {
+      if (!this.noticiaSeleccionada.imagenes || this.noticiaSeleccionada.imagenes.length <= 1) return;
+
+      const total = this.noticiaSeleccionada.imagenes.length;
+      let nuevoIndice = this.indiceActual + direccion;
+
+      if (nuevoIndice < 0) nuevoIndice = total - 1;
+      if (nuevoIndice >= total) nuevoIndice = 0;
+
+      this.indiceActual = nuevoIndice;
+      this.imagenActual = this.noticiaSeleccionada.imagenes[nuevoIndice];
     },
     compartirNoticia() {
       const url = window.location.href;
@@ -188,7 +275,6 @@ export default {
     }
   },
   beforeUnmount() {
-    // Asegurar que se restaure el scroll al desmontar
     document.body.style.overflow = '';
   }
 };
@@ -240,12 +326,12 @@ export default {
 
 /* ========== WRAPPER DE IMAGEN ========== */
 .card-img-wrapper {
-  width: 50%;
-  height: 250px;
+  width: 30%;
+  height: 30%;
   overflow: hidden;
   background-color: #f0f0f0;
   position: relative;
-   margin: 0 auto;
+  margin: 0 auto;
 }
 
 .card-img-wrapper .card-img-top {
@@ -305,7 +391,7 @@ export default {
   transform: scale(0.95);
 }
 
-/* ========== MODAL PERSONALIZADO ========== */
+/* ========== MODAL ========== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -401,22 +487,130 @@ export default {
   background: #a80000;
 }
 
-/* ========== IMAGEN DEL MODAL ========== */
+/* ========== GALERÍA DE IMÁGENES ========== */
+.galeria-container {
+  position: relative;
+  width: 100%;
+}
+
+/* ========== IMAGEN PRINCIPAL ========== */
 .modal-img-wrapper {
   width: 100%;
-  max-height: 350px;
+  max-height: 400px;
   overflow: hidden;
   border-radius: 8px;
   background-color: #f0f0f0;
+  position: relative;
 }
 
 .modal-img-wrapper img {
   width: 100%;
   height: 100%;
-  max-height: 350px;
+  max-height: 400px;
   object-fit: contain;
   object-position: center;
   background-color: #f0f0f0;
+}
+
+/* ========== CONTADOR DE IMÁGENES ========== */
+.contador-imagenes {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 5;
+}
+
+/* ========== BOTONES DE NAVEGACIÓN ========== */
+.btn-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 5;
+  font-size: 1.2rem;
+}
+
+.btn-nav:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.btn-nav-izquierda {
+  left: 10px;
+}
+
+.btn-nav-derecha {
+  right: 10px;
+}
+
+/* ========== MINIATURAS ========== */
+.miniaturas-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  flex-wrap: nowrap;
+  scroll-behavior: smooth;
+}
+
+.miniaturas-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.miniaturas-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.miniaturas-container::-webkit-scrollbar-thumb {
+  background: #cc0000;
+  border-radius: 10px;
+}
+
+.miniatura-item {
+  flex: 0 0 80px;
+  height: 60px;
+  cursor: pointer;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 3px solid transparent;
+  transition: all 0.3s ease;
+  opacity: 0.6;
+}
+
+.miniatura-item:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.miniatura-item.activa {
+  border-color: #cc0000;
+  opacity: 1;
+  box-shadow: 0 0 10px rgba(204, 0, 0, 0.3);
+}
+
+.miniatura-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 /* ========== BADGE CUSTOM ========== */
@@ -493,6 +687,7 @@ export default {
   }
 
   .card-img-wrapper {
+    width: 80%;
     height: 180px !important;
   }
 
@@ -519,11 +714,11 @@ export default {
   }
 
   .modal-img-wrapper {
-    max-height: 200px;
+    max-height: 250px;
   }
 
   .modal-img-wrapper img {
-    max-height: 200px;
+    max-height: 250px;
   }
 
   .modal-footer-custom {
@@ -532,6 +727,17 @@ export default {
 
   .modal-footer-custom .btn {
     width: 100%;
+  }
+
+  .miniatura-item {
+    flex: 0 0 60px;
+    height: 45px;
+  }
+
+  .btn-nav {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
   }
 }
 
