@@ -12,7 +12,7 @@
         <div class="input-group mb-4">
           <span class="input-group-text"><i class="fas fa-search"></i></span>
           <input type="text" class="form-control" v-model="busqueda"
-                 placeholder="Buscar Resoluciones por título, número o año...">
+                 placeholder="Buscar Ordenanzas por título, número o año...">
         </div>
 
         <div class="table-container">

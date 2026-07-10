@@ -1,7 +1,7 @@
 <template>
-    <footer class="bg-dark text-white mt-5">
-        <div class="container-fluid py-4">
-            <div class="row align-items-start">
+  <footer class="bg-dark text-white mt-5">
+    <div class="container-fluid py-4">
+      <div class="row align-items-start">
                 <!-- Columna Izquierda -->
                 <div class="col-md-4 text-start">
                     <h5>Concejo Municipal de Potosí</h5>
