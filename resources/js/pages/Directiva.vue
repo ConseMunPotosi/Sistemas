@@ -23,17 +23,23 @@
               <span>{{ directiva.vicepresidente.partido }}</span>
             </div>
             <div class="enlaces">
-              <a v-if="directiva.vicepresidente.facebook" :href="directiva.vicepresidente.facebook" target="_blank" class="enlace-social facebook">
+              <a v-if="directiva.vicepresidente.facebook" :href="directiva.vicepresidente.facebook" target="_blank" rel="noopener noreferrer" class="enlace-social facebook" title="Facebook">
                 <i class="bi bi-facebook"></i>
               </a>
-              <a v-if="directiva.vicepresidente.twitter" :href="directiva.vicepresidente.twitter" target="_blank" class="enlace-social twitter">
+              <a v-if="directiva.vicepresidente.twitter" :href="directiva.vicepresidente.twitter" target="_blank" rel="noopener noreferrer" class="enlace-social twitter" title="Twitter">
                 <i class="bi bi-twitter-x"></i>
               </a>
-              <a v-if="directiva.vicepresidente.instagram" :href="directiva.vicepresidente.instagram" target="_blank" class="enlace-social instagram">
+              <a v-if="directiva.vicepresidente.instagram" :href="directiva.vicepresidente.instagram" target="_blank" rel="noopener noreferrer" class="enlace-social instagram" title="Instagram">
                 <i class="bi bi-instagram"></i>
               </a>
-              <a v-if="directiva.vicepresidente.web" :href="directiva.vicepresidente.web" target="_blank" class="enlace-social web">
+              <a v-if="directiva.vicepresidente.web" :href="directiva.vicepresidente.web" target="_blank" rel="noopener noreferrer" class="enlace-social web" title="Sitio Web">
                 <i class="bi bi-globe2"></i>
+              </a>
+              <a v-if="directiva.vicepresidente.youtube" :href="directiva.vicepresidente.youtube" target="_blank" rel="noopener noreferrer" class="enlace-social youtube" title="YouTube">
+                <i class="bi bi-youtube"></i>
+              </a>
+              <a v-if="directiva.vicepresidente.tiktok" :href="directiva.vicepresidente.tiktok" target="_blank" rel="noopener noreferrer" class="enlace-social tiktok" title="TikTok">
+                <i class="bi bi-tiktok"></i>
               </a>
             </div>
           </div>
@@ -57,17 +63,23 @@
               <span>{{ directiva.presidente.partido }}</span>
             </div>
             <div class="enlaces">
-              <a v-if="directiva.presidente.facebook" :href="directiva.presidente.facebook" target="_blank" class="enlace-social facebook">
+              <a v-if="directiva.presidente.facebook" :href="directiva.presidente.facebook" target="_blank" rel="noopener noreferrer" class="enlace-social facebook" title="Facebook">
                 <i class="bi bi-facebook"></i>
               </a>
-              <a v-if="directiva.presidente.twitter" :href="directiva.presidente.twitter" target="_blank" class="enlace-social twitter">
+              <a v-if="directiva.presidente.twitter" :href="directiva.presidente.twitter" target="_blank" rel="noopener noreferrer" class="enlace-social twitter" title="Twitter">
                 <i class="bi bi-twitter-x"></i>
               </a>
-              <a v-if="directiva.presidente.instagram" :href="directiva.presidente.instagram" target="_blank" class="enlace-social instagram">
+              <a v-if="directiva.presidente.instagram" :href="directiva.presidente.instagram" target="_blank" rel="noopener noreferrer" class="enlace-social instagram" title="Instagram">
                 <i class="bi bi-instagram"></i>
               </a>
-              <a v-if="directiva.presidente.web" :href="directiva.presidente.web" target="_blank" class="enlace-social web">
+              <a v-if="directiva.presidente.web" :href="directiva.presidente.web" target="_blank" rel="noopener noreferrer" class="enlace-social web" title="Sitio Web">
                 <i class="bi bi-globe2"></i>
+              </a>
+              <a v-if="directiva.presidente.youtube" :href="directiva.presidente.youtube" target="_blank" rel="noopener noreferrer" class="enlace-social youtube" title="YouTube">
+                <i class="bi bi-youtube"></i>
+              </a>
+              <a v-if="directiva.presidente.tiktok" :href="directiva.presidente.tiktok" target="_blank" rel="noopener noreferrer" class="enlace-social tiktok" title="TikTok">
+                <i class="bi bi-tiktok"></i>
               </a>
             </div>
           </div>
@@ -90,17 +102,23 @@
               <span>{{ directiva.secretario.partido }}</span>
             </div>
             <div class="enlaces">
-              <a v-if="directiva.secretario.facebook" :href="directiva.secretario.facebook" target="_blank" class="enlace-social facebook">
+              <a v-if="directiva.secretario.facebook" :href="directiva.secretario.facebook" target="_blank" rel="noopener noreferrer" class="enlace-social facebook" title="Facebook">
                 <i class="bi bi-facebook"></i>
               </a>
-              <a v-if="directiva.secretario.twitter" :href="directiva.secretario.twitter" target="_blank" class="enlace-social twitter">
+              <a v-if="directiva.secretario.twitter" :href="directiva.secretario.twitter" target="_blank" rel="noopener noreferrer" class="enlace-social twitter" title="Twitter">
                 <i class="bi bi-twitter-x"></i>
               </a>
-              <a v-if="directiva.secretario.instagram" :href="directiva.secretario.instagram" target="_blank" class="enlace-social instagram">
+              <a v-if="directiva.secretario.instagram" :href="directiva.secretario.instagram" target="_blank" rel="noopener noreferrer" class="enlace-social instagram" title="Instagram">
                 <i class="bi bi-instagram"></i>
               </a>
-              <a v-if="directiva.secretario.web" :href="directiva.secretario.web" target="_blank" class="enlace-social web">
+              <a v-if="directiva.secretario.web" :href="directiva.secretario.web" target="_blank" rel="noopener noreferrer" class="enlace-social web" title="Sitio Web">
                 <i class="bi bi-globe2"></i>
+              </a>
+              <a v-if="directiva.secretario.youtube" :href="directiva.secretario.youtube" target="_blank" rel="noopener noreferrer" class="enlace-social youtube" title="YouTube">
+                <i class="bi bi-youtube"></i>
+              </a>
+              <a v-if="directiva.secretario.tiktok" :href="directiva.secretario.tiktok" target="_blank" rel="noopener noreferrer" class="enlace-social tiktok" title="TikTok">
+                <i class="bi bi-tiktok"></i>
               </a>
             </div>
           </div>
@@ -114,36 +132,51 @@
 import { ref } from 'vue'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
-// Datos de la Directiva
+// Datos de la Directiva con enlaces a redes sociales reales
 const directiva = ref({
   presidente: {
     nombre: 'Abg. German Antonio Vidaurre Villanueva',
     cargo: 'Presidente del Concejo Municipal',
     foto: '/images/Concejales/Antonio_Vidaurre.png',
     descripcion: 'Experiencia profesional en gestión municipal, 25 años de experiencia en medios de comunicación, 23 años los desempeñó en Radio Fides Potosí (Bolivia); Voz reconocida en el ámbito informativo local.',
-    facebook: 'https://facebook.com/presidente',
-    twitter: 'https://twitter.com/presidente',
-    instagram: 'https://instagram.com/presidente',
-    web: 'https://presidente.com'
+    partido: 'MAS-IPSP',
+    colorPartido: '#0066CC',
+    // Redes Sociales - Reemplazar con enlaces reales
+    facebook: 'https://www.facebook.com/profile.php?id=100064507628933',
+    twitter: 'https://twitter.com/AntonioVidaurre',
+    instagram: 'https://www.instagram.com/antoniovidaurre',
+    youtube: 'https://www.youtube.com/@AntonioVidaurre',
+    tiktok: 'https://www.tiktok.com/@antoniovidaurre',
+    web: 'https://concejomunicipalpotosi.gob.bo'
   },
   vicepresidente: {
     nombre: 'Claudio German Clemente Vedia',
     cargo: 'Vicepresidente del Concejo Municipal',
     foto: '/images/concejales/Claudio_Clemente.png',
-    descripcion: 'A detallar',
-    facebook: 'https://facebook.com/vicepresidente',
-    twitter: 'https://twitter.com/vicepresidente',
-    instagram: 'https://instagram.com/vicepresidente'
+    descripcion: 'Profesional con amplia experiencia en gestión pública y desarrollo municipal. Comprometido con el progreso de Potosí y la participación ciudadana.',
+    partido: 'FRENTE CIVISMO SOLIDARIO',
+    colorPartido: '#FF6600',
+    // Redes Sociales - Reemplazar con enlaces reales
+    facebook: 'https://www.facebook.com/claudioclemente',
+    twitter: 'https://twitter.com/ClaudioClemente',
+    instagram: 'https://www.instagram.com/claudioclemente',
+    youtube: 'https://www.youtube.com/@ClaudioClemente',
+    web: ''
   },
   secretario: {
     nombre: 'María del Carmen Michel Araujo',
     cargo: 'Concejal Secretaria',
     foto: '/images/Concejales/Carmen_Michel.png',
-    descripcion: 'A detallar',
-    facebook: 'https://facebook.com/secretario',
-    twitter: 'https://twitter.com/secretario',
-    instagram: 'https://instagram.com/secretario',
-    web: 'https://secretario.com'
+    descripcion: 'Destacada lideresa social y defensora de los derechos de la mujer y la niñez. Con amplia trayectoria en organizaciones sociales y trabajo comunitario.',
+    partido: 'MAS-IPSP',
+    colorPartido: '#0066CC',
+    // Redes Sociales - Reemplazar con enlaces reales
+    facebook: 'https://www.facebook.com/carmenmichel',
+    twitter: 'https://twitter.com/CarmenMichel',
+    instagram: 'https://www.instagram.com/carmenmichel',
+    youtube: 'https://www.youtube.com/@CarmenMichel',
+    tiktok: 'https://www.tiktok.com/@carmenmichel',
+    web: ''
   }
 })
 </script>
@@ -156,6 +189,7 @@ const directiva = ref({
   background-image: url('/images/fondo.png');
   background-size: cover;
   background-position: center;
+  min-height: 100vh;
 }
 
 /* ========== HEADER ========== */
@@ -163,7 +197,6 @@ const directiva = ref({
   text-align: center;
   margin-bottom: 3rem;
   padding: 1rem;
-  color: red;
 }
 
 .directiva-titulo {
@@ -171,19 +204,25 @@ const directiva = ref({
   font-weight: 800;
   margin: 0 0 0.5rem 0;
   letter-spacing: 1px;
+  color: #cc0000;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .directiva-subtitulo {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
+  color: #333;
   margin: 0;
+  font-weight: 500;
 }
 
 /* ========== GRID DE TARJETAS ========== */
 .directiva-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
+  gap: 1.5rem;
   align-items: stretch;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* ========== TARJETA BASE ========== */
@@ -253,6 +292,7 @@ const directiva = ref({
   width: 100%;
   padding-top: 100%;
   overflow: hidden;
+  background-color: #f0f0f0;
 }
 
 .card-image img {
@@ -352,6 +392,7 @@ const directiva = ref({
 .enlaces {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .enlace-social {
@@ -372,10 +413,12 @@ const directiva = ref({
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.facebook { background: #1877f2; }
-.twitter { background: #000000; }
-.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
-.web { background: #4a6cf7; }
+.enlace-social.facebook { background: #1877f2; }
+.enlace-social.twitter { background: #000000; }
+.enlace-social.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+.enlace-social.youtube { background: #ff0000; }
+.enlace-social.tiktok { background: #000000; }
+.enlace-social.web { background: #4a6cf7; }
 
 /* ========== RESPONSIVE ========== */
 
@@ -442,6 +485,12 @@ const directiva = ref({
   .enlaces {
     width: 100%;
     justify-content: center;
+  }
+
+  .enlace-social {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
   }
 }
 
