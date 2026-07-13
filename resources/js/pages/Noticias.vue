@@ -8,9 +8,20 @@
     <div class="row g-4">
       <div class="col-12 col-lg-6" v-for="noticia in noticiasOrdenadas" :key="noticia.id_noticia">
         <div class="card h-100 border-0 shadow-sm">
+          <!-- Contenedor de imagen optimizado -->
           <div class="card-img-wrapper">
-            <img :src="noticia.imagen" class="card-img-top" :alt="noticia.titulo">
+            <img
+              :src="noticia.imagen"
+              class="card-img-top"
+              :alt="noticia.titulo"
+              loading="lazy"
+            >
+            <!-- Badge de imágenes múltiples -->
+            <span class="imagenes-badge" v-if="noticia.imagenes && noticia.imagenes.length > 1">
+              <i class="fas fa-images me-1"></i>{{ noticia.imagenes.length }}
+            </span>
           </div>
+
           <div class="card-body">
             <div class="d-flex justify-content-between mb-2">
               <span class="badge">{{ noticia.categoria }}</span>
@@ -163,8 +174,8 @@ export default {
         {
           id_noticia: 2,
           titulo: 'CONCEJAL ASIGNADO AL DISTRITO 20 REALIZA GESTIONES CON EL EJECUTIVO Y EL CONTROL SOCIAL',
-          resumen: 'Con el objetivo de gestionar la atención de las demandas del distrito 20,  el concejal asignado a este importante sector de la ciudad, Ing. Guido Armando Cruz Mora, sostuvo... ',
-          contenido: 'Con el objetivo de gestionar la atención de las demandas del distrito 20,  el concejal asignado a este importante sector de la ciudad, Ing. Guido Armando Cruz Mora, sostuvo  reunión con la participación del Secretario General y el  responsable de salud del municipio, como  representantes vecinales. En esta importante reunión,   se conoció y  evaluó el tema de predios destinados a la construcción de la nueva infraestructura de la Unidad Educativa Evo Morales,  ubicada en la zona de Rollo Kucho, asimismo la necesidad de proyectar la edificación del nuevo Centro de Salud Ambulatorio en Cantumarca. Temas que serán atendidos en el marco de las competencias.',
+          resumen: 'Con el objetivo de gestionar la atención de las demandas del distrito 20, el concejal asignado a este importante sector de la ciudad, Ing. Guido Armando Cruz Mora, sostuvo...',
+          contenido: 'Con el objetivo de gestionar la atención de las demandas del distrito 20, el concejal asignado a este importante sector de la ciudad, Ing. Guido Armando Cruz Mora, sostuvo reunión con la participación del Secretario General y el responsable de salud del municipio, como representantes vecinales. En esta importante reunión, se conoció y evaluó el tema de predios destinados a la construcción de la nueva infraestructura de la Unidad Educativa Evo Morales, ubicada en la zona de Rollo Kucho, asimismo la necesidad de proyectar la edificación del nuevo Centro de Salud Ambulatorio en Cantumarca. Temas que serán atendidos en el marco de las competencias.',
           fecha: '10/07/2026',
           categoria: 'Gestión',
           imagen: '/images/noticias/gestionD-20.jpg',
@@ -172,31 +183,6 @@ export default {
             '/images/noticias/gestionD-20-1.jpg',
             '/images/noticias/gestionD-20-2.jpg',
             '/images/noticias/gestionD-20-3.jpg'
-          ]
-        },
-        {
-          id_noticia: 3,
-          titulo: 'Proyecto de modernización administrativa',
-          resumen: 'Se presentó el proyecto de modernización de los procesos administrativos del municipio...',
-          contenido: 'El Concejo Municipal recibió el proyecto de modernización administrativa que propone la implementación de un sistema digital para agilizar los trámites municipales. Este proyecto contempla la digitalización de todos los procesos, la creación de una plataforma en línea para la atención al ciudadano y la capacitación del personal municipal en nuevas tecnologías. Se estima que la implementación completa tomará aproximadamente 6 meses.',
-          fecha: '15/06/2026',
-          categoria: 'Modernización',
-          imagen: '/images/noticias/noticia3.jpg',
-          imagenes: [
-            '/images/noticias/noticia3.jpg'
-          ]
-        },
-        {
-          id_noticia: 4,
-          titulo: 'Audiencia pública por obras de alcantarillado',
-          resumen: 'El Concejo Municipal convoca a audiencia pública para tratar las obras de alcantarillado en zonas periurbanas...',
-          contenido: 'El Concejo Municipal convoca a todos los ciudadanos a participar en la audiencia pública que se realizará para tratar el proyecto de obras de alcantarillado en las zonas periurbanas de la ciudad. El proyecto beneficiará a más de 5,000 familias que actualmente no cuentan con este servicio básico. Durante la audiencia se presentarán los planos, el cronograma de ejecución y se responderán las preguntas de los vecinos.',
-          fecha: '10/06/2026',
-          categoria: 'Obras Públicas',
-          imagen: '/images/noticias/noticia4.jpg',
-          imagenes: [
-            '/images/noticias/noticia4.jpg',
-            '/images/noticias/noticia4_1.jpg'
           ]
         }
       ]
@@ -214,14 +200,12 @@ export default {
   methods: {
     abrirModal(noticia) {
       this.noticiaSeleccionada = { ...noticia };
-      // Establecer la imagen actual como la primera del array o la principal
       if (noticia.imagenes && noticia.imagenes.length > 0) {
         this.imagenActual = noticia.imagenes[0];
         this.indiceActual = 0;
       } else {
         this.imagenActual = noticia.imagen;
         this.indiceActual = 0;
-        // Si no hay array de imágenes, crear uno con la imagen principal
         if (!noticia.imagenes) {
           this.noticiaSeleccionada.imagenes = [noticia.imagen];
         }
@@ -239,20 +223,16 @@ export default {
     },
     cambiarImagenNavegacion(direccion) {
       if (!this.noticiaSeleccionada.imagenes || this.noticiaSeleccionada.imagenes.length <= 1) return;
-
       const total = this.noticiaSeleccionada.imagenes.length;
       let nuevoIndice = this.indiceActual + direccion;
-
       if (nuevoIndice < 0) nuevoIndice = total - 1;
       if (nuevoIndice >= total) nuevoIndice = 0;
-
       this.indiceActual = nuevoIndice;
       this.imagenActual = this.noticiaSeleccionada.imagenes[nuevoIndice];
     },
     compartirNoticia() {
       const url = window.location.href;
       const texto = `📰 ${this.noticiaSeleccionada.titulo}\n\n${this.noticiaSeleccionada.resumen}\n\nLeer más en: ${url}`;
-
       if (navigator.share) {
         navigator.share({
           title: this.noticiaSeleccionada.titulo,
@@ -311,7 +291,6 @@ export default {
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* ========== SUBTÍTULO ========== */
 .noticias-subtitulo {
   font-size: 1.1rem;
   color: #000000 !important;
@@ -324,26 +303,48 @@ export default {
   text-justify: inter-word;
 }
 
-/* ========== WRAPPER DE IMAGEN ========== */
+/* ========== WRAPPER DE IMAGEN - IMAGEN COMPLETA ========== */
 .card-img-wrapper {
-  width: 30%;
-  height: 30%;
+  width: 100%;
+  height: 220px; /* Altura fija para uniformidad */
   overflow: hidden;
-  background-color: #f0f0f0;
+  background-color: #f5f5f5;
   position: relative;
-  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-img-wrapper .card-img-top {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* Muestra la imagen completa */
   object-position: center;
+  background-color: #f5f5f5;
   transition: transform 0.5s ease;
+  padding: 4px; /* Pequeño padding para no tocar bordes */
 }
 
 .card:hover .card-img-wrapper .card-img-top {
-  transform: scale(1.05);
+  transform: scale(1.02);
+}
+
+/* ========== BADGE DE MÚLTIPLES IMÁGENES ========== */
+.imagenes-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(204, 0, 0, 0.9);
+  color: white;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* ========== TARJETAS ========== */
@@ -352,11 +353,38 @@ export default {
   border-radius: 12px;
   overflow: hidden;
   height: 100%;
+  background: white;
 }
 
 .card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 3rem;
+}
+
+.card-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.95rem;
+}
+
+.card-footer {
+  padding: 0.75rem 1.25rem;
 }
 
 /* ========== BADGE ========== */
@@ -365,6 +393,7 @@ export default {
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
+  font-weight: 500;
 }
 
 /* ========== BOTÓN ROJO ========== */
@@ -389,6 +418,17 @@ export default {
   background-color: #8a0000;
   border-color: #8a0000;
   transform: scale(0.95);
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
 }
 
 /* ========== MODAL ========== */
@@ -426,7 +466,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
   background-color: #cc0000;
   color: white;
   flex-shrink: 0;
@@ -434,12 +474,13 @@ export default {
 
 .modal-titulo {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding-right: 1rem;
+  line-height: 1.3;
 }
 
 .btn-close-custom {
@@ -455,6 +496,7 @@ export default {
   align-items: center;
   justify-content: center;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .btn-close-custom:hover {
@@ -499,17 +541,20 @@ export default {
   max-height: 400px;
   overflow: hidden;
   border-radius: 8px;
-  background-color: #f0f0f0;
+  background-color: #f5f5f5;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-img-wrapper img {
   width: 100%;
-  height: 100%;
+  height: auto;
   max-height: 400px;
   object-fit: contain;
   object-position: center;
-  background-color: #f0f0f0;
+  background-color: #f5f5f5;
 }
 
 /* ========== CONTADOR DE IMÁGENES ========== */
@@ -563,9 +608,9 @@ export default {
 .miniaturas-container {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
   overflow-x: auto;
-  padding: 0.5rem 0;
+  padding: 0.25rem 0;
   flex-wrap: nowrap;
   scroll-behavior: smooth;
 }
@@ -593,6 +638,7 @@ export default {
   border: 3px solid transparent;
   transition: all 0.3s ease;
   opacity: 0.6;
+  background-color: #f5f5f5;
 }
 
 .miniatura-item:hover {
@@ -616,10 +662,11 @@ export default {
 /* ========== BADGE CUSTOM ========== */
 .badge-custom {
   display: inline-block;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 1rem;
   border-radius: 20px;
   color: white;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .badge-custom.bg-secondary {
@@ -649,12 +696,8 @@ export default {
 
 /* ========== ANIMACIONES ========== */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes slideUp {
@@ -687,7 +730,6 @@ export default {
   }
 
   .card-img-wrapper {
-    width: 80%;
     height: 180px !important;
   }
 
@@ -741,8 +783,9 @@ export default {
   }
 }
 
-/* ========== PREVENIR SCROLL ========== */
-body.modal-open {
-  overflow: hidden;
+@media (max-width: 576px) {
+  .card-img-wrapper {
+    height: 150px !important;
+  }
 }
 </style>
