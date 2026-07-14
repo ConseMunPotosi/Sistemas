@@ -1,10 +1,8 @@
 <template>
   <div class="principal">
     <div class="comision-header">
-      <h2 class="comision-titulo">
-        Comisiones del Concejo Municipal de Potosí
-      </h2>
-        <p class="comision-subtitulo">Las 10 comisiones que trabajan por el desarrollo de Potosí</p>
+      <h2 class="comision-titulo">Comisiones del Concejo Municipal de Potosí</h2>
+        <p class="comision-subtitulo">Las 10 comisiones que trabajan por el desarrollo integral y sostenible de Potosí, abordando las diversas áreas estratégicas que demanda el crecimiento económico, social y cultural de nuestro municipio.</p>
     </div>
 
     <div class="row g-4">
@@ -146,7 +144,8 @@ name: 'Comisiones',
   font-size: 2.5rem;
   font-weight: 800;
   margin: 0 0 0.5rem 0;
-  letter-spacing: 1px;
+  color: #cc0000;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
 }
 .comision-subtitulo {
   font-size: 1.2rem;

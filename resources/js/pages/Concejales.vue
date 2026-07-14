@@ -15,24 +15,59 @@
             <div class="col-md-8">
               <div class="card-body">
                 <h5 class="card-title fw-bold">{{ concejal.nombre }}</h5>
-                <h6 class="text-primary mb-2">{{ concejal.cargo }}</h6>
+                <h6 class="text-danger mb-2">{{ concejal.cargo }}</h6>
                 <p class="card-text text-muted small">{{ concejal.descripcion }}</p>
                 <b><p>Responsable de distritos:</p></b>
                 <p class="card-text text-muted small">{{ concejal.distritos }}</p>
-                <div class="mt-2">
-                  <a :href="concejal.facebook" class="text-primary me-2" v-if="concejal.facebook">
-                    <i class="fab fa-facebook-f"></i>
-                  </a>
-                  <a :href="concejal.twitter" class="text-info me-2" v-if="concejal.twitter">
-                    <i class="fab fa-twitter"></i>
-                  </a>
-                  <a :href="concejal.instagram" class="text-danger me-2" v-if="concejal.instagram">
-                    <i class="fab fa-instagram"></i>
-                  </a>
-                  <a :href="concejal.linkedin" class="text-primary" v-if="concejal.linkedin">
-                    <i class="fab fa-linkedin-in"></i>
-                  </a>
-                </div>
+                <div class="social-icons-group">
+                    <!-- YouTube -->
+                    <button
+                        class="social-icon youtube"
+                        aria-label="Youtube"
+                        @click="irARedSocial('https://www.youtube.com/@ConcejoMunicipalPotosi', 'YouTube')">
+                        <i class="bi bi-youtube"></i>
+                    </button>
+
+                    <!-- Facebook -->
+                    <button
+                        class="social-icon facebook"
+                        aria-label="Facebook"
+                        @click="irARedSocial('https://www.facebook.com/profile.php?id=100068918032041', 'Facebook')">
+                        <i class="bi bi-facebook"></i>
+                    </button>
+
+                    <!-- Instagram -->
+                    <button
+                        class="social-icon instagram"
+                        aria-label="Instagram"
+                        @click="irARedSocial('https://www.instagram.com/concejomunicipalpotosi', 'Instagram')">
+                        <i class="bi bi-instagram"></i>
+                    </button>
+
+                    <!-- Twitter/X -->
+                    <button
+                        class="social-icon twitter-x"
+                        aria-label="Twitter"
+                        @click="irARedSocial('https://twitter.com/ConcejoPotosi', 'Twitter')">
+                        <i class="bi bi-twitter-x"></i>
+                    </button>
+
+                        <!-- WhatsApp -->
+                    <button
+                        class="social-icon whatsapp"
+                        aria-label="WhatsApp"
+                        @click="irARedSocial('https://wa.me/59170000000', 'WhatsApp')">
+                        <i class="bi bi-whatsapp"></i>
+                    </button>
+
+                    <!-- TikTok -->
+                    <button
+                        class="social-icon tiktok"
+                        aria-label="Tiktok"
+                        @click="irARedSocial('https://www.tiktok.com/@concejomunicipaldepotosi', 'TikTok')">
+                        <i class="bi bi-tiktok"></i>
+                    </button>
+                    </div>
               </div>
             </div>
           </div>
@@ -54,7 +89,7 @@ export default {
                     cargo: 'Concejal - Presidente',
                     imagen: '/images/concejales/Antonio_Vidaurre.png',
                     descripcion: 'Experiencia profesional en gestión municipal, 25 años de experiencia en medios de comunicación, 23 años los desempeñó en Radio Fides Potosí (Bolivia); Voz reconocida en el ámbito informativo local.',
-                    distritos: 'Ninguno',
+                    distritos: 'No tiene asignado',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -66,7 +101,7 @@ export default {
                     cargo: 'Concejal - Vicepresidente',
                     imagen: '/images/concejales/Claudio_Clemente.png',
                     descripcion: 'A detallar',
-                    distritos: 'Ninguno',
+                    distritos: 'No tiene asignado',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -78,7 +113,7 @@ export default {
                     cargo: 'Concejal - Secretaria',
                     imagen: '/images/concejales/Carmen_Michel.png',
                     descripcion: 'A detallar',
-                    distritos: 'Ninguno',
+                    distritos: 'No tiene asignado',
                     facebook: '#',
                     twitter: '#',
                     instagram: '#',
@@ -205,7 +240,8 @@ export default {
   font-size: 2.5rem;
   font-weight: 800;
   margin: 0 0 0.5rem 0;
-  letter-spacing: 1px;
+  color: #cc0000;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
 }
 .concejales-subtitulo {
   font-size: 1.2rem;
@@ -235,4 +271,39 @@ a {
 a:hover {
     transform: scale(1.2);
 }
+
+.social-icons-group {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.8rem;
+}
+
+.social-icon {
+  background: transparent;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.social-icon i {
+  color: #A8A8B7;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover i {
+  transform: scale(1.2);
+}
+
+.social-icon.facebook:hover i {color: #1877f2; }
+.social-icon.youtube:hover i {color: #ff0000;}
+.social-icon.instagram:hover i {color: #e4405f;}
+.social-icon.twitter-x:hover i {color: #1da1f2;}
+.social-icon.whatsapp:hover i {color: #25d366;}
+.social-icon.tiktok:hover i {color: #00f2ea;}
 </style>

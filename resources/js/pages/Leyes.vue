@@ -3,7 +3,7 @@
     <div class="Leyes-header">
       <h2 class="Leyes-titulo">Leyes Municipales</h2>
       <p class="Leyes-subtitulo">
-        Normas de mayor jerarquía dentro del municipio que tienen un alcance general, es decir, aplican a todos los ciudadanos e instituciones dentro de su jurisdicción. <br/>
+        Normas de mayor jerarquía dentro del municipio que tienen un alcance general, es decir, aplican a todos los ciudadanos e instituciones dentro de su jurisdicción.
         Se utilizan para regular aspectos fundamentales en el municipio.
       </p>
     </div>
@@ -155,10 +155,12 @@ export default {
   font-size: 1.1rem;
   color: #000000 !important;
   margin: 0;
-  max-width: 800px;
+  max-width: 90%;
   margin-left: auto;
   margin-right: auto;
   text-shadow: 1px 1px 4px rgba(255, 255, 255, 0.8);
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 /* ========== CONTENEDOR DE LA TABLA ========== */

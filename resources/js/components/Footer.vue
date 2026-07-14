@@ -166,29 +166,12 @@ footer .text-muted:hover {
   transform: scale(1.2);
 }
 
-.social-icon.facebook:hover i {
-  color: #1877f2;
-}
-
-.social-icon.youtube:hover i {
-  color: #ff0000;
-}
-
-.social-icon.instagram:hover i {
-  color: #e4405f;
-}
-
-.social-icon.twitter-x:hover i {
-  color: #1da1f2;
-}
-
-.social-icon.whatsapp:hover i {
-  color: #25d366;
-}
-
-.social-icon.tiktok:hover i {
-  color: #00f2ea;
-}
+.social-icon.facebook:hover i {color: #1877f2; }
+.social-icon.youtube:hover i {color: #ff0000;}
+.social-icon.instagram:hover i {color: #e4405f;}
+.social-icon.twitter-x:hover i {color: #1da1f2;}
+.social-icon.whatsapp:hover i {color: #25d366;}
+.social-icon.tiktok:hover i {color: #00f2ea;}
 
 /* Asegurar que el contenido de la columna centro esté centrado */
 .col-md-4.d-flex {
