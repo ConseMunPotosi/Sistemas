@@ -13,8 +13,24 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->api(prepend: [
+        /*$middleware->api(prepend: [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]);*/
+        // 1. Agrupar middlewares para API
+        $middleware->group('api', [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            //'throttle:api', // ← Este puede estar comentado, lo agregamos después
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]);
+        // 2. Agregar middleware de throttle (límite de peticiones)
+        // Esto limita las peticiones a 60 por minuto
+        $middleware->throttleApi(
+            'api', // Nombre del grupo
+            '60,1' // 60 peticiones, 1 minuto
+        );
+        // 3. Configurar alias de middlewares (opcional)
+        $middleware->alias([
+            'auth.sanctum' => \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
