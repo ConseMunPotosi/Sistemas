@@ -169,7 +169,7 @@ class SeguridadSeeder extends Seeder
             );
         }
 
-        // Asignación de roles a usuarios
+        // Asignación de roles a usuarios de sistema
         //DB::table('seguridad.usuario_roles')->insert([
         $usuario_roles = [
             //Administrador
