@@ -2,7 +2,7 @@
     <div class="principal">
         <div class="sesion-header">
             <h2 class="sesion-titulo"><i class="fas fa-video me-3"></i>Sesiones del Concejo</h2>
-            <p class="sesion-subtitulo">Las grabaciones de las sesiones del Concejo Municipal de Potosí, se realizan de manera sistemática y permanente, permitiendo documentar íntegramente el desarrollo de cada reunión ordinaria y extraordinaria, asegurando que la ciudadanía pueda conocer en detalle las discusiones, los argumentos de los concejales, las votaciones y las resoluciones adoptadas sobre los asuntos de interés público.</p>
+            <p class="sesion-subtitulo">Las grabaciones de las sesiones del Concejo Municipal de Potosí, se realizan de manera sistemática y permanente, permitiendo documentar íntegramente el desarrollo de cada sesión ordinaria y extraordinaria, asegurando que la ciudadanía pueda conocer en detalle las discusiones, los argumentos de los concejales, las votaciones y las resoluciones adoptadas sobre los asuntos de interés público.</p>
         </div>
 
         <div class="row g-4">
