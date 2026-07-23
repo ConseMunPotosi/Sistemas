@@ -47,14 +47,14 @@
           <div class="stat">
             <i class="bi bi-geo-alt"></i>
             <div class="stat-info">
-              <span class="stat-number">20</span>
+              <span class="stat-number">21</span>
               <span class="stat-label">Distritos</span>
             </div>
           </div>
           <div class="stat">
             <i class="bi bi-flag"></i>
             <div class="stat-info">
-              <span class="stat-number">287</span>
+              <span class="stat-number">233</span>
               <span class="stat-label">Juntas Vecinales</span>
             </div>
           </div>

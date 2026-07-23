@@ -1,3 +1,4 @@
+import { comment } from 'postcss';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
@@ -10,6 +11,13 @@ const routes = [
     { path: '/ordenanzas', name: 'ordenanzas', component: () => import('../pages/Ordenanzas.vue') },
     { path: '/noticias', name: 'noticias', component: () => import('../pages/Noticias.vue') },
     { path: '/sesiones', name: 'sesiones', component: () => import('../pages/Sesiones.vue') },
+
+    {
+        path: '/loginCMP',
+        name: 'loginCMP',
+        component: () => import('../pages/LoginCMP.vue'),
+        meta: { layout: 'empty', hidden:true }
+    },
 ];
 
 const router = createRouter({

@@ -7,29 +7,35 @@ export default {
     components: {
         Header,
         Footer
+    },
+    computed: {
+        isEmptyLayout() {
+            return this.$route.meta.layout === 'empty';
+        }
     }
 };
 </script>
 
 <template>
     <div id="app">
-        <Header />
-        <main class="container-fluid p-0">
+
+        <!-- 👇 Solo si NO es login -->
+        <Header v-if="!isEmptyLayout" />
+
+        <main
+            class="container-fluid p-0"
+            :class="{ 'with-header': !isEmptyLayout }"
+        >
             <router-view />
         </main>
-        <Footer />
+
+        <!-- 👇 Solo si NO es login -->
+        <Footer v-if="!isEmptyLayout" />
+
     </div>
 </template>
-
 <style>
-@import 'bootstrap/dist/css/bootstrap.min.css';
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding-top: 70px;
-}
-
-main {
-    min-height: calc(100vh - 200px);
+.with-header {
+    margin-top: 70px; /* 👈 altura de tu header */
 }
 </style>
