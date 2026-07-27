@@ -6,7 +6,7 @@
         <div class="col-md-4 text-start">
           <h5>Concejo Municipal de Potosí</h5>
           <p class="text-muted">
-            El Concejo Municipal de Potosí es el Órgano Legislativo, Deliberativo y Fiscalizador del Gobierno Municipal de Potosí. Está compuesto por 11 concejalas y concejales elegidos en votación universal, directa y secreta por un período de cinco años.
+            El Concejo Municipal de Potosí es el Órgano Legislativo, Deliberativo y Fiscalizador del Gobierno Autónomo Municipal de Potosí. Está compuesto por 11 concejalas y concejales elegidos en votación universal, directa y secreta por un período de cinco años.
           </p>
         </div>
 
@@ -121,6 +121,7 @@ footer {
 footer .text-muted {
   color: #adb5bd !important;
   transition: color 0.3s ease;
+  text-align: justify;
 }
 
 footer .text-muted:hover {

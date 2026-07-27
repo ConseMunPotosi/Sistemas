@@ -173,7 +173,7 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    // Simular llamada a API
+    /* Simular llamada a API
     await new Promise((resolve, reject) => {
       setTimeout(() => {
         // Simular credenciales válidas
@@ -190,7 +190,7 @@ const handleLogin = async () => {
           reject(new Error('Usuario o contraseña incorrectos'))
         }
       }, 1500)
-    })
+    })*/
 
     // Guardar sesión
     if (rememberMe.value) {
