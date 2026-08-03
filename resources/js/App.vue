@@ -1,41 +1,35 @@
-<script>
-import Header from './components/Header.vue';
-import Footer from './components/Footer.vue';
+<template>
+  <div id="app">
+    <router-view />
+  </div>
+</template>
 
-export default {
-    name: 'App',
-    components: {
-        Header,
-        Footer
-    },
-    computed: {
-        isEmptyLayout() {
-            return this.$route.meta.layout === 'empty';
-        }
-    }
-};
+<script setup>
+import { onMounted } from 'vue';
+import { useAuthStore } from './api/auth';
+
+const authStore = useAuthStore();
+
+onMounted(() => {
+  if (authStore.token) {
+    authStore.fetchUser();
+  }
+});
 </script>
 
-<template>
-    <div id="app">
-
-        <!-- 👇 Solo si NO es login -->
-        <Header v-if="!isEmptyLayout" />
-
-        <main
-            class="container-fluid p-0"
-            :class="{ 'with-header': !isEmptyLayout }"
-        >
-            <router-view />
-        </main>
-
-        <!-- 👇 Solo si NO es login -->
-        <Footer v-if="!isEmptyLayout" />
-
-    </div>
-</template>
 <style>
-.with-header {
-    margin-top: 70px; /* 👈 altura de tu header */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f2f5;
+}
+
+#app {
+  min-height: 100vh;
 }
 </style>

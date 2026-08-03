@@ -12,35 +12,12 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Controlador de autenticación
- * 
+ *
  * @package App\Http\Controllers\Api
  */
 class AuthController extends Controller
 {
-    /*public function login(Request $request)
-    {
-        // PASO 1: Validar los datos recibidos
-        $validator = Validator::make($request->all(), [
-            'usuario' => 'required|string|max:50',
-            'password' => 'required|string|min:6',
-        ]);
-        // Si la validación falla, retornar errores
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error de validación',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-    }*/
-
-
-    /**
-     * INICIAR SESION
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+    /* LOGIN */
     public function login(Request $request)
     {
         // PASO 1: Validar los datos recibidos
@@ -112,7 +89,7 @@ class AuthController extends Controller
 
     /**
      * CERRAR SESION
-     * 
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -128,7 +105,7 @@ class AuthController extends Controller
 
     /**
      * OBTENER USUARIO AUTENTICADO
-     * 
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -148,7 +125,7 @@ class AuthController extends Controller
 
     /**
      * CAMBIAR CONTRASEÑA
-     * 
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -187,7 +164,7 @@ class AuthController extends Controller
 
     /**
      * OBTENER PERMISOS DEL USUARIO
-     * 
+     *
      * @param Usuario $usuario
      * @return array
      */

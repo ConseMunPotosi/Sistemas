@@ -3,13 +3,13 @@
     <div class="responsive-grid">
       <!-- Imagen -->
       <div class="image-wrapper">
-        <img src="/public/images/concejo.png" alt="Fondo del concejo" class="card-image" />
+        <img src="../../../public/images/concejo.png" class="card-image" />
       </div>
 
       <!-- Contenido -->
       <div class="info-wrapper">
         <div class="imagenLogo">
-          <img src="/public/images/Logo_negativo.png" alt="Logo Concejo Municipal" />
+          <img src="../../../public/images/Logo_negativo.png" alt="Logo Concejo Municipal" />
         </div>
         <div class="texto">
           <h1 class="titulo">Concejo Municipal de Potosí</h1>

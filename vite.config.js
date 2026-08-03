@@ -1,18 +1,32 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
+import path from 'path';
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/js/app.js', 'resources/css/app.css'],
+            input: ['resources/js/app.js'], // 👈 Punto de entrada
             refresh: true,
         }),
-        vue(),
+        vue({
+            template: {
+                transformAssetUrls: {
+                    base: null,
+                    includeAbsolute: false,
+                },
+            },
+        }),
     ],
     resolve: {
         alias: {
-            '@': '/resources/js',
+            '@': path.resolve(__dirname, 'resources/js'),
+            '~': path.resolve(__dirname, 'resources'),
+        },
+    },
+    server: {
+        hmr: {
+            host: 'localhost',
         },
     },
 });
