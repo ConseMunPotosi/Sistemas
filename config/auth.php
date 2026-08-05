@@ -47,6 +47,7 @@ return [
         'api' => [
             'driver' => 'sanctum', // ← CAMBIAR A 'sanctum'
             'provider' => 'users',
+            'hash' => false,
         ],
     ],
 
@@ -70,7 +71,6 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            //'model' => env('AUTH_MODEL', User::class),
             'model' => App\Models\Seguridad\Usuario::class,
         ],
 

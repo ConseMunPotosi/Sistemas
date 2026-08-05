@@ -9,32 +9,36 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('seguridad.usuarios', function (Blueprint $table) {
-            //$table->integer('id_usuario')->primary();
             $table->id('id_usuario');
-            //$table->integer('id_funcionario')->nullable();
             $table->unsignedBigInteger('id_funcionario');
+            $table->string('usuario', 50)->unique();
+            $table->text('password_hash');
+            $table->boolean('activo')->default(true);
+            $table->integer('intentos_fallidos')->default(0); // ← SIN CONDICIÓN
+            $table->timestamp('ultimo_acceso')->nullable();
+            $table->timestamp('fecha_creacion')->nullable();
+            $table->timestamp('fecha_actualizacion')->nullable(); // ← SIN CONDICIÓN
+            $table->string('remember_token', 100)->nullable(); // ← SIN CONDICIÓN
+
+            // Índices para mejorar rendimiento
+            $table->index('usuario');
+            $table->index('activo');
+
+            // Llave foránea
             $table->foreign('id_funcionario')
                   ->references('id_funcionario')
                   ->on('institucional.funcionarios')
-                  ->onDelete('set null');
-            $table->string('usuario', 50)->unique();
-            $table->text('password_hash');
-            $table->string('correo', 150)->nullable();
-            $table->boolean('activo')->default(true);
-            $table->timestamp('ultimo_acceso')->nullable();
-            $table->timestamp('fecha_creacion')->nullable();
-
-            
+                  ->onDelete('cascade'); // ← Cambiar a cascade para mantener integridad
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('seguridad.usuarios');
     }

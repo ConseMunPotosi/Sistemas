@@ -1,4 +1,3 @@
-<!-- ModernLogin.vue -->
 <template>
   <div class="login-container">
     <div class="login-wrapper">
@@ -6,7 +5,7 @@
       <div class="login-left">
         <div class="brand-content">
           <div class="imagenLogo">
-            <img src="/public/images/Logo_blanco.png" alt="Logo Concejo Municipal" />
+            <img src="/images/Logo_blanco.png" alt="Logo Concejo Municipal" />
           </div>
           <h1>Bienvenido</h1>
           <p>Inicie sesión para acceder a su cuenta institucional y gestionar los módulos del Sistema Integral del Concejo Municipal de Potosí.</p>
@@ -41,21 +40,22 @@
           </div>
 
           <form @submit.prevent="handleLogin" class="login-form">
-            <!-- Campo Username -->
+            <!-- Campo Usuario -->
             <div class="form-group">
               <label for="username">
-                <span class="label-icon">
-                  <i class="bi bi-person-fill"></i>
-                </span>
+                <span class="label-icon">👤</span>
                 Usuario
               </label>
               <input
                 id="username"
                 v-model="form.username"
                 type="text"
-                placeholder="Ingresa tu usuario"
+                placeholder="Ingresa tu nombre de usuario"
                 required
+                autocomplete="username"
                 :class="{ 'is-invalid': errors.username }"
+                :disabled="loading"
+                @keyup.enter="handleLogin"
               />
               <span v-if="errors.username" class="error-message">
                 {{ errors.username }}
@@ -75,14 +75,18 @@
                   :type="showPassword ? 'text' : 'password'"
                   placeholder="Ingresa tu contraseña"
                   required
+                  autocomplete="current-password"
                   :class="{ 'is-invalid': errors.password }"
+                  :disabled="loading"
+                  @keyup.enter="handleLogin"
                 />
                 <button
-                    type="button"
-                    class="toggle-password"
-                    @click="showPassword = !showPassword"
+                  type="button"
+                  class="toggle-password"
+                  @click="showPassword = !showPassword"
+                  :disabled="loading"
                 >
-                    <i :class="passwordIcon"></i>
+                  <i :class="passwordIcon"></i>
                 </button>
               </div>
               <span v-if="errors.password" class="error-message">
@@ -93,23 +97,30 @@
             <!-- Opciones adicionales -->
             <div class="form-options">
               <label class="remember-me">
-                <input v-model="rememberMe" type="checkbox" />
+                <input v-model="rememberMe" type="checkbox" :disabled="loading" />
                 <span>Recordarme</span>
               </label>
-              <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+              <a href="#" class="forgot-link" @click.prevent="handleForgotPassword">
+                ¿Olvidaste tu contraseña?
+              </a>
             </div>
 
             <!-- Botón Login -->
-            <button type="submit" class="btn-login" :disabled="loading">
+            <button type="submit" class="btn-login" :disabled="loading || !form.username || !form.password">
               <span v-if="loading" class="spinner"></span>
               <span v-else>INGRESAR</span>
             </button>
 
             <!-- Mensaje de error global -->
             <div v-if="loginError" class="error-global">
+              <i class="bi bi-exclamation-triangle-fill"></i>
               {{ loginError }}
             </div>
           </form>
+
+          <div class="login-footer">
+            <p>Unidad de Sistemas &copy; 2026 Concejo Municipal de Potosí. <br>Todos los derechos reservados.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -117,10 +128,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores'
 
+// Router y Store
 const router = useRouter()
+const authStore = useAuthStore()
 
 // Estado del formulario
 const form = reactive({
@@ -136,6 +150,14 @@ const errors = reactive({
 const loading = ref(false)
 const loginError = ref('')
 const rememberMe = ref(false)
+const showPassword = ref(false)
+
+// Computed
+const isDevelopment = computed(() => import.meta.env.MODE === 'development')
+
+const passwordIcon = computed(() => {
+  return showPassword.value ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'
+})
 
 // Validar formulario
 const validateForm = () => {
@@ -143,14 +165,19 @@ const validateForm = () => {
   errors.username = ''
   errors.password = ''
 
+  // Validar username
   if (!form.username.trim()) {
     errors.username = 'El nombre de usuario es requerido'
     isValid = false
   } else if (form.username.length < 3) {
     errors.username = 'El usuario debe tener al menos 3 caracteres'
     isValid = false
+  } else if (!/^[a-zA-Z0-9_]+$/.test(form.username)) {
+    errors.username = 'El usuario solo puede contener letras, números y guión bajo'
+    isValid = false
   }
 
+  // Validar password
   if (!form.password) {
     errors.password = 'La contraseña es requerida'
     isValid = false
@@ -173,72 +200,138 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    /* Simular llamada a API
-    await new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // Simular credenciales válidas
-        if (form.username === 'admin' && form.password === '123456') {
-          resolve({
-            user: {
-              id: 1,
-              username: form.username,
-              email: 'admin@ejemplo.com'
-            },
-            token: 'fake-jwt-token'
-          })
-        } else {
-          reject(new Error('Usuario o contraseña incorrectos'))
-        }
-      }, 1500)
-    })*/
+    // Llamar al store para autenticar
+    const result = await authStore.login({
+      username: form.username,
+      password: form.password
+    })
 
-    // Guardar sesión
-    if (rememberMe.value) {
-      localStorage.setItem('auth_token', 'fake-jwt-token')
-      localStorage.setItem('user', JSON.stringify({
-        username: form.username,
-        email: 'admin@ejemplo.com'
-      }))
+    if (result.success) {
+      // Guardar preferencia de "recordarme"
+      if (rememberMe.value) {
+        localStorage.setItem('remember_me', 'true')
+        // Guardar usuario y contraseña en localStorage
+        localStorage.setItem('saved_username', form.username)
+        localStorage.setItem('saved_password', form.password)
+      } else {
+        localStorage.removeItem('remember_me')
+        localStorage.removeItem('saved_username')
+        localStorage.removeItem('saved_password')
+      }
+
+      // Redirigir al dashboard
+      router.push({ name: 'dashboard' })
     } else {
-      sessionStorage.setItem('auth_token', 'fake-jwt-token')
-      sessionStorage.setItem('user', JSON.stringify({
-        username: form.username,
-        email: 'admin@ejemplo.com'
-      }))
+      // Mostrar error específico
+      if (result.errors) {
+        if (result.errors.username) {
+          errors.username = result.errors.username[0]
+        }
+        if (result.errors.password) {
+          errors.password = result.errors.password[0]
+        }
+      }
+      loginError.value = result.message || 'Error al iniciar sesión'
     }
+  } catch (error) {
+    console.error('Error en login:', error)
 
-    // Redirigir
-    router.push('/dashboard')
+    // Manejar errores específicos
+    if (error.response) {
+      const status = error.response.status
+      const data = error.response.data
 
-  } catch (err) {
-    loginError.value = err.message || 'Error al iniciar sesión'
+      if (status === 422) {
+        // Errores de validación
+        if (data.errors) {
+          if (data.errors.username) {
+            errors.username = data.errors.username[0]
+          }
+          if (data.errors.password) {
+            errors.password = data.errors.password[0]
+          }
+        }
+        loginError.value = data.message || 'Datos incorrectos'
+      } else if (status === 401) {
+        loginError.value = 'Usuario o contraseña incorrectos'
+      } else if (status === 403) {
+        loginError.value = 'Tu cuenta está inactiva. Contacta al administrador'
+      } else if (status === 429) {
+        loginError.value = 'Demasiados intentos fallidos. Espera unos minutos'
+      } else {
+        loginError.value = data.message || 'Error al procesar la solicitud'
+      }
+    } else if (error.request) {
+      loginError.value = 'No se pudo conectar al servidor. Verifica tu conexión'
+    } else {
+      loginError.value = 'Error inesperado. Intenta nuevamente'
+    }
   } finally {
     loading.value = false
   }
 }
 
-// Social login
-const socialLogin = (provider) => {
-  console.log(`Iniciando sesión con ${provider}`)
-  // Implementar lógica de OAuth aquí
+// Manejar "Olvidé mi contraseña"
+const handleForgotPassword = () => {
+  // Implementar lógica para recuperar contraseña
+  alert('Función de recuperación de contraseña en desarrollo')
+}
+
+// Manejar registro
+const handleRegister = () => {
+  // Implementar lógica de registro
+  alert('Función de registro en desarrollo')
 }
 
 // Verificar si ya hay sesión activa
 const checkAuth = () => {
-  const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')
-  if (token) {
-    router.push('/dashboard')
+  if (authStore.isAuthenticated) {
+    router.push({ name: 'dashboard' })
   }
 }
 
-const showPassword = ref(false)
+// Cargar credenciales guardadas
+const loadSavedCredentials = () => {
+  const remember = localStorage.getItem('remember_me')
+  if (remember === 'true') {
+    const savedUsername = localStorage.getItem('saved_username')
+    const savedPassword = localStorage.getItem('saved_password')
 
-const passwordIcon = computed(() => {
-  return showPassword.value ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'
+    if (savedUsername) {
+      form.username = savedUsername
+      rememberMe.value = true
+    }
+
+    if (savedPassword) {
+      form.password = savedPassword
+    }
+  }
+}
+
+// Guardar/limpiar credenciales cuando cambie "recordarme"
+watch(rememberMe, (newValue) => {
+  if (!newValue) {
+    localStorage.removeItem('saved_username')
+    localStorage.removeItem('saved_password')
+  } else if (form.username && form.password) {
+    localStorage.setItem('saved_username', form.username)
+    localStorage.setItem('saved_password', form.password)
+  }
 })
 
-// Ejecutar al montar
-checkAuth()
+// Guardar credenciales cuando el usuario ingrese datos y "recordarme" esté activo
+watch([() => form.username, () => form.password], ([newUsername, newPassword]) => {
+  if (rememberMe.value && newUsername && newPassword) {
+    localStorage.setItem('saved_username', newUsername)
+    localStorage.setItem('saved_password', newPassword)
+  }
+})
+
+// Ciclo de vida
+onMounted(() => {
+  checkAuth()
+  loadSavedCredentials()
+})
 </script>
 
 <style scoped>
@@ -255,6 +348,8 @@ checkAuth()
   align-items: center;
   justify-content: center;
   background-image: url('/images/fondo.png');
+  background-size: cover;
+  background-position: center;
   padding: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -285,7 +380,7 @@ checkAuth()
 /* Panel izquierdo */
 .login-left {
   flex: 1;
-  background-color: #cc0000;
+  background: linear-gradient(135deg, #cc0000, #8B0000);
   padding: 60px 40px;
   display: flex;
   align-items: center;
@@ -325,11 +420,6 @@ checkAuth()
   flex-direction: column;
   align-items: center;
   width: 100%;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
 }
 
 .brand-content h1 {
@@ -407,7 +497,7 @@ checkAuth()
   color: #2c3e50;
   letter-spacing: 2px;
   margin-bottom: 4px;
-  background-color: #cc0000;
+  background: linear-gradient(135deg, #cc0000, #8B0000);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -458,7 +548,7 @@ checkAuth()
   outline: none;
   border-color: #cc0000;
   background: white;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 4px rgba(204, 0, 0, 0.1);
 }
 
 .form-group input.is-invalid {
@@ -468,6 +558,11 @@ checkAuth()
 
 .form-group input.is-invalid:focus {
   box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1);
+}
+
+.form-group input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .error-message {
@@ -507,8 +602,13 @@ checkAuth()
   color: #cc0000;
 }
 
-.toggle-password:hover {
+.toggle-password:hover:not(:disabled) {
   background: #f0f0f0;
+}
+
+.toggle-password:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Opciones */
@@ -531,7 +631,12 @@ checkAuth()
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #667eea;
+  accent-color: #cc0000;
+}
+
+.remember-me input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .forgot-link {
@@ -539,17 +644,18 @@ checkAuth()
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s;
+  cursor: pointer;
 }
 
 .forgot-link:hover {
-  color: #764ba2;
+  color: #8B0000;
   text-decoration: underline;
 }
 
 /* Botón Login */
 .btn-login {
   padding: 14px;
-  background-color: #cc0000;
+  background: linear-gradient(135deg, #cc0000, #8B0000);
   color: white;
   border: none;
   border-radius: 12px;
@@ -580,7 +686,7 @@ checkAuth()
 
 .btn-login:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(204, 0, 0, 0.4);
 }
 
 .btn-login:active:not(:disabled) {
@@ -610,17 +716,56 @@ checkAuth()
   color: #e74c3c;
   text-align: center;
   font-size: 13px;
-  padding: 8px;
+  padding: 10px;
   background: #fff5f5;
   border-radius: 8px;
   border: 1px solid #fcc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Credenciales de desarrollo */
+.dev-credentials {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px dashed #dee2e6;
+  font-size: 12px;
+}
+
+.dev-header {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.dev-item {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.dev-label {
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.dev-value {
+  color: #cc0000;
+  font-weight: 500;
+  font-family: monospace;
 }
 
 /* Footer */
 .login-footer {
   text-align: center;
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: 20px;
+  padding-top: 16px;
   border-top: 1px solid #f0f0f0;
 }
 
@@ -629,103 +774,6 @@ checkAuth()
   font-size: 14px;
 }
 
-.register-link {
-  color: #667eea;
-  text-decoration: none;
-  font-weight: 700;
-  letter-spacing: 1px;
-  transition: all 0.3s;
-  position: relative;
-}
-
-.register-link::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  transition: width 0.3s;
-}
-
-.register-link:hover::after {
-  width: 100%;
-}
-
-.register-link:hover {
-  color: #764ba2;
-}
-
-/* Social Login */
-.social-login {
-  margin-top: 24px;
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  margin: 16px 0;
-}
-
-.divider::before,
-.divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #e0e0e0;
-}
-
-.divider span {
-  padding: 0 16px;
-  color: #95a5a6;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.social-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
-
-.social-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid #e0e0e0;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 18px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.social-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.social-btn.google:hover {
-  border-color: #ea4335;
-  background: #fef6f5;
-  color: #ea4335;
-}
-
-.social-btn.facebook:hover {
-  border-color: #1877f2;
-  background: #f0f4ff;
-  color: #1877f2;
-}
-
-.social-btn.twitter:hover {
-  border-color: #1da1f2;
-  background: #f0f8ff;
-  color: #1da1f2;
-}
 .imagenLogo {
   display: flex;
   justify-content: center;
@@ -773,6 +821,10 @@ checkAuth()
   .login-title {
     font-size: 28px;
   }
+
+  .imagenLogo img {
+    max-width: 180px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -794,14 +846,13 @@ checkAuth()
     align-items: flex-start;
   }
 
-  .social-buttons {
-    gap: 8px;
+  .imagenLogo img {
+    max-width: 140px;
   }
 
-  .social-btn {
-    width: 38px;
-    height: 38px;
-    font-size: 16px;
+  .dev-item {
+    flex-direction: column;
+    align-items: center;
   }
 }
 </style>
