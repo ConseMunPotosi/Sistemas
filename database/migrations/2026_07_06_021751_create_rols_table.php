@@ -12,14 +12,14 @@ return new class extends Migration
     public function up()
     {
         Schema::create('seguridad.roles', function (Blueprint $table) {
-            //$table->integer('id_rol')->primary();
             $table->id('id_rol');
-            $table->string('nombre', 80);
-            $table->text('descripcion')->nullable();
-            $table->boolean('estado')->default(true);
+            $table->string('nombre', 50)->unique();
+            $table->string('descripcion', 255)->nullable();
+            $table->boolean('activo')->default(true);
+            $table->timestamp('fecha_creacion')->useCurrent();
+            $table->timestamp('fecha_actualizacion')->nullable()->useCurrentOnUpdate();
         });
     }
-
     /**
      * Reverse the migrations.
      */
