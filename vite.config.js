@@ -28,5 +28,12 @@ export default defineConfig({
         hmr: {
             host: 'localhost',
         },
+        cors: true,
+        headers: {
+            'Cache-Control': 'no-store',
+        },
+    },
+    optimizeDeps: {
+        include: ['vue', 'vue-router', 'pinia', 'axios'],
     },
 });

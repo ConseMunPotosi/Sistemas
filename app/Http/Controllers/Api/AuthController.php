@@ -40,7 +40,6 @@ class AuthController extends Controller
 
             // PASO 2: Buscar el usuario por usuario o correo
             $usuario = Usuario::where('usuario', $request->usuario)
-                ->orWhere('correo', $request->usuario)
                 ->with(['roles', 'funcionario', 'funcionario.cargo', 'funcionario.unidad'])
                 ->first();
 
@@ -380,8 +379,7 @@ class AuthController extends Controller
             'id' => $usuario->id_usuario,
             'usuario' => $usuario->usuario,
             'nombre_completo' => $usuario->nombre_completo,
-            'correo' => $usuario->correo,
-            'activo' => $usuario->activo,
+            'estado' => $usuario->estado,
             'ultimo_acceso' => $usuario->ultimo_acceso,
             'funcionario' => $usuario->funcionario ? [
                 'id' => $usuario->funcionario->id_funcionario,

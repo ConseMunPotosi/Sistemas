@@ -27,7 +27,7 @@ class SeguridadSeeder extends Seeder
         // Roles
         //DB::table('seguridad.roles')->insert([
         $roles = [
-            ['nombre' => 'Administrador', 'descripcion' => 'Acceso total al sistema', 'estado' => true],
+            ['nombre' => 'Super Administrador', 'descripcion' => 'Acceso total al sistema', 'estado' => true],
             ['nombre' => 'Concejal', 'descripcion' => 'Gestión y seguimiento de documentos de su comisión', 'estado' => true],
             ['nombre' => 'Asesor', 'descripcion' => 'Registro, recepción y atención de documentos', 'estado' => true],
             ['nombre' => 'Asistente', 'descripcion' => 'Solo visualización de información', 'estado' => true],
@@ -74,7 +74,7 @@ class SeguridadSeeder extends Seeder
                 [
                     'modulo' => $permiso['modulo'], // Buscar por nombre
                     'accion' => $permiso['accion']
-                ], 
+                ],
                 [ // Datos a insertar o actualizar
                     'descripcion' => $permiso['descripcion']
                 ]
@@ -157,7 +157,7 @@ class SeguridadSeeder extends Seeder
             DB::table('seguridad.usuarios')->updateOrInsert(
                 [
                    'usuario' => $usuario['usuario'] // Buscar por usuario
-                ], 
+                ],
                 [ // Datos a insertar o actualizar
                     'id_funcionario' => $usuario['id_funcionario'],
                     'password_hash' => $usuario['password_hash'],
@@ -175,50 +175,50 @@ class SeguridadSeeder extends Seeder
             //Administrador
             ['id_usuario' => 44, 'id_rol' => 1],
             // Concejal
-            ['id_usuario' => 2, 'id_rol' => 2], 
-            ['id_usuario' => 3, 'id_rol' => 2], 
-            ['id_usuario' => 4, 'id_rol' => 2], 
-            ['id_usuario' => 5, 'id_rol' => 2], 
+            ['id_usuario' => 2, 'id_rol' => 2],
+            ['id_usuario' => 3, 'id_rol' => 2],
+            ['id_usuario' => 4, 'id_rol' => 2],
+            ['id_usuario' => 5, 'id_rol' => 2],
             ['id_usuario' => 6, 'id_rol' => 2],
             ['id_usuario' => 7, 'id_rol' => 2],
             ['id_usuario' => 8, 'id_rol' => 2],
             ['id_usuario' => 9, 'id_rol' => 2],
             ['id_usuario' => 10, 'id_rol' => 2],
             // Asesor
-            ['id_usuario' => 52, 'id_rol' => 3], 
-            ['id_usuario' => 54, 'id_rol' => 3], 
-            ['id_usuario' => 55, 'id_rol' => 3], 
-            ['id_usuario' => 57, 'id_rol' => 3], 
+            ['id_usuario' => 52, 'id_rol' => 3],
+            ['id_usuario' => 54, 'id_rol' => 3],
+            ['id_usuario' => 55, 'id_rol' => 3],
+            ['id_usuario' => 57, 'id_rol' => 3],
             ['id_usuario' => 59, 'id_rol' => 3],
             ['id_usuario' => 61, 'id_rol' => 3],
             ['id_usuario' => 63, 'id_rol' => 3],
             ['id_usuario' => 65, 'id_rol' => 3],
             ['id_usuario' => 67, 'id_rol' => 3],
             //Asistente
-            ['id_usuario' => 11, 'id_rol' => 4], 
-            ['id_usuario' => 12, 'id_rol' => 4], 
-            ['id_usuario' => 13, 'id_rol' => 4], 
+            ['id_usuario' => 11, 'id_rol' => 4],
+            ['id_usuario' => 12, 'id_rol' => 4],
+            ['id_usuario' => 13, 'id_rol' => 4],
             ['id_usuario' => 17, 'id_rol' => 4],
             //Responsables
-            ['id_usuario' => 24, 'id_rol' => 5], 
-            ['id_usuario' => 30, 'id_rol' => 5], 
-            ['id_usuario' => 34, 'id_rol' => 5], 
-            ['id_usuario' => 40, 'id_rol' => 5], 
+            ['id_usuario' => 24, 'id_rol' => 5],
+            ['id_usuario' => 30, 'id_rol' => 5],
+            ['id_usuario' => 34, 'id_rol' => 5],
+            ['id_usuario' => 40, 'id_rol' => 5],
             ['id_usuario' => 42, 'id_rol' => 5],
             //Auxiliar
-            ['id_usuario' => 15, 'id_rol' => 6], 
-            ['id_usuario' => 27, 'id_rol' => 6], 
-            ['id_usuario' => 29, 'id_rol' => 6], 
-            ['id_usuario' => 31, 'id_rol' => 6], 
+            ['id_usuario' => 15, 'id_rol' => 6],
+            ['id_usuario' => 27, 'id_rol' => 6],
+            ['id_usuario' => 29, 'id_rol' => 6],
+            ['id_usuario' => 31, 'id_rol' => 6],
             ['id_usuario' => 33, 'id_rol' => 6],
             ['id_usuario' => 35, 'id_rol' => 6],
             ['id_usuario' => 37, 'id_rol' => 6],
             ['id_usuario' => 38, 'id_rol' => 6],
             ['id_usuario' => 39, 'id_rol' => 6],
-            ['id_usuario' => 41, 'id_rol' => 6], 
-            ['id_usuario' => 43, 'id_rol' => 6], 
-            ['id_usuario' => 45, 'id_rol' => 6], 
-            ['id_usuario' => 53, 'id_rol' => 6], 
+            ['id_usuario' => 41, 'id_rol' => 6],
+            ['id_usuario' => 43, 'id_rol' => 6],
+            ['id_usuario' => 45, 'id_rol' => 6],
+            ['id_usuario' => 53, 'id_rol' => 6],
             ['id_usuario' => 56, 'id_rol' => 6],
             ['id_usuario' => 58, 'id_rol' => 6],
             ['id_usuario' => 60, 'id_rol' => 6],
@@ -236,9 +236,9 @@ class SeguridadSeeder extends Seeder
                 [
                    'id_usuario' => $usuario_rol['id_usuario'], // Buscar por id_usuario
                    'id_rol' => $usuario_rol['id_rol']
-                ], 
+                ],
                 [ // Datos a insertar o actualizar
-        
+
                 ]
             );
         }
@@ -291,7 +291,7 @@ class SeguridadSeeder extends Seeder
             ['id_rol' => 7, 'id_permiso' => 10],
         ]);
 
-        
+
         // ==========================================
         // PASO 9: Mensaje de éxito
         // ==========================================

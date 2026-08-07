@@ -219,8 +219,8 @@ const handleLogin = async () => {
         localStorage.removeItem('saved_password')
       }
 
-      // Redirigir al dashboard
-      router.push({ name: 'dashboard' })
+        await new Promise(resolve => setTimeout(resolve, 100))
+        await router.replace({ name: 'dashboard' })
     } else {
       // Mostrar error específico
       if (result.errors) {

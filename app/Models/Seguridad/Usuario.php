@@ -99,7 +99,7 @@ class Usuario extends Authenticatable
             'seguridad.usuario_roles',
             'id_usuario',
             'id_rol'
-        )->withTimestamps();
+        );
     }
 
     /* Documentos creados por el usuario */

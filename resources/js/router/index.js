@@ -1,4 +1,3 @@
-//import { useAuthStore } from '../api/auth.js';
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores';
 
@@ -12,7 +11,7 @@ import LoginCMP from '@/pages/LoginCMP.vue';
 import Profile from '@/components/dashboard/Profile.vue';
 import Settings from '@/components/dashboard/Settings.vue';
 import Users from '@/components/dashboard/Users.vue';
-import Inicio from '../pages/Inicio.vue';
+import Inicio from '@/pages/Inicio.vue';
 
 // Importaciones dinámicas para páginas públicas
 const Directiva = () => import('../pages/Directiva.vue');
@@ -115,7 +114,7 @@ const routes = [
         children: [
             {
                 path: '',
-                name: 'Dashboard',
+                name: 'dashboard',
                 component: Dashboard,
                 meta: {
                     title: 'Dashboard',
@@ -124,7 +123,7 @@ const routes = [
             },
             {
                 path: 'profile',
-                name: 'Profile',
+                name: 'profile',
                 component: Profile,
                 meta: {
                     title: 'Mi Perfil',
@@ -134,7 +133,7 @@ const routes = [
             },
             {
                 path: 'settings',
-                name: 'Settings',
+                name: 'settings',
                 component: Settings,
                 meta: {
                     title: 'Configuración',
@@ -145,7 +144,7 @@ const routes = [
             },
             {
                 path: 'users',
-                name: 'Users',
+                name: 'users',
                 component: Users,
                 meta: {
                     title: 'Usuarios',
@@ -194,7 +193,7 @@ const router = createRouter({
 });
 
 // ==========================================
-// GUARDIA DE NAVEGACIÓN (MEJORADA)
+// GUARDIA DE NAVEGACIÓN
 // ==========================================
 router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
@@ -209,17 +208,17 @@ router.beforeEach(async (to, from, next) => {
         if (!authStore.isAuthenticated) {
             // Redirigir a login con return URL
             next({
-                name: 'login',
+                name: 'loginCMP',
                 query: { redirect: to.fullPath }
             });
             return;
         }
 
         // Verificar si el usuario está activo
-        if (authStore.user && !authStore.user.activo) {
+        if (authStore.user && !authStore.user.estado === false) {
             await authStore.logout();
             next({
-                name: 'login',
+                name: 'loginCMP',
                 query: { message: 'Cuenta inactiva' }
             });
             return;

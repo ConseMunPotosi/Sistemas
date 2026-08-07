@@ -17,11 +17,11 @@ return new class extends Migration
             $table->string('usuario', 50)->unique();
             $table->text('password_hash');
             $table->boolean('activo')->default(true);
-            $table->integer('intentos_fallidos')->default(0); // ← SIN CONDICIÓN
+            $table->integer('intentos_fallidos')->default(0);
             $table->timestamp('ultimo_acceso')->nullable();
             $table->timestamp('fecha_creacion')->nullable();
-            $table->timestamp('fecha_actualizacion')->nullable(); // ← SIN CONDICIÓN
-            $table->string('remember_token', 100)->nullable(); // ← SIN CONDICIÓN
+            $table->timestamp('fecha_actualizacion')->nullable();
+            $table->string('remember_token', 100)->nullable();
 
             // Índices para mejorar rendimiento
             $table->index('usuario');
@@ -31,7 +31,7 @@ return new class extends Migration
             $table->foreign('id_funcionario')
                   ->references('id_funcionario')
                   ->on('institucional.funcionarios')
-                  ->onDelete('cascade'); // ← Cambiar a cascade para mantener integridad
+                  ->onDelete('cascade');
         });
     }
 

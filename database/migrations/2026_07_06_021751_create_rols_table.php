@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_rol');
             $table->string('nombre', 50)->unique();
             $table->string('descripcion', 255)->nullable();
-            $table->boolean('activo')->default(true);
+            $table->boolean('estado')->default(true);
             $table->timestamp('fecha_creacion')->useCurrent();
             $table->timestamp('fecha_actualizacion')->nullable()->useCurrentOnUpdate();
         });

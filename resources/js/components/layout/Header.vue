@@ -14,8 +14,8 @@
       </div>
 
       <button @click="$emit('logout')" class="logout-btn">
-        <span class="material-icons">logout</span>
-        Cerrar Sesión
+        <span class="material-icons">Cerrar Sesión</span>
+
       </button>
     </div>
   </header>

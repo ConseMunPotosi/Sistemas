@@ -51,7 +51,7 @@ class Rol extends Model
             'seguridad.usuario_roles',
             'id_rol',
             'id_usuario'
-        )->withTimestamps();
+        );
     }
 
     /* Relación con los permisos */

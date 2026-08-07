@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             SeguridadSeeder::class,
             DocumentalSeeder::class,
             ComunicacionSeeder::class,
+            SuperAdministradorSeeder::class,
         ]);
 
     }

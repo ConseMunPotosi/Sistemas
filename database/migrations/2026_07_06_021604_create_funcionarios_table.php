@@ -12,7 +12,6 @@ return new class extends Migration
     public function up()
     {
         Schema::create('institucional.funcionarios', function (Blueprint $table) {
-            //$table->integer('id_funcionario')->primary();
             $table->id('id_funcionario');
             $table->string('nombres', 100);
             $table->string('apellidos', 100);
@@ -21,7 +20,7 @@ return new class extends Migration
             $table->string('correo', 150)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamp('fecha_registro')->nullable();
-            //$table->integer('id_unidad')->nullable();
+
             // 1. Crear la columna para la Unidad
             $table->unsignedBigInteger('id_unidad');
             // Definir la llave foránea física hacia el esquema institucional
@@ -29,7 +28,6 @@ return new class extends Migration
                 ->references('id_unidad')
                 ->on('institucional.unidades')
                 ->onDelete('restrict');
-            //$table->integer('id_cargo')->nullable();
             // 2. Crear la columna para el Cargo
             $table->unsignedBigInteger('id_cargo');
             // Definir la llave foránea física hacia el esquema institucional
