@@ -1,10 +1,12 @@
 <template>
   <div v-if="isReady" class="dashboard-layout">
     <Sidebar :is-collapsed="isCollapsed" @toggle-sidebar="toggleSidebar" />
+
     <div class="main-content" :class="{ expanded: isCollapsed }">
-      <!-- 🔧 Pasar user como prop, con valor por defecto -->
+      <!-- 🔧 Pasar isExpanded al Header -->
       <Header
         :user="user || null"
+        :is-expanded="isCollapsed"
         @logout="handleLogout"
         @toggle-sidebar="toggleSidebar"
       />
@@ -43,29 +45,26 @@ watch(isAuthenticated, (newVal) => {
   }
 });
 
+// 🔧 Toggle Sidebar
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value;
+  console.log('🔍 Sidebar colapsado:', isCollapsed.value);
 };
 
-// 🔧 Handle Logout - CORREGIDO
+// 🔧 Handle Logout
 const handleLogout = async () => {
-  // Evitar múltiples llamadas
   if (isLoggingOut.value) return;
 
   isLoggingOut.value = true;
+  console.log('🔍 Cerrando sesión...');
 
   try {
     await authStore.logout();
-
-    // 🔧 Limpiar estado local
+    console.log('✅ Sesión cerrada');
     isReady.value = false;
-
-    // 🔧 Redirigir usando replace
     window.location.replace('/loginCMP');
-
   } catch (error) {
     console.error('❌ Error al cerrar sesión:', error);
-    // Si hay error, forzar limpieza
     authStore.clearAuth();
     isReady.value = false;
     window.location.replace('/loginCMP');
@@ -77,6 +76,8 @@ const handleLogout = async () => {
 // 🔧 Verificar autenticación
 const checkAuth = async () => {
   const token = localStorage.getItem('auth_token');
+  console.log('🔍 DashboardLayout - Verificando autenticación...');
+  console.log('🔍 Token:', token ? '✅' : '❌');
 
   if (!token) {
     console.log('❌ No hay token, redirigiendo...');
@@ -84,7 +85,6 @@ const checkAuth = async () => {
     return false;
   }
 
-  // Si hay token pero no usuario, obtenerlo
   if (token && !authStore.user) {
     try {
       await authStore.fetchUser();
@@ -103,23 +103,23 @@ const checkAuth = async () => {
   return true;
 };
 
-// 🔧 Before Mount - Verificar antes de renderizar
 onBeforeMount(async () => {
-  // Si ya está desautenticado, redirigir
   if (!authStore.isAuthenticated && !localStorage.getItem('auth_token')) {
     window.location.replace('/loginCMP');
     return;
   }
 });
 
-// 🔧 Mount - Verificar al cargar
 onMounted(async () => {
+  console.log('🔍 DashboardLayout - Montando...');
+
   const isValid = await checkAuth();
   if (!isValid) {
     return;
   }
 
   isReady.value = true;
+  console.log('✅ DashboardLayout - Listo');
 });
 </script>
 

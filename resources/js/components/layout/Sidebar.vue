@@ -3,7 +3,9 @@
     <!-- Logo -->
     <div class="sidebar-header">
       <div class="logo">
-        <span v-if="!isCollapsed" class="logo-text">Sistema CMP</span>
+        <span v-if="!isCollapsed" class="logo-text">
+          <img src="/images/Logo_blanco.png" alt="Logo Concejo Municipal" class="logo-image" />
+        </span>
         <span v-else class="logo-icon">⚙️</span>
       </div>
     </div>
@@ -89,7 +91,7 @@ const menuItems = computed(() => {
   left: 0;
   width: 250px;
   height: 100vh;
-  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  background: #474A4E;
   color: white;
   display: flex;
   flex-direction: column;
@@ -147,15 +149,28 @@ const menuItems = computed(() => {
   cursor: pointer;
 }
 
+.logo-image {
+  width: 70%;
+  object-fit: contain; /* Mantiene la proporción */
+  display: block;
+  margin: 0 auto;     /* Centra horizontalmente */
+}
+
+/* 🔧 Cuando el sidebar está colapsado */
+.sidebar.collapsed .logo-image {
+  width: 40px;
+  height: 40px;
+}
+
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.08);
   color: white;
 }
 
 .nav-item.active {
-  background: rgba(79, 70, 229, 0.3);
+  background: rgba(255, 255, 255, 0.08);;
   color: white;
-  box-shadow: inset 3px 0 0 #4f46e5;
+  box-shadow: inset 3px 0 0 white;
 }
 
 .nav-icon {

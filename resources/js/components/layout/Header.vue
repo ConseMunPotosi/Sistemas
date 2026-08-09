@@ -55,12 +55,12 @@
       <!-- Perfil de Usuario con Submenú -->
       <!-- 🔧 Mostrar solo si hay usuario -->
       <div v-if="user" class="user-profile" @click.stop="toggleUserMenu">
-        <div class="user-avatar">
-          <span class="avatar-text">{{ userInitials }}</span>
-        </div>
         <div class="user-info">
           <span class="user-name">{{ user?.displayName || user?.usuario || 'Usuario' }}</span>
           <span class="user-role">{{ userRoles }}</span>
+        </div>
+        <div class="user-avatar">
+          <span class="avatar-text">{{ userInitials }}</span>
         </div>
         <svg class="dropdown-arrow" :class="{ rotated: showUserMenu }" viewBox="0 0 24 24" width="18" height="18">
           <path d="M7 10l5 5 5-5z" fill="currentColor"/>

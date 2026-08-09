@@ -1,29 +1,5 @@
 <template>
   <div class="dashboard-container">
-    <!-- Header -->
-    <header class="dashboard-header">
-      <div class="header-content">
-        <div class="logo-section">
-          <img src="" alt="Escudo" class="shield-logo">
-          <div>
-            <h1>Concejo Municipal de Potosí</h1>
-            <p class="subtitle">Sistema de Gestión Legislativa</p>
-          </div>
-        </div>
-        <div class="header-actions">
-          <span class="date-display">{{ currentDate }}</span>
-          <button class="btn-notification" @click="toggleNotifications">
-            <i class="fas fa-bell"></i>
-            <span class="notification-badge" v-if="notifications.length">3</span>
-          </button>
-          <div class="user-profile">
-            <img src="" alt="User" class="user-avatar">
-            <span class="user-name">Administrador</span>
-          </div>
-        </div>
-      </div>
-    </header>
-
     <!-- Stats Cards -->
     <div class="stats-grid">
       <div class="stat-card" v-for="stat in stats" :key="stat.title">
@@ -326,97 +302,6 @@ export default {
   background: #f5f7fa;
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Header Styles */
-.dashboard-header {
-  background: white;
-  border-radius: 12px;
-  padding: 20px 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.shield-logo {
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.header-content h1 {
-  margin: 0;
-  font-size: 24px;
-  color: #2d3748;
-}
-
-.subtitle {
-  margin: 0;
-  color: #718096;
-  font-size: 14px;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.date-display {
-  color: #4a5568;
-  font-size: 14px;
-}
-
-.btn-notification {
-  position: relative;
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: #4a5568;
-  transition: color 0.2s;
-}
-
-.btn-notification:hover {
-  color: #2d3748;
-}
-
-.notification-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #e53e3e;
-  color: white;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 10px;
-  font-weight: bold;
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.user-avatar {
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.user-name {
-  font-weight: 500;
-  color: #2d3748;
 }
 
 /* Stats Grid */
