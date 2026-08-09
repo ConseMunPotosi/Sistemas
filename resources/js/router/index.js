@@ -23,6 +23,9 @@ const Ordenanzas = () => import('../pages/Ordenanzas.vue');
 const Noticias = () => import('../pages/Noticias.vue');
 const Sesiones = () => import('../pages/Sesiones.vue');
 
+// ==========================================
+// DEFINICIÓN DE RUTAS
+// ==========================================
 const routes = [
     // ==========================================
     // RUTAS PÚBLICAS (Layout Principal)
@@ -75,16 +78,8 @@ const routes = [
                 path: 'sesiones',
                 name: 'sesiones',
                 component: Sesiones
-            },
-            {
-                path: 'login',
-                name: 'login',
-                component: LoginCMP,
-                meta: {
-                    requiresGuest: true,
-                    layout: 'empty'
-                }
             }
+            // ❌ ELIMINADO: loginCMP de aquí para evitar duplicados
         ]
     },
 
@@ -139,7 +134,7 @@ const routes = [
                     title: 'Configuración',
                     icon: 'settings',
                     requiresAuth: true,
-                    requiresPermission: 'configuracion:ver' // Ejemplo de permiso
+                    requiresPermission: 'configuracion:ver'
                 }
             },
             {
@@ -150,21 +145,9 @@ const routes = [
                     title: 'Usuarios',
                     icon: 'users',
                     requiresAuth: true,
-                    requiresPermission: 'usuarios:ver' // Permiso específico
+                    requiresPermission: 'usuarios:ver'
                 }
-            },
-            /* Agregar más rutas protegidas según necesidad
-            {
-                path: 'noticias-admin',
-                name: 'noticias-admin',
-                component: () => import('../pages/NoticiasAdmin.vue'),
-                meta: {
-                    title: 'Gestionar Noticias',
-                    icon: 'news',
-                    requiresAuth: true,
-                    requiresPermission: 'noticias:ver'
-                }
-            }*/
+            }
         ]
     },
 
@@ -189,94 +172,80 @@ const router = createRouter({
         } else {
             return { top: 0 };
         }
-    },
+    }
 });
 
 // ==========================================
-// GUARDIA DE NAVEGACIÓN
+// GUARDIA DE NAVEGACIÓN - VERSIÓN CORREGIDA
 // ==========================================
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
 
-    // Si hay token pero no hay usuario, intentar obtenerlo
-    if (authStore.token && !authStore.user) {
-        await authStore.fetchUser();
-    }
-
-    // Verificar si la ruta requiere autenticación
-    if (to.meta.requiresAuth) {
-        if (!authStore.isAuthenticated) {
-            // Redirigir a login con return URL
-            next({
-                name: 'loginCMP',
-                query: { redirect: to.fullPath }
-            });
-            return;
-        }
-
-        // Verificar si el usuario está activo
-        if (authStore.user && !authStore.user.estado === false) {
-            await authStore.logout();
-            next({
-                name: 'loginCMP',
-                query: { message: 'Cuenta inactiva' }
-            });
-            return;
-        }
-
-        // Verificar permisos específicos
-        if (to.meta.requiresPermission) {
-            const hasPermission = authStore.hasPermission(to.meta.requiresPermission);
-            if (!hasPermission) {
-                // Redirigir a dashboard con mensaje de error
-                next({
-                    name: 'Dashboard',
-                    query: { error: 'No tienes permisos para acceder a esta sección' }
-                });
-                return;
-            }
-        }
-    }
-
-    // Si está autenticado y va a login, redirigir a dashboard
-    if (to.meta.requiresGuest && authStore.isAuthenticated) {
-        // Verificar si hay una URL de redirección
-        const redirect = to.query.redirect || '/dashboard';
-        next(redirect);
+    // 🔧 Si es la misma ruta, no hacer nada
+    if (to.path === from.path) {
+        next(false);
         return;
     }
 
-    // Verificar roles específicos (opcional)
-    if (to.meta.requiresRole) {
-        const hasRole = authStore.hasRole(to.meta.requiresRole);
-        if (!hasRole) {
-            next({
-                name: 'Dashboard',
-                query: { error: 'No tienes el rol necesario' }
-            });
+    // 🔧 RUTAS PÚBLICAS (NO requieren autenticación)
+    const publicPaths = [
+        '/', '/inicio', '/directiva', '/concejales',
+        '/comisiones', '/leyes', '/resoluciones',
+        '/ordenanzas', '/noticias', '/sesiones'
+    ];
+
+    // Si es una ruta pública
+    if (publicPaths.includes(to.path) || to.path === '/') {
+        // Si está autenticado, ir a dashboard
+        if (authStore.isAuthenticated) {
+            next('/dashboard');
             return;
         }
+        next();
+        return;
     }
 
-    // Establecer título de página (opcional)
-    if (to.meta.title) {
-        document.title = `${to.meta.title} - Sistema de Gestión`;
+    // 🔧 RUTA DE LOGIN
+    if (to.path === '/loginCMP' || to.name === 'loginCMP') {
+        if (authStore.isAuthenticated) {
+            next('/dashboard');
+            return;
+        }
+        next();
+        return;
     }
 
-    // Todo está bien, continuar
+    // 🔧 RUTAS PROTEGIDAS (requieren autenticación)
+    if (to.meta.requiresAuth) {
+        if (!authStore.isAuthenticated) {
+            next('/loginCMP');
+            return;
+        }
+        next();
+        return;
+    }
+
+    // Si llegamos aquí, permitir acceso
     next();
 });
 
+// 🔧 Manejador de errores
+router.onError((error) => {
+    console.error('❌ Error en router:', error);
+    window.location.href = '/loginCMP';
+});
+
 // ==========================================
-// ERROR HANDLER (OPCIONAL)
+// MANEJADOR DE ERRORES DE NAVEGACIÓN
 // ==========================================
 router.onError((error) => {
-    console.error('Error en el router:', error);
-    // Redirigir a página de error o login
-    if (error.message.includes('auth')) {
+    console.error('❌ Error en router:', error);
+
+    // Si es error de navegación, redirigir a login
+    if (error.message && error.message.includes('navigation')) {
         const authStore = useAuthStore();
         authStore.clearAuth();
-        router.push('/login');
+        window.location.href = '/loginCMP';
     }
 });
 

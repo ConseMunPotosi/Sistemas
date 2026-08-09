@@ -2,9 +2,7 @@
   <header class="header">
     <div class="header-left">
       <button @click="$emit('toggle-sidebar')" class="menu-btn">
-        <span class="material-icons">menu</span>
       </button>
-      <h1 class="page-title">{{ pageTitle }}</h1>
     </div>
 
     <div class="header-right">
@@ -15,8 +13,8 @@
 
       <button @click="$emit('logout')" class="logout-btn">
         <span class="material-icons">Cerrar Sesión</span>
-
       </button>
+
     </div>
   </header>
 </template>

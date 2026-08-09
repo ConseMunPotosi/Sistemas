@@ -26,23 +26,32 @@ api.interceptors.request.use(
     }
 );
 
-// Interceptor para manejar respuestas
+// 🔧 Interceptor para manejar respuestas - CORREGIDO
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
 
-        // Si el token expiró (401)
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // 🔧 Identificar si es una petición de login
+        const isLoginRequest = originalRequest.url === '/login' ||
+                               originalRequest.url === '/api/login' ||
+                               originalRequest.url.includes('login');
+
+
+        // 🔧 Solo manejar 401 si NO es una petición de login
+        if (error.response?.status === 401 && !originalRequest._retry && !isLoginRequest) {
             originalRequest._retry = true;
+
+            console.log('🔍 Axios - Token expirado, limpiando autenticación');
 
             // Limpiar autenticación
             const { useAuthStore } = await import('./auth.js');
             const authStore = useAuthStore();
             authStore.clearAuth();
 
-            // Redirigir a login
-            if (typeof window !== 'undefined') {
+            // Redirigir a login solo si no estamos ya en login
+            if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+                console.log('🔍 Axios - Redirigiendo a login');
                 window.location.href = '/loginCMP';
             }
         }

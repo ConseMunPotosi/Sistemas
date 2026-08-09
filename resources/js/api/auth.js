@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import api from './axios.js';
+import router from '../router'
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -69,8 +70,6 @@ export const useAuthStore = defineStore('auth', {
                 };
 
             } catch (error) {
-                console.error('❌ Login Error:', error.response?.data);
-
                 let errorMessage = 'Error al iniciar sesión';
                 let errors = null;
 
@@ -117,7 +116,9 @@ export const useAuthStore = defineStore('auth', {
             } finally {
                 this.clearAuth();
                 this.loading = false;
+                router.push({ name: 'LoginCMP' });
             }
+
         },
 
         clearAuth() {

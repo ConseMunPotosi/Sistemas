@@ -1,433 +1,687 @@
 <template>
-  <div class="dashboard">
-    <!-- Tarjetas de estadísticas -->
+  <div class="dashboard-container">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="header-content">
+        <div class="logo-section">
+          <img src="" alt="Escudo" class="shield-logo">
+          <div>
+            <h1>Concejo Municipal de Potosí</h1>
+            <p class="subtitle">Sistema de Gestión Legislativa</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span class="date-display">{{ currentDate }}</span>
+          <button class="btn-notification" @click="toggleNotifications">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" v-if="notifications.length">3</span>
+          </button>
+          <div class="user-profile">
+            <img src="" alt="User" class="user-avatar">
+            <span class="user-name">Administrador</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stats Cards -->
     <div class="stats-grid">
-      <div class="stat-card" v-for="stat in statistics" :key="stat.title">
+      <div class="stat-card" v-for="stat in stats" :key="stat.title">
         <div class="stat-icon" :style="{ background: stat.color }">
           <i :class="stat.icon"></i>
         </div>
-        <div class="stat-info">
-          <div class="stat-value">{{ stat.value }}</div>
-          <div class="stat-title">{{ stat.title }}</div>
-          <div class="stat-change" :class="stat.change > 0 ? 'positive' : 'negative'">
+        <div class="stat-content">
+          <h3>{{ stat.value }}</h3>
+          <p>{{ stat.title }}</p>
+          <span class="stat-change" :class="stat.change > 0 ? 'positive' : 'negative'">
             <i :class="stat.change > 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
             {{ Math.abs(stat.change) }}%
-          </div>
+          </span>
         </div>
       </div>
     </div>
 
-    <!-- Gráficos y tablas -->
-    <div class="dashboard-grid">
-      <!-- Actividad Reciente -->
-      <div class="card recent-activity">
+    <!-- Charts Section -->
+    <div class="charts-grid">
+      <div class="chart-card">
         <div class="card-header">
-          <h3>Actividad Reciente</h3>
-          <button class="btn-link">Ver todas</button>
+          <h3>Proyectos por Estado</h3>
+          <select v-model="selectedPeriod" class="period-select">
+            <option value="month">Este Mes</option>
+            <option value="quarter">Este Trimestre</option>
+            <option value="year">Este Año</option>
+          </select>
         </div>
-        <div class="card-body">
-          <div class="activity-item" v-for="activity in recentActivities" :key="activity.id">
-            <div class="activity-icon" :style="{ background: activity.color }">
-              <i :class="activity.icon"></i>
-            </div>
-            <div class="activity-content">
-              <p>{{ activity.description }}</p>
-              <span>{{ activity.time }}</span>
-            </div>
-          </div>
+        <div class="chart-container">
+          <canvas ref="statusChart"></canvas>
         </div>
       </div>
 
-      <!-- Tabla de Usuarios Recientes -->
-      <div class="card recent-users">
+      <div class="chart-card">
         <div class="card-header">
-          <h3>Usuarios Recientes</h3>
-          <button class="btn-link">Ver todos</button>
+          <h3>Distribución por Área</h3>
+          <button class="btn-refresh" @click="refreshData">
+            <i class="fas fa-sync-alt"></i>
+          </button>
         </div>
-        <div class="card-body">
-          <div class="user-item" v-for="user in recentUsers" :key="user.id">
-            <div class="user-avatar-small" :style="{ background: user.color }">
-              {{ user.initials }}
-            </div>
-            <div class="user-info">
-              <div class="user-name">{{ user.name }}</div>
-              <div class="user-email">{{ user.email }}</div>
-            </div>
-            <span class="user-status" :class="user.status">
-              {{ user.status }}
-            </span>
-          </div>
+        <div class="chart-container">
+          <canvas ref="areaChart"></canvas>
         </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity Table -->
+    <div class="activity-section">
+      <div class="section-header">
+        <h3>Actividad Reciente</h3>
+        <button class="btn-view-all">Ver Todos</button>
+      </div>
+      <div class="table-container">
+        <table class="activity-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Proyecto</th>
+              <th>Estado</th>
+              <th>Responsable</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="activity in recentActivities" :key="activity.id">
+              <td>{{ activity.date }}</td>
+              <td>{{ activity.project }}</td>
+              <td>
+                <span class="status-badge" :class="activity.statusClass">
+                  {{ activity.status }}
+                </span>
+              </td>
+              <td>{{ activity.responsible }}</td>
+              <td>
+                <button class="btn-action" @click="viewDetails(activity.id)">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue';
-import { useAuthStore } from '../../api/auth';
+<script>
+import { ref, onMounted, computed } from 'vue';
+import { Chart, registerables } from 'chart.js';
 
-const authStore = useAuthStore();
+Chart.register(...registerables);
 
-// Estadísticas
-const statistics = ref([
-  {
-    title: 'Usuarios Totales',
-    value: '1,234',
-    icon: 'fas fa-users',
-    color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    change: 12.5
-  },
-  {
-    title: 'Ventas del Mes',
-    value: '$45,678',
-    icon: 'fas fa-dollar-sign',
-    color: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-    change: 8.3
-  },
-  {
-    title: 'Pedidos',
-    value: '456',
-    icon: 'fas fa-shopping-bag',
-    color: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-    change: -2.1
-  },
-  {
-    title: 'Productos',
-    value: '789',
-    icon: 'fas fa-box',
-    color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-    change: 15.7
+export default {
+  name: 'DashboardConcejo',
+  setup() {
+    // State
+    const statusChart = ref(null);
+    const areaChart = ref(null);
+    const selectedPeriod = ref('month');
+    const notifications = ref([
+      { id: 1, message: 'Nuevo proyecto registrado' },
+      { id: 2, message: 'Sesión programada para mañana' },
+      { id: 3, message: 'Documento pendiente de revisión' }
+    ]);
+
+    // Computed
+    const currentDate = computed(() => {
+      return new Date().toLocaleDateString('es-BO', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    });
+
+    // Data
+    const stats = ref([
+      {
+        title: 'Proyectos Activos',
+        value: '42',
+        icon: 'fas fa-file-alt',
+        color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        change: 12
+      },
+      {
+        title: 'Sesiones Realizadas',
+        value: '18',
+        icon: 'fas fa-calendar-check',
+        color: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        change: 8
+      },
+      {
+        title: 'Concejales Activos',
+        value: '11',
+        icon: 'fas fa-users',
+        color: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        change: 0
+      },
+      {
+        title: 'Documentos Pendientes',
+        value: '7',
+        icon: 'fas fa-clock',
+        color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+        change: -5
+      }
+    ]);
+
+    const recentActivities = ref([
+      {
+        id: 1,
+        date: '2024-01-15',
+        project: 'Ley de Movilidad Urbana',
+        status: 'En Revisión',
+        statusClass: 'status-review',
+        responsible: 'Lic. Pérez'
+      },
+      {
+        id: 2,
+        date: '2024-01-14',
+        project: 'Presupuesto Participativo',
+        status: 'Aprobado',
+        statusClass: 'status-approved',
+        responsible: 'Dr. Ramírez'
+      },
+      {
+        id: 3,
+        date: '2024-01-13',
+        project: 'Plan de Desarrollo Municipal',
+        status: 'Pendiente',
+        statusClass: 'status-pending',
+        responsible: 'Arq. Flores'
+      },
+      {
+        id: 4,
+        date: '2024-01-12',
+        project: 'Reglamento de Construcción',
+        status: 'En Discusión',
+        statusClass: 'status-discussion',
+        responsible: 'Ing. Torres'
+      }
+    ]);
+
+    // Methods
+    const initCharts = () => {
+      // Status Chart
+      if (statusChart.value) {
+        new Chart(statusChart.value, {
+          type: 'doughnut',
+          data: {
+            labels: ['En Revisión', 'Aprobado', 'Pendiente', 'En Discusión'],
+            datasets: [{
+              data: [12, 19, 7, 4],
+              backgroundColor: [
+                'rgba(102, 126, 234, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(255, 159, 64, 0.8)',
+                'rgba(255, 99, 132, 0.8)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      }
+
+      // Area Chart
+      if (areaChart.value) {
+        new Chart(areaChart.value, {
+          type: 'bar',
+          data: {
+            labels: ['Infraestructura', 'Social', 'Económico', 'Ambiental', 'Educación'],
+            datasets: [{
+              label: 'Proyectos por Área',
+              data: [15, 12, 8, 5, 8],
+              backgroundColor: [
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(255, 206, 86, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(153, 102, 255, 0.7)'
+              ],
+              borderColor: [
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1
+                }
+              }
+            }
+          }
+        });
+      }
+    };
+
+    const toggleNotifications = () => {
+      // Implement notification toggle
+      console.log('Toggle notifications');
+    };
+
+    const refreshData = () => {
+      // Implement data refresh
+      console.log('Refreshing data...');
+    };
+
+    const viewDetails = (id) => {
+      // Implement view details
+      console.log('Viewing details for:', id);
+    };
+
+    // Lifecycle
+    onMounted(() => {
+      initCharts();
+    });
+
+    return {
+      stats,
+      recentActivities,
+      notifications,
+      currentDate,
+      selectedPeriod,
+      statusChart,
+      areaChart,
+      toggleNotifications,
+      refreshData,
+      viewDetails
+    };
   }
-]);
-
-// Actividad reciente
-const recentActivities = ref([
-  {
-    id: 1,
-    icon: 'fas fa-user-plus',
-    description: 'Nuevo usuario registrado: Juan Pérez',
-    time: 'Hace 5 minutos',
-    color: '#667eea'
-  },
-  {
-    id: 2,
-    icon: 'fas fa-shopping-cart',
-    description: 'Nuevo pedido #1234 por $125.00',
-    time: 'Hace 15 minutos',
-    color: '#f5576c'
-  },
-  {
-    id: 3,
-    icon: 'fas fa-edit',
-    description: 'Producto "Laptop" actualizado',
-    time: 'Hace 1 hora',
-    color: '#4facfe'
-  },
-  {
-    id: 4,
-    icon: 'fas fa-comment',
-    description: 'Nuevo comentario en "iPhone 15"',
-    time: 'Hace 2 horas',
-    color: '#43e97b'
-  }
-]);
-
-// Usuarios recientes
-const recentUsers = ref([
-  {
-    id: 1,
-    name: 'María González',
-    email: 'maria@email.com',
-    initials: 'MG',
-    status: 'Activo',
-    color: '#667eea'
-  },
-  {
-    id: 2,
-    name: 'Carlos Rodríguez',
-    email: 'carlos@email.com',
-    initials: 'CR',
-    status: 'Pendiente',
-    color: '#f5576c'
-  },
-  {
-    id: 3,
-    name: 'Ana Martínez',
-    email: 'ana@email.com',
-    initials: 'AM',
-    status: 'Activo',
-    color: '#4facfe'
-  },
-  {
-    id: 4,
-    name: 'Luis Sánchez',
-    email: 'luis@email.com',
-    initials: 'LS',
-    status: 'Inactivo',
-    color: '#43e97b'
-  }
-]);
-
-onMounted(() => {
-  // Aquí puedes cargar datos desde la API
-  console.log('Dashboard montado');
-});
+};
 </script>
 
 <style scoped>
-.dashboard {
-  padding: 0;
-}
-
-/* Stats Grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.stat-card {
-  background: #fff;
-  border-radius: 12px;
+.dashboard-container {
   padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
+  background: #f5f7fa;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-.stat-icon {
-  width: 50px;
-  height: 50px;
+/* Header Styles */
+.dashboard-header {
+  background: white;
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 1.5rem;
-  flex-shrink: 0;
+  padding: 20px 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
-.stat-info {
-  flex: 1;
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1a1a2e;
-}
-
-.stat-title {
-  font-size: 0.85rem;
-  color: #999;
-  margin-top: 2px;
-}
-
-.stat-change {
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-top: 4px;
-}
-
-.stat-change.positive {
-  color: #43e97b;
-}
-
-.stat-change.negative {
-  color: #f5576c;
-}
-
-/* Dashboard Grid */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-/* Cards */
-.card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-}
-
-.card-header {
-  padding: 15px 20px;
-  border-bottom: 1px solid #f0f2f5;
+.header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.card-header h3 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1a1a2e;
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.btn-link {
+.shield-logo {
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.header-content h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #2d3748;
+}
+
+.subtitle {
+  margin: 0;
+  color: #718096;
+  font-size: 14px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.date-display {
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.btn-notification {
+  position: relative;
   background: none;
   border: none;
-  color: #667eea;
-  font-size: 0.85rem;
+  font-size: 20px;
   cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 4px;
-  transition: background 0.2s;
+  color: #4a5568;
+  transition: color 0.2s;
 }
 
-.btn-link:hover {
-  background: #f7fafc;
+.btn-notification:hover {
+  color: #2d3748;
 }
 
-.card-body {
-  padding: 15px 20px;
-  max-height: 350px;
-  overflow-y: auto;
-}
-
-.card-body::-webkit-scrollbar {
-  width: 4px;
-}
-
-.card-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.card-body::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
-  border-radius: 2px;
-}
-
-/* Activity Items */
-.activity-item {
-  display: flex;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid #f7fafc;
-}
-
-.activity-item:last-child {
-  border-bottom: none;
-}
-
-.activity-icon {
-  width: 35px;
-  height: 35px;
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #e53e3e;
+  color: white;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 0.9rem;
-  flex-shrink: 0;
-}
-
-.activity-content {
-  flex: 1;
-}
-
-.activity-content p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.activity-content span {
-  font-size: 0.75rem;
-  color: #999;
-}
-
-/* User Items */
-.user-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid #f7fafc;
-}
-
-.user-item:last-child {
-  border-bottom: none;
-}
-
-.user-avatar-small {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
+  padding: 2px 6px;
+  font-size: 10px;
   font-weight: bold;
-  font-size: 0.9rem;
-  flex-shrink: 0;
 }
 
-.user-info {
-  flex: 1;
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .user-name {
-  font-size: 0.9rem;
   font-weight: 500;
-  color: #1a1a2e;
+  color: #2d3748;
 }
 
-.user-email {
-  font-size: 0.8rem;
-  color: #999;
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
 }
 
-.user-status {
-  font-size: 0.7rem;
-  padding: 3px 10px;
+.stat-card {
+  background: white;
   border-radius: 12px;
-  font-weight: 500;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.user-status.Activo {
-  background: #d4edda;
-  color: #155724;
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12);
 }
 
-.user-status.Pendiente {
-  background: #fff3cd;
-  color: #856404;
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
 }
 
-.user-status.Inactivo {
-  background: #f8d7da;
-  color: #721c24;
+.stat-content h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  color: #2d3748;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  .dashboard-grid {
+.stat-content p {
+  margin: 0;
+  color: #718096;
+  font-size: 14px;
+}
+
+.stat-change {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.stat-change.positive {
+  color: #38a169;
+}
+
+.stat-change.negative {
+  color: #e53e3e;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 968px) {
+  .charts-grid {
     grid-template-columns: 1fr;
   }
 }
 
+.chart-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #2d3748;
+}
+
+.period-select {
+  padding: 5px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  color: #4a5568;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-refresh {
+  background: none;
+  border: none;
+  color: #718096;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.btn-refresh:hover {
+  transform: rotate(180deg);
+  color: #2d3748;
+}
+
+.chart-container {
+  height: 200px;
+  position: relative;
+}
+
+/* Activity Section */
+.activity-section {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #2d3748;
+}
+
+.btn-view-all {
+  padding: 8px 16px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.btn-view-all:hover {
+  background: #5a67d8;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.activity-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.activity-table th {
+  text-align: left;
+  padding: 12px;
+  background: #f7fafc;
+  color: #4a5568;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.activity-table td {
+  padding: 12px;
+  border-bottom: 1px solid #edf2f7;
+  color: #2d3748;
+}
+
+.activity-table tr:hover {
+  background: #f7fafc;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.status-review {
+  background: #ebf8ff;
+  color: #2b6cb0;
+}
+
+.status-approved {
+  background: #f0fff4;
+  color: #276749;
+}
+
+.status-pending {
+  background: #fffaf0;
+  color: #c05621;
+}
+
+.status-discussion {
+  background: #fef2f2;
+  color: #c53030;
+}
+
+.btn-action {
+  background: none;
+  border: none;
+  color: #667eea;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.btn-action:hover {
+  background: #ebf4ff;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
+  .dashboard-header {
+    padding: 15px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stat-card {
+    padding: 15px;
   }
 }
 
 @media (max-width: 480px) {
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 12px;
   }
 }
 </style>

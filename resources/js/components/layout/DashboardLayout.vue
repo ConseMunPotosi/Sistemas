@@ -26,6 +26,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+// ✅ Este import es correcto para tu estructura
 import { useAuthStore } from '../../api/auth.js';
 import Sidebar from './Sidebar.vue';
 import Header from './Header.vue';
@@ -57,15 +58,19 @@ const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value;
 };
 
+// 🔧 CORREGIDO: Usar el nombre correcto de la ruta
 const handleLogout = async () => {
   try {
     await authStore.logout();
-    router.push({ name: 'login' });
+    // 🔧 CAMBIO IMPORTANTE: Usar 'loginCMP' en lugar de 'login'
+    await router.replace({ name: 'loginCMP' });
+
   } catch (error) {
-    console.error('Error al cerrar sesión:', error);
+
     // Si hay error, forzar logout local
     authStore.clearAuth();
-    router.push({ name: 'login' });
+    // 🔧 Fallback con URL directa
+    window.location.href = '/loginCMP';
   }
 };
 
@@ -75,20 +80,34 @@ const handleLogout = async () => {
 onMounted(async () => {
   // Verificar autenticación
   if (!authStore.isAuthenticated) {
-    router.push({ name: 'login' });
+    console.log('🔍 DashboardLayout - No autenticado');
+    // 🔧 CAMBIO: Usar 'loginCMP'
+    router.replace({ name: 'loginCMP' });
     return;
   }
 
   // Si está autenticado pero no tiene datos del usuario, obtenerlos
   if (authStore.token && !authStore.user) {
     try {
+      console.log('🔍 DashboardLayout - Obteniendo usuario...');
       await authStore.fetchUser();
+      console.log('🔍 DashboardLayout - Usuario obtenido:', authStore.user);
     } catch (error) {
-      console.error('Error al obtener datos del usuario:', error);
+      console.error('❌ Error al obtener datos del usuario:', error);
       authStore.clearAuth();
-      router.push({ name: 'login' });
+      // 🔧 CAMBIO: Usar 'loginCMP'
+      router.replace({ name: 'loginCMP' });
       return;
     }
+  }
+
+  // Verificar si el usuario está activo
+  if (authStore.user && authStore.user.activo === false) {
+    console.log('🔍 DashboardLayout - Usuario inactivo');
+    authStore.clearAuth();
+    // 🔧 CAMBIO: Usar 'loginCMP'
+    router.replace({ name: 'loginCMP' });
+    return;
   }
 
   // Verificar permisos para la ruta actual
@@ -96,17 +115,18 @@ onMounted(async () => {
   if (requiredPermission) {
     const hasPermission = authStore.hasPermission(requiredPermission);
     if (!hasPermission) {
-      // Redirigir a dashboard o página de no autorizado
-      router.push({ name: 'dashboard' });
+      console.log('🔍 DashboardLayout - Sin permiso:', requiredPermission);
+      // ✅ Esto está bien, 'dashboard' es el nombre correcto
+      router.replace({ name: 'dashboard' });
+      return;
     }
   }
 
   isLoading.value = false;
 });
 
-// Escuchar cambios en la autenticación
 onBeforeUnmount(() => {
-  // Limpiar si es necesario
+  console.log('🔍 DashboardLayout - Desmontando');
 });
 </script>
 

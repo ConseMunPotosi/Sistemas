@@ -38,7 +38,7 @@ class AuthController extends Controller
                 ], 422);
             }
 
-            // PASO 2: Buscar el usuario por usuario o correo
+            // PASO 2: Buscar el usuario por usuario
             $usuario = Usuario::where('usuario', $request->usuario)
                 ->with(['roles', 'funcionario', 'funcionario.cargo', 'funcionario.unidad'])
                 ->first();

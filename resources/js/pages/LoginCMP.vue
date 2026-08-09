@@ -128,7 +128,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores'
 
@@ -152,6 +152,7 @@ const loginError = ref('')
 const rememberMe = ref(false)
 const showPassword = ref(false)
 
+
 // Computed
 const isDevelopment = computed(() => import.meta.env.MODE === 'development')
 
@@ -171,9 +172,6 @@ const validateForm = () => {
     isValid = false
   } else if (form.username.length < 3) {
     errors.username = 'El usuario debe tener al menos 3 caracteres'
-    isValid = false
-  } else if (!/^[a-zA-Z0-9_]+$/.test(form.username)) {
-    errors.username = 'El usuario solo puede contener letras, números y guión bajo'
     isValid = false
   }
 
