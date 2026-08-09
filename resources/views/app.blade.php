@@ -18,6 +18,14 @@
 
     <!-- Scripts -->
     @vite(['resources/js/app.js'])
+
+    <script>
+        // Prevenir que el navegador guarde esta página en caché
+        if (window.performance && window.performance.navigation.type === 2) {
+            // Si la página fue cargada desde caché (Back-Forward), recargar
+            window.location.reload();
+        }
+    </script>
 </head>
 <body>
     <div id="app"></div>

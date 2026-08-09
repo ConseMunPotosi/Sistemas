@@ -2,7 +2,12 @@
   <div v-if="isReady" class="dashboard-layout">
     <Sidebar :is-collapsed="isCollapsed" @toggle-sidebar="toggleSidebar" />
     <div class="main-content" :class="{ expanded: isCollapsed }">
-      <Header :user="user" @logout="handleLogout" />
+      <!-- 🔧 Pasar user como prop, con valor por defecto -->
+      <Header
+        :user="user || null"
+        @logout="handleLogout"
+        @toggle-sidebar="toggleSidebar"
+      />
       <main class="content-area">
         <router-view />
       </main>
@@ -15,7 +20,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeMount } from 'vue';
+import { ref, computed, onMounted, onBeforeMount, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../api/auth.js';
 import Sidebar from './Sidebar.vue';
@@ -25,56 +30,96 @@ const router = useRouter();
 const authStore = useAuthStore();
 const isCollapsed = ref(false);
 const isReady = ref(false);
+const isLoggingOut = ref(false);
 
 const user = computed(() => authStore.user);
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+
+// 🔧 Watch para detectar cuando el usuario se desautentica
+watch(isAuthenticated, (newVal) => {
+  if (!newVal && !isLoggingOut.value) {
+    console.log('🔍 Autenticación perdida, redirigiendo...');
+    window.location.replace('/loginCMP');
+  }
+});
 
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value;
 };
 
+// 🔧 Handle Logout - CORREGIDO
 const handleLogout = async () => {
-  console.log('🔍 Cerrando sesión...');
-  await authStore.logout();
-  console.log('✅ Sesión cerrada');
+  // Evitar múltiples llamadas
+  if (isLoggingOut.value) return;
 
-  // 🔧 Redirigir y reemplazar el historial para evitar back/forward
-  window.location.replace('/loginCMP');
+  isLoggingOut.value = true;
+
+  try {
+    await authStore.logout();
+
+    // 🔧 Limpiar estado local
+    isReady.value = false;
+
+    // 🔧 Redirigir usando replace
+    window.location.replace('/loginCMP');
+
+  } catch (error) {
+    console.error('❌ Error al cerrar sesión:', error);
+    // Si hay error, forzar limpieza
+    authStore.clearAuth();
+    isReady.value = false;
+    window.location.replace('/loginCMP');
+  } finally {
+    isLoggingOut.value = false;
+  }
 };
 
-// 🔧 Verificar autenticación ANTES de montar el componente
-onBeforeMount(() => {
-  console.log('🔍 DashboardLayout - Verificando autenticación...');
+// 🔧 Verificar autenticación
+const checkAuth = async () => {
+  const token = localStorage.getItem('auth_token');
 
-  if (!authStore.isAuthenticated) {
-    console.log('❌ No autenticado, redirigiendo...');
+  if (!token) {
+    console.log('❌ No hay token, redirigiendo...');
+    window.location.replace('/loginCMP');
+    return false;
+  }
+
+  // Si hay token pero no usuario, obtenerlo
+  if (token && !authStore.user) {
+    try {
+      await authStore.fetchUser();
+      if (!authStore.user) {
+        console.log('❌ No se pudo obtener usuario');
+        window.location.replace('/loginCMP');
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ Error obteniendo usuario:', error);
+      window.location.replace('/loginCMP');
+      return false;
+    }
+  }
+
+  return true;
+};
+
+// 🔧 Before Mount - Verificar antes de renderizar
+onBeforeMount(async () => {
+  // Si ya está desautenticado, redirigir
+  if (!authStore.isAuthenticated && !localStorage.getItem('auth_token')) {
     window.location.replace('/loginCMP');
     return;
   }
 });
 
+// 🔧 Mount - Verificar al cargar
 onMounted(async () => {
-  // Si no está autenticado, redirigir
-  if (!authStore.isAuthenticated) {
-    window.location.replace('/loginCMP');
+  const isValid = await checkAuth();
+  if (!isValid) {
     return;
   }
 
-  // Si hay token pero no usuario, obtenerlo
-  if (authStore.token && !authStore.user) {
-    try {
-      await authStore.fetchUser();
-      if (!authStore.user) {
-        window.location.replace('/loginCMP');
-        return;
-      }
-    } catch (error) {
-      window.location.replace('/loginCMP');
-      return;
-    }
-  }
-
   isReady.value = true;
-  console.log('✅ DashboardLayout - Listo');
 });
 </script>
 

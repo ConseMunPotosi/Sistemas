@@ -1,11 +1,15 @@
 <template>
   <aside class="sidebar" :class="{ collapsed: isCollapsed }">
-    <div class="logo-container">
-      <h2 v-if="!isCollapsed" class="logo-text">Sistema</h2>
-      <h2 v-else class="logo-text-short">S</h2>
+    <!-- Logo -->
+    <div class="sidebar-header">
+      <div class="logo">
+        <span v-if="!isCollapsed" class="logo-text">Sistema CMP</span>
+        <span v-else class="logo-icon">⚙️</span>
+      </div>
     </div>
 
-    <nav class="nav-menu">
+    <!-- Navegación -->
+    <nav class="sidebar-nav">
       <router-link
         v-for="item in menuItems"
         :key="item.path"
@@ -13,17 +17,10 @@
         class="nav-item"
         :class="{ active: $route.path === item.path }"
       >
-        <span class="material-icons nav-icon">{{ item.icon }}</span>
+        <span class="nav-icon">{{ item.icon }}</span>
         <span v-if="!isCollapsed" class="nav-text">{{ item.name }}</span>
       </router-link>
     </nav>
-
-    <div class="sidebar-footer">
-      <div v-if="!isCollapsed" class="user-info">
-        <span class="user-name">{{ user?.displayName || user?.usuario }}</span>
-        <span class="user-email">{{ user?.correo }}</span>
-      </div>
-    </div>
   </aside>
 </template>
 
@@ -31,6 +28,7 @@
 import { computed } from 'vue';
 import { useAuthStore } from '../../api/auth.js';
 
+// Props
 const props = defineProps({
   isCollapsed: {
     type: Boolean,
@@ -42,126 +40,174 @@ const props = defineProps({
   }
 });
 
+// Store
 const authStore = useAuthStore();
 
-// Menú dinámico basado en permisos
+// 🔧 Menú items con verificación de permisos (sin usar hasPermission)
 const menuItems = computed(() => {
   const items = [
-    { path: '/dashboard', name: 'Dashboard', icon: 'dashboard', permission: 'dashboard:ver' }
+    { path: '/dashboard', name: 'Dashboard', icon: '📊', permission: 'dashboard:ver' }
   ];
 
-  // Verificar permisos para mostrar items
-  if (authStore.hasPermission('documentos:ver')) {
-    items.push({ path: '/documentos', name: 'Documentos', icon: 'description', permission: 'documentos:ver' });
+  // 🔧 Verificar si el usuario tiene permisos de forma segura
+  const userPermissions = authStore.user?.permissions || {};
+  const userRoles = authStore.user?.roles || [];
+
+  // Verificar si es admin (tiene rol Administrador)
+  const isAdmin = userRoles.some(r => r.nombre === 'Administrador');
+
+  // Verificar permisos de documentos
+  if (userPermissions.documentos?.includes('ver') || isAdmin) {
+    items.push({ path: '/documentos', name: 'Documentos', icon: '📄', permission: 'documentos:ver' });
   }
 
-  if (authStore.hasPermission('noticias:ver')) {
-    items.push({ path: '/noticias', name: 'Noticias', icon: 'newspaper', permission: 'noticias:ver' });
+  // Verificar permisos de noticias
+  if (userPermissions.noticias?.includes('ver') || isAdmin) {
+    items.push({ path: '/noticias-admin', name: 'Noticias', icon: '📰', permission: 'noticias:ver' });
   }
 
-  if (authStore.hasPermission('usuarios:ver')) {
-    items.push({ path: '/usuarios', name: 'Usuarios', icon: 'people', permission: 'usuarios:ver' });
+  // Verificar permisos de usuarios (solo admin)
+  if (isAdmin) {
+    items.push({ path: '/users', name: 'Usuarios', icon: '👥', permission: 'usuarios:ver' });
+    items.push({ path: '/settings', name: 'Configuración', icon: '⚙️', permission: 'configuracion:ver' });
   }
 
-  // Solo administradores
-  if (authStore.isAdmin) {
-    items.push({ path: '/configuracion', name: 'Configuración', icon: 'settings', permission: 'configuracion:ver' });
-  }
+  // Verificar permisos de profile (siempre visible)
+  items.push({ path: '/dashboard/profile', name: 'Mi Perfil', icon: '👤' });
 
   return items;
 });
 </script>
 
 <style scoped>
+/* ==========================================
+   SIDEBAR - ESTILOS
+   ========================================== */
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
   width: 250px;
   height: 100vh;
-  background: #1a1a2e;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
   color: white;
   display: flex;
   flex-direction: column;
   transition: width 0.3s ease;
-  z-index: 200;
+  z-index: 1000;
   overflow: hidden;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar.collapsed {
   width: 70px;
 }
 
-.logo-container {
+.sidebar-header {
   padding: 20px;
-  text-align: center;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo-text {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
-  color: #4f46e5;
+  color: #fff;
+  letter-spacing: 1px;
 }
 
-.logo-text-short {
-  font-size: 24px;
-  font-weight: 700;
-  color: #4f46e5;
+.logo-icon {
+  font-size: 28px;
 }
 
-.nav-menu {
+.sidebar-nav {
   flex: 1;
-  padding: 20px 0;
+  padding: 20px 12px;
   overflow-y: auto;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  color: rgba(255,255,255,0.7);
+  padding: 12px 16px;
+  margin-bottom: 4px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .nav-item:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.08);
   color: white;
 }
 
 .nav-item.active {
-  background: #4f46e5;
+  background: rgba(79, 70, 229, 0.3);
   color: white;
+  box-shadow: inset 3px 0 0 #4f46e5;
 }
 
 .nav-icon {
-  font-size: 24px;
-  margin-right: 15px;
-  min-width: 24px;
+  font-size: 20px;
+  min-width: 30px;
+  text-align: center;
+}
+
+.nav-text {
+  margin-left: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .sidebar.collapsed .nav-text {
   display: none;
 }
 
-.sidebar-footer {
-  padding: 20px;
-  border-top: 1px solid rgba(255,255,255,0.1);
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 12px;
 }
 
-.user-info {
-  display: flex;
-  flex-direction: column;
+/* Scrollbar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
 }
 
-.user-name {
-  font-weight: 500;
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.user-email {
-  font-size: 12px;
-  color: rgba(255,255,255,0.7);
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 0;
+    transform: translateX(-100%);
+  }
+
+  .sidebar:not(.collapsed) {
+    width: 250px;
+    transform: translateX(0);
+  }
 }
 </style>

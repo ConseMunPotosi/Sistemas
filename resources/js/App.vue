@@ -13,10 +13,6 @@ const authStore = useAuthStore();
 // 🔧 Función para verificar autenticación en cambios de historial
 const handlePopState = () => {
   const currentPath = window.location.pathname;
-
-  console.log('🔍 PopState - Path:', currentPath);
-  console.log('🔍 PopState - Autenticado:', authStore.isAuthenticated);
-
   // Si está en dashboard y no autenticado, redirigir
   if (currentPath.includes('/dashboard') && !authStore.isAuthenticated) {
     console.log('❌ PopState - No autenticado en dashboard, redirigiendo...');
