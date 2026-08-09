@@ -13,7 +13,7 @@ import Settings from '@/components/dashboard/Settings.vue';
 import Users from '@/components/dashboard/Users.vue';
 import Inicio from '@/pages/Inicio.vue';
 
-// Importaciones dinámicas para páginas públicas
+// Importaciones dinámicas
 const Directiva = () => import('../pages/Directiva.vue');
 const Concejales = () => import('../pages/Concejales.vue');
 const Comisiones = () => import('../pages/Comisiones.vue');
@@ -23,156 +23,91 @@ const Ordenanzas = () => import('../pages/Ordenanzas.vue');
 const Noticias = () => import('../pages/Noticias.vue');
 const Sesiones = () => import('../pages/Sesiones.vue');
 
-// ==========================================
-// DEFINICIÓN DE RUTAS
-// ==========================================
 const routes = [
-    // ==========================================
-    // RUTAS PÚBLICAS (Layout Principal)
-    // ==========================================
+    // RUTAS PÚBLICAS
     {
         path: '/',
         component: IndexLayout,
         children: [
-            {
-                path: '',
-                name: 'inicio',
-                component: Inicio
-            },
-            {
-                path: 'directiva',
-                name: 'directiva',
-                component: Directiva
-            },
-            {
-                path: 'concejales',
-                name: 'concejales',
-                component: Concejales
-            },
-            {
-                path: 'comisiones',
-                name: 'comisiones',
-                component: Comisiones
-            },
-            {
-                path: 'leyes',
-                name: 'leyes',
-                component: Leyes
-            },
-            {
-                path: 'resoluciones',
-                name: 'resoluciones',
-                component: Resoluciones
-            },
-            {
-                path: 'ordenanzas',
-                name: 'ordenanzas',
-                component: Ordenanzas
-            },
-            {
-                path: 'noticias',
-                name: 'noticias',
-                component: Noticias
-            },
-            {
-                path: 'sesiones',
-                name: 'sesiones',
-                component: Sesiones
-            }
-            // ❌ ELIMINADO: loginCMP de aquí para evitar duplicados
+            { path: '', name: 'inicio', component: Inicio },
+            { path: 'directiva', name: 'directiva', component: Directiva },
+            { path: 'concejales', name: 'concejales', component: Concejales },
+            { path: 'comisiones', name: 'comisiones', component: Comisiones },
+            { path: 'leyes', name: 'leyes', component: Leyes },
+            { path: 'resoluciones', name: 'resoluciones', component: Resoluciones },
+            { path: 'ordenanzas', name: 'ordenanzas', component: Ordenanzas },
+            { path: 'noticias', name: 'noticias', component: Noticias },
+            { path: 'sesiones', name: 'sesiones', component: Sesiones }
         ]
     },
-
-    // ==========================================
-    // RUTA DE LOGIN (Independiente)
-    // ==========================================
+    // LOGIN
     {
         path: '/loginCMP',
         name: 'loginCMP',
-        component: LoginCMP,
-        meta: {
-            requiresGuest: true,
-            layout: 'empty',
-            hidden: true
-        }
+        component: LoginCMP
     },
-
-    // ==========================================
-    // RUTAS PROTEGIDAS (Dashboard)
-    // ==========================================
+    // DASHBOARD (Protegido)
     {
         path: '/dashboard',
         component: DashboardLayout,
-        meta: {
-            requiresAuth: true
-        },
+        meta: { requiresAuth: true },
         children: [
-            {
-                path: '',
-                name: 'dashboard',
-                component: Dashboard,
-                meta: {
-                    title: 'Dashboard',
-                    icon: 'home'
-                }
-            },
-            {
-                path: 'profile',
-                name: 'profile',
-                component: Profile,
-                meta: {
-                    title: 'Mi Perfil',
-                    icon: 'user',
-                    requiresAuth: true
-                }
-            },
-            {
-                path: 'settings',
-                name: 'settings',
-                component: Settings,
-                meta: {
-                    title: 'Configuración',
-                    icon: 'settings',
-                    requiresAuth: true,
-                    requiresPermission: 'configuracion:ver'
-                }
-            },
-            {
-                path: 'users',
-                name: 'users',
-                component: Users,
-                meta: {
-                    title: 'Usuarios',
-                    icon: 'users',
-                    requiresAuth: true,
-                    requiresPermission: 'usuarios:ver'
-                }
-            }
+            { path: '', name: 'dashboard', component: Dashboard },
+            { path: 'profile', name: 'profile', component: Profile },
+            { path: 'settings', name: 'settings', component: Settings },
+            { path: 'users', name: 'users', component: Users }
         ]
     },
-
-    // ==========================================
-    // RUTA 404 - SIEMPRE AL FINAL
-    // ==========================================
-    {
-        path: '/:pathMatch(.*)*',
-        redirect: '/dashboard'
-    }
+    // 404
+    { path: '/:pathMatch(.*)*', redirect: '/' }
 ];
 
-// ==========================================
-// CONFIGURACIÓN DEL ROUTER
-// ==========================================
 const router = createRouter({
     history: createWebHistory(),
-    routes,
-    scrollBehavior(to, from, savedPosition) {
-        if (savedPosition) {
-            return savedPosition;
-        } else {
-            return { top: 0 };
-        }
-    }
+    routes
 });
 
+// ==========================================
+// GUARDIA DE NAVEGACIÓN - QUE FUNCIONA
+// ==========================================
+router.beforeEach((to, from, next) => {
+    const authStore = useAuthStore();
+
+    // 🔧 Actualizar estado de autenticación desde localStorage
+    const token = localStorage.getItem('auth_token');
+    if (token && !authStore.isAuthenticated) {
+        authStore.isAuthenticated = true;
+        authStore.token = token;
+    }
+
+    if (!token && authStore.isAuthenticated) {
+        authStore.clearAuth();
+    }
+
+    // Rutas públicas
+    const publicPaths = [
+        '/', '/inicio', '/directiva', '/concejales',
+        '/comisiones', '/leyes', '/resoluciones',
+        '/ordenanzas', '/noticias', '/sesiones', '/loginCMP'
+    ];
+
+    // Si es ruta pública, permitir
+    if (publicPaths.includes(to.path)) {
+        next();
+        return;
+    }
+
+    // Si es dashboard, verificar autenticación
+    if (to.path.startsWith('/dashboard')) {
+        if (!authStore.isAuthenticated) {
+            // 🔧 Usar replace para evitar que el usuario vuelva atrás
+            next({ path: '/loginCMP', replace: true });
+            return;
+        }
+        next();
+        return;
+    }
+
+    next();
+});
 export default router;

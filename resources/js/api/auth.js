@@ -126,8 +126,15 @@ export const useAuthStore = defineStore('auth', {
             this.user = null;
             this.isAuthenticated = false;
             this.error = null;
+
             localStorage.removeItem('auth_token');
+            localStorage.removeItem('remember_me');
+            localStorage.removeItem('saved_username');
+            localStorage.removeItem('saved_password');
+
             delete api.defaults.headers.common['Authorization'];
+
+            console.log('🔍 Auth - Todo limpiado');
 
         },
 
