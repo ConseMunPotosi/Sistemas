@@ -76,8 +76,6 @@ const handleLogout = async () => {
 // 🔧 Verificar autenticación
 const checkAuth = async () => {
   const token = localStorage.getItem('auth_token');
-  console.log('🔍 DashboardLayout - Verificando autenticación...');
-  console.log('🔍 Token:', token ? '✅' : '❌');
 
   if (!token) {
     console.log('❌ No hay token, redirigiendo...');
@@ -111,15 +109,12 @@ onBeforeMount(async () => {
 });
 
 onMounted(async () => {
-  console.log('🔍 DashboardLayout - Montando...');
-
   const isValid = await checkAuth();
   if (!isValid) {
     return;
   }
 
   isReady.value = true;
-  console.log('✅ DashboardLayout - Listo');
 });
 </script>
 

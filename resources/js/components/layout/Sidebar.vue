@@ -3,31 +3,182 @@
     <!-- Logo -->
     <div class="sidebar-header">
       <div class="logo">
-        <span v-if="!isCollapsed" class="logo-text">
-          <img src="/images/Logo_blanco.png" alt="Logo Concejo Municipal" class="logo-image" />
-        </span>
-        <span v-else class="logo-icon">⚙️</span>
+        <img
+          v-if="!isCollapsed"
+          src="/images/Logo_blanco.png"
+          alt="Logo Concejo Municipal"
+          class="logo-image"
+        />
+        <span v-else class="logo-icon">🏛️</span>
       </div>
     </div>
 
     <!-- Navegación -->
     <nav class="sidebar-nav">
-      <router-link
-        v-for="item in menuItems"
-        :key="item.path"
-        :to="item.path"
-        class="nav-item"
-        :class="{ active: $route.path === item.path }"
-      >
-        <span class="nav-icon">{{ item.icon }}</span>
-        <span v-if="!isCollapsed" class="nav-text">{{ item.name }}</span>
-      </router-link>
+      <!-- ========================================== -->
+      <!-- 1. GESTIÓN INSTITUCIONAL                    -->
+      <!-- ========================================== -->
+      <div class="menu-section">
+        <div
+          class="nav-item menu-toggle"
+          :class="{ active: isInstitucionalOpen }"
+          @click="toggleMenu('institucional')"
+        >
+          <span class="nav-icon">🏛️</span>
+          <span v-if="!isCollapsed" class="nav-text">Gestión Institucional</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: isInstitucionalOpen }">▶</span>
+        </div>
+
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: isInstitucionalOpen }">
+          <router-link to="/institucional/funcionarios" class="submenu-item" :class="{ active: $route.path.includes('/institucional/funcionarios') }">
+            <span class="submenu-icon">👤</span> Funcionarios
+          </router-link>
+          <router-link to="/institucional/unidades" class="submenu-item" :class="{ active: $route.path.includes('/institucional/unidades') }">
+            <span class="submenu-icon">🏢</span> Unidades
+          </router-link>
+          <router-link to="/institucional/cargos" class="submenu-item" :class="{ active: $route.path.includes('/institucional/cargos') }">
+            <span class="submenu-icon">💼</span> Cargos
+          </router-link>
+          <router-link to="/institucional/roles" class="submenu-item" :class="{ active: $route.path.includes('/institucional/roles') }">
+            <span class="submenu-icon">🔑</span> Roles
+          </router-link>
+          <router-link to="/institucional/permisos" class="submenu-item" :class="{ active: $route.path.includes('/institucional/permisos') }">
+            <span class="submenu-icon">🛡️</span> Permisos
+          </router-link>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- 2. GESTIÓN COMUNICACIONAL                  -->
+      <!-- ========================================== -->
+      <div class="menu-section">
+        <div
+          class="nav-item menu-toggle"
+          :class="{ active: isComunicacionalOpen }"
+          @click="toggleMenu('comunicacional')"
+        >
+          <span class="nav-icon">📢</span>
+          <span v-if="!isCollapsed" class="nav-text">Gestión Comunicacional</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: isComunicacionalOpen }">▶</span>
+        </div>
+
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: isComunicacionalOpen }">
+          <router-link to="/comunicacion/sesiones" class="submenu-item" :class="{ active: $route.path.includes('/comunicacion/sesiones') }">
+            <span class="submenu-icon">📋</span> Sesiones
+          </router-link>
+          <router-link to="/comunicacion/noticias" class="submenu-item" :class="{ active: $route.path.includes('/comunicacion/noticias') }">
+            <span class="submenu-icon">📰</span> Noticias
+          </router-link>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- 3. GESTIÓN DOCUMENTAL                      -->
+      <!-- ========================================== -->
+      <div class="menu-section">
+        <div
+          class="nav-item menu-toggle"
+          :class="{ active: isDocumentalOpen }"
+          @click="toggleMenu('documental')"
+        >
+          <span class="nav-icon">📄</span>
+          <span v-if="!isCollapsed" class="nav-text">Gestión Documental</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: isDocumentalOpen }">▶</span>
+        </div>
+
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: isDocumentalOpen }">
+          <router-link to="/documental/documentos" class="submenu-item" :class="{ active: $route.path.includes('/documental/documentos') }">
+            <span class="submenu-icon">📄</span> Documentos
+          </router-link>
+          <router-link to="/documental/tipos" class="submenu-item" :class="{ active: $route.path.includes('/documental/tipos') }">
+            <span class="submenu-icon">🏷️</span> Tipos de Documento
+          </router-link>
+          <router-link to="/documental/archivos" class="submenu-item" :class="{ active: $route.path.includes('/documental/archivos') }">
+            <span class="submenu-icon">📁</span> Archivos
+          </router-link>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- 4. GESTIÓN DE RECURSOS HUMANOS             -->
+      <!-- ========================================== -->
+      <div class="menu-section">
+        <div
+          class="nav-item menu-toggle"
+          :class="{ active: isRrhhOpen }"
+          @click="toggleMenu('rrhh')"
+        >
+          <span class="nav-icon">👥</span>
+          <span v-if="!isCollapsed" class="nav-text">Recursos Humanos</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: isRrhhOpen }">▶</span>
+        </div>
+
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: isRrhhOpen }">
+          <router-link to="/rrhh/empleados" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/empleados') }">
+            <span class="submenu-icon">👨‍💼</span> Empleados
+          </router-link>
+          <router-link to="/rrhh/asistencias" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/asistencias') }">
+            <span class="submenu-icon">📅</span> Asistencias
+          </router-link>
+          <router-link to="/rrhh/vacaciones" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/vacaciones') }">
+            <span class="submenu-icon">🏖️</span> Vacaciones
+          </router-link>
+          <router-link to="/rrhh/permisos" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/permisos') }">
+            <span class="submenu-icon">📋</span> Permisos
+          </router-link>
+          <router-link to="/rrhh/contratos" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/contratos') }">
+            <span class="submenu-icon">📄</span> Contratos
+          </router-link>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- 5. GESTIÓN DE ACTIVOS FIJOS                -->
+      <!-- ========================================== -->
+      <div class="menu-section">
+        <div
+          class="nav-item menu-toggle"
+          :class="{ active: isActivosOpen }"
+          @click="toggleMenu('activos')"
+        >
+          <span class="nav-icon">💻</span>
+          <span v-if="!isCollapsed" class="nav-text">Activos Fijos</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: isActivosOpen }">▶</span>
+        </div>
+
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: isActivosOpen }">
+          <router-link to="/activos/inventario" class="submenu-item" :class="{ active: $route.path.includes('/activos/inventario') }">
+            <span class="submenu-icon">📦</span> Inventario
+          </router-link>
+          <router-link to="/activos/bienes" class="submenu-item" :class="{ active: $route.path.includes('/activos/bienes') }">
+            <span class="submenu-icon">🏷️</span> Bienes
+          </router-link>
+          <router-link to="/activos/categorias" class="submenu-item" :class="{ active: $route.path.includes('/activos/categorias') }">
+            <span class="submenu-icon">📂</span> Categorías
+          </router-link>
+          <router-link to="/activos/asignaciones" class="submenu-item" :class="{ active: $route.path.includes('/activos/asignaciones') }">
+            <span class="submenu-icon">📋</span> Asignaciones
+          </router-link>
+          <router-link to="/activos/mantenimientos" class="submenu-item" :class="{ active: $route.path.includes('/activos/mantenimientos') }">
+            <span class="submenu-icon">🔧</span> Mantenimientos
+          </router-link>
+          <router-link to="/activos/bajas" class="submenu-item" :class="{ active: $route.path.includes('/activos/bajas') }">
+            <span class="submenu-icon">🗑️</span> Bajas
+          </router-link>
+          <router-link to="/activos/reportes" class="submenu-item" :class="{ active: $route.path.includes('/activos/reportes') }">
+            <span class="submenu-icon">📊</span> Reportes
+          </router-link>
+          <router-link to="/activos/proveedores" class="submenu-item" :class="{ active: $route.path.includes('/activos/proveedores') }">
+            <span class="submenu-icon">🏢</span> Proveedores
+          </router-link>
+        </div>
+      </div>
     </nav>
   </aside>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '../../api/auth.js';
 
 // Props
@@ -45,40 +196,56 @@ const props = defineProps({
 // Store
 const authStore = useAuthStore();
 
-// 🔧 Menú items con verificación de permisos (sin usar hasPermission)
-const menuItems = computed(() => {
-  const items = [
-    { path: '/dashboard', name: 'Dashboard', icon: '📊', permission: 'dashboard:ver' }
-  ];
+// ==========================================
+// ESTADO DE MENÚS - TODOS ABIERTOS POR DEFECTO
+// ==========================================
+const isInstitucionalOpen = ref(true);
+const isComunicacionalOpen = ref(true);
+const isDocumentalOpen = ref(true);
+const isRrhhOpen = ref(true);
+const isActivosOpen = ref(true);
 
-  // 🔧 Verificar si el usuario tiene permisos de forma segura
-  const userPermissions = authStore.user?.permissions || {};
-  const userRoles = authStore.user?.roles || [];
-
-  // Verificar si es admin (tiene rol Administrador)
-  const isAdmin = userRoles.some(r => r.nombre === 'Administrador');
-
-  // Verificar permisos de documentos
-  if (userPermissions.documentos?.includes('ver') || isAdmin) {
-    items.push({ path: '/documentos', name: 'Documentos', icon: '📄', permission: 'documentos:ver' });
-  }
-
-  // Verificar permisos de noticias
-  if (userPermissions.noticias?.includes('ver') || isAdmin) {
-    items.push({ path: '/noticias-admin', name: 'Noticias', icon: '📰', permission: 'noticias:ver' });
-  }
-
-  // Verificar permisos de usuarios (solo admin)
-  if (isAdmin) {
-    items.push({ path: '/users', name: 'Usuarios', icon: '👥', permission: 'usuarios:ver' });
-    items.push({ path: '/settings', name: 'Configuración', icon: '⚙️', permission: 'configuracion:ver' });
-  }
-
-  // Verificar permisos de profile (siempre visible)
-  items.push({ path: '/dashboard/profile', name: 'Mi Perfil', icon: '👤' });
-
-  return items;
+// ==========================================
+// COMPUTED
+// ==========================================
+const userRoles = computed(() => {
+  if (!props.user?.roles) return 'Sin roles';
+  return props.user.roles.map(r => r.nombre).join(', ');
 });
+
+// ==========================================
+// MÉTODOS
+// ==========================================
+const toggleMenu = (menu) => {
+  if (props.isCollapsed) return;
+
+  switch(menu) {
+    case 'institucional':
+      isInstitucionalOpen.value = !isInstitucionalOpen.value;
+      break;
+    case 'comunicacional':
+      isComunicacionalOpen.value = !isComunicacionalOpen.value;
+      break;
+    case 'documental':
+      isDocumentalOpen.value = !isDocumentalOpen.value;
+      break;
+    case 'rrhh':
+      isRrhhOpen.value = !isRrhhOpen.value;
+      break;
+    case 'activos':
+      isActivosOpen.value = !isActivosOpen.value;
+      break;
+  }
+};
+
+// ==========================================
+// VERIFICACIÓN DE PERMISOS
+// ==========================================
+const hasRole = (roleName) => {
+  const userRoles = authStore.user?.roles || [];
+  return userRoles.some(r => r.nombre === roleName);
+};
+
 </script>
 
 <style scoped>
@@ -91,7 +258,7 @@ const menuItems = computed(() => {
   left: 0;
   width: 250px;
   height: 100vh;
-  background: #474A4E;
+  background: #2c3e50;
   color: white;
   display: flex;
   flex-direction: column;
@@ -105,6 +272,9 @@ const menuItems = computed(() => {
   width: 70px;
 }
 
+/* ==========================================
+   HEADER DEL SIDEBAR
+   ========================================== */
 .sidebar-header {
   padding: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -120,46 +290,46 @@ const menuItems = computed(() => {
   justify-content: center;
 }
 
-.logo-text {
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 1px;
+.logo-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  display: block;
+}
+
+.sidebar.collapsed .logo-image {
+  width: 35px;
+  height: 35px;
 }
 
 .logo-icon {
-  font-size: 28px;
+  font-size: 32px;
 }
 
+/* ==========================================
+   NAVEGACIÓN
+   ========================================== */
 .sidebar-nav {
   flex: 1;
-  padding: 20px 12px;
+  padding: 10px 12px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
+/* ==========================================
+   ITEMS DEL MENÚ
+   ========================================== */
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  margin-bottom: 4px;
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.6);
+  padding: 10px 14px;
+  margin-bottom: 2px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   transition: all 0.2s ease;
   cursor: pointer;
-}
-
-.logo-image {
-  width: 70%;
-  object-fit: contain; /* Mantiene la proporción */
-  display: block;
-  margin: 0 auto;     /* Centra horizontalmente */
-}
-
-/* 🔧 Cuando el sidebar está colapsado */
-.sidebar.collapsed .logo-image {
-  width: 40px;
-  height: 40px;
+  position: relative;
 }
 
 .nav-item:hover {
@@ -168,34 +338,135 @@ const menuItems = computed(() => {
 }
 
 .nav-item.active {
-  background: rgba(255, 255, 255, 0.08);;
+  background: rgba(79, 70, 229, 0.3);
   color: white;
-  box-shadow: inset 3px 0 0 white;
+  box-shadow: inset 3px 0 0 #4f46e5;
 }
 
 .nav-icon {
-  font-size: 20px;
+  font-size: 18px;
   min-width: 30px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .nav-text {
-  margin-left: 12px;
+  margin-left: 10px;
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
 }
 
+/* ==========================================
+   MENU TOGGLE
+   ========================================== */
+.menu-toggle {
+  user-select: none;
+}
+
+.menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.menu-arrow {
+  margin-left: auto;
+  font-size: 12px;
+  transition: transform 0.3s ease;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.menu-arrow.open {
+  transform: rotate(90deg);
+}
+
+/* ==========================================
+   SUBMENÚ
+   ========================================== */
+.submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  margin-left: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.submenu.open {
+  max-height: 500px;
+  opacity: 1;
+}
+
+.submenu-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 14px 8px 20px;
+  margin: 1px 0;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 13px;
+}
+
+.submenu-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+}
+
+.submenu-item.active {
+  background: rgba(79, 70, 229, 0.2);
+  color: white;
+  box-shadow: inset 2px 0 0 #4f46e5;
+}
+
+.submenu-icon {
+  font-size: 14px;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* ==========================================
+   SECCIÓN DEL MENÚ
+   ========================================== */
+.menu-section {
+  margin-bottom: 4px;
+}
+
+/* ==========================================
+   SIDEBAR COLLAPSED
+   ========================================== */
 .sidebar.collapsed .nav-text {
   display: none;
 }
 
 .sidebar.collapsed .nav-item {
   justify-content: center;
-  padding: 12px;
+  padding: 10px;
 }
 
-/* Scrollbar */
+.sidebar.collapsed .menu-arrow {
+  display: none;
+}
+
+.sidebar.collapsed .submenu {
+  display: none;
+}
+
+/* ==========================================
+   DEBUG
+   ========================================== */
+.debug-info {
+  margin-top: 10px;
+  padding: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================
+   SCROLLBAR
+   ========================================== */
 .sidebar-nav::-webkit-scrollbar {
   width: 4px;
 }
@@ -213,7 +484,9 @@ const menuItems = computed(() => {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Responsive */
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
 @media (max-width: 768px) {
   .sidebar {
     width: 0;
