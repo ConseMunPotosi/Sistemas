@@ -22,6 +22,9 @@ const Resoluciones = () => import('../pages/Resoluciones.vue');
 const Ordenanzas = () => import('../pages/Ordenanzas.vue');
 const Noticias = () => import('../pages/Noticias.vue');
 const Sesiones = () => import('../pages/Sesiones.vue');
+const Boletines = () => import('../pages/BoletinPrensa.vue');
+const Comunicados = () => import('../pages/Comunicados.vue');
+const Audiovisuales = () => import('../pages/AudioVisual.vue');
 
 const routes = [
     // RUTAS PÚBLICAS
@@ -37,7 +40,10 @@ const routes = [
             { path: 'resoluciones', name: 'resoluciones', component: Resoluciones },
             { path: 'ordenanzas', name: 'ordenanzas', component: Ordenanzas },
             { path: 'noticias', name: 'noticias', component: Noticias },
-            { path: 'sesiones', name: 'sesiones', component: Sesiones }
+            { path: 'boletines', name: 'boletines', component: Boletines },
+            { path: 'comunicados', name: 'comunicados', component: Comunicados },
+            { path: 'audiovisuales', name: 'audiovisuales', component: Audiovisuales },
+            { path: 'sesiones', name: 'sesiones', component: Sesiones },
         ]
     },
     // LOGIN
@@ -88,7 +94,7 @@ router.beforeEach((to, from, next) => {
     const publicPaths = [
         '/', '/inicio', '/directiva', '/concejales',
         '/comisiones', '/leyes', '/resoluciones',
-        '/ordenanzas', '/noticias', '/sesiones', '/loginCMP'
+        '/ordenanzas', '/noticias', '/boletines', '/sesiones', '/loginCMP', '/comunicados', '/audiovisuales'
     ];
 
     // Si es ruta pública, permitir

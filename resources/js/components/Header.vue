@@ -74,10 +74,34 @@
                             </ul>
                         </li>
 
-                        <li class="nav-item">
-                            <router-link class="nav-link" to="/noticias" exact-active-class="active">
-                                <i class="fas fa-newspaper me-1"></i> Noticias
-                            </router-link>
+                        <!-- Dropdown: Comunicación -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarComunicacion" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-megaphone-fill"></i> Comunicación
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarComunicacion">
+                                <li>
+                                    <router-link class="dropdown-item" to="/Noticias">
+                                        <i class="bi bi-newspaper"></i> Noticias
+                                    </router-link>
+                                </li>
+                                <li>
+                                    <router-link class="dropdown-item" to="/Boletines">
+                                        <i class="bi bi-file-richtext-fill"></i> Boletines de Prensa
+                                    </router-link>
+                                </li>
+                                <li>
+                                    <router-link class="dropdown-item" to="/Comunicados">
+                                        <i class="bi bi-chat-left-text-fill"></i> Comunicados
+                                    </router-link>
+                                </li>
+                                <li>
+                                    <router-link class="dropdown-item" to="/Audiovisuales">
+                                        <i class="bi bi-play-circle-fill"></i> Material Audiovisual
+                                    </router-link>
+                                </li>
+                            </ul>
                         </li>
 
                         <li class="nav-item">

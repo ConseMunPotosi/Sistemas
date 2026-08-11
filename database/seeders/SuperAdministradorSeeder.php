@@ -56,8 +56,8 @@ class SuperAdministradorSeeder extends Seeder
             $id_usuario = DB::table('seguridad.usuarios')->insertGetId(
                 [
                     'id_funcionario' => $id_funcionario,
-                    'usuario' => 'superadmin',
-                    'password_hash' => Hash::make('Cmp@2026'),
+                    'usuario' => 'admin',
+                    'password_hash' => Hash::make('CMP@2026'),
                     'activo' => true,
                     'intentos_fallidos' => 0,
                     'ultimo_acceso' => null,
