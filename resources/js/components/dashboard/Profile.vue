@@ -6,9 +6,7 @@
         <p class="profile-subtitle">Gestiona tu información personal y configuración de cuenta</p>
       </div>
       <div class="profile-grid">
-        <!-- ========================================== -->
-        <!-- COLUMNA IZQUIERDA - AVATAR Y DATOS BÁSICOS -->
-        <!-- ========================================== -->
+        <!-- === COLUMNA IZQUIERDA - AVATAR Y DATOS BÁSICOS === -->
         <div class="profile-card profile-info-card">
             <div class="avatar-section">
             <div class="avatar-container">
@@ -53,9 +51,7 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- COLUMNA DERECHA - PESTAÑAS                -->
-        <!-- ========================================== -->
+        <!-- === COLUMNA DERECHA - PESTAÑAS === -->
         <div class="profile-tabs-container">
             <!-- Pestañas -->
             <div class="tabs-header">
@@ -73,13 +69,6 @@
             >
                 🔒 Cambiar Contraseña
             </button>
-            <button
-                class="tab-btn"
-                :class="{ active: activeTab === 'preferences' }"
-                @click="activeTab = 'preferences'"
-            >
-                ⚙️ Preferencias
-            </button>
             </div>
 
             <!-- Contenido de las pestañas -->
@@ -89,13 +78,42 @@
                 <form @submit.prevent="updateProfile" class="profile-form">
                 <div class="form-row">
                     <div class="form-group">
-                    <label for="displayName">Nombre Completo</label>
+                    <label for="name">Nombre Completo</label>
                     <input
-                        id="displayName"
-                        v-model="profileForm.displayName"
+                        id="name"
+                        v-model="name"
                         type="text"
-                        placeholder="Tu nombre completo"
+                        placeholder="Tus nombres"
                         required
+                    />
+                    </div>
+                    <div class="form-group">
+                    <label for="apellidos">Apellidos</label>
+                    <input
+                        id="apellidos"
+                        v-model="apellidos"
+                        type="text"
+                        placeholder="Tus apellidos"
+                        required
+                    />
+                    </div>
+                    <div class="form-group">
+                    <label for="ci">Carnet de Identidad</label>
+                    <input
+                        id="ci"
+                        v-model="ci"
+                        type="text"
+                        placeholder="Tu Carnet de Identidad"
+                        required
+                    />
+                    </div>
+                    <div class="form-group">
+                    <label for="cel">Celular</label>
+                    <input
+                        id="cel"
+                        v-model="cel"
+                        type="tel"
+                        placeholder="7XXXXXXX"
                     />
                     </div>
                     <div class="form-group">
@@ -108,9 +126,6 @@
                         disabled
                     />
                     </div>
-                </div>
-
-                <div class="form-row">
                     <div class="form-group">
                     <label for="email">Correo Electrónico</label>
                     <input
@@ -121,17 +136,7 @@
                         required
                     />
                     </div>
-                    <div class="form-group">
-                    <label for="phone">Teléfono</label>
-                    <input
-                        id="phone"
-                        v-model="profileForm.phone"
-                        type="tel"
-                        placeholder="+591 7XXXXXXX"
-                    />
-                    </div>
                 </div>
-
                 <div class="form-row">
                     <div class="form-group">
                     <label for="cargo">Cargo</label>
@@ -170,6 +175,14 @@
             <div v-if="activeTab === 'password'" class="tab-panel">
                 <form @submit.prevent="changePassword" class="profile-form">
                 <div class="form-group">
+                    <label for="currentPassword">Usuario</label>
+                    <input
+                        id="username"
+                        v-model="username"
+                        type = "text"
+                        placeholder="Usuario"
+                        required
+                    />
                     <label for="currentPassword">Contraseña Actual</label>
                     <div class="password-input-wrapper">
                     <input
@@ -253,74 +266,6 @@
                 </div>
                 </form>
             </div>
-
-            <!-- Pestaña: Preferencias -->
-            <div v-if="activeTab === 'preferences'" class="tab-panel">
-                <div class="preferences-section">
-                <h3>🎨 Tema de la Aplicación</h3>
-                <div class="theme-options">
-                    <button
-                    class="theme-btn"
-                    :class="{ active: selectedTheme === 'light' }"
-                    @click="selectedTheme = 'light'"
-                    >
-                    ☀️ Claro
-                    </button>
-                    <button
-                    class="theme-btn"
-                    :class="{ active: selectedTheme === 'dark' }"
-                    @click="selectedTheme = 'dark'"
-                    >
-                    🌙 Oscuro
-                    </button>
-                    <button
-                    class="theme-btn"
-                    :class="{ active: selectedTheme === 'system' }"
-                    @click="selectedTheme = 'system'"
-                    >
-                    💻 Sistema
-                    </button>
-                </div>
-                </div>
-
-                <div class="preferences-section">
-                <h3>🔔 Notificaciones</h3>
-                <div class="preference-item">
-                    <label class="toggle-switch">
-                    <input type="checkbox" v-model="preferences.emailNotifications" />
-                    <span class="toggle-slider"></span>
-                    </label>
-                    <span class="preference-label">Notificaciones por correo</span>
-                </div>
-                <div class="preference-item">
-                    <label class="toggle-switch">
-                    <input type="checkbox" v-model="preferences.browserNotifications" />
-                    <span class="toggle-slider"></span>
-                    </label>
-                    <span class="preference-label">Notificaciones en navegador</span>
-                </div>
-                <div class="preference-item">
-                    <label class="toggle-switch">
-                    <input type="checkbox" v-model="preferences.soundNotifications" />
-                    <span class="toggle-slider"></span>
-                    </label>
-                    <span class="preference-label">Sonido de notificaciones</span>
-                </div>
-                </div>
-
-                <div class="preferences-section">
-                <h3>🌐 Idioma</h3>
-                <select v-model="preferences.language" class="language-select">
-                    <option value="es">Español</option>
-                    <option value="en">English</option>
-                    <option value="pt">Português</option>
-                </select>
-                </div>
-
-                <div class="form-actions">
-                <button class="btn-save" @click="savePreferences">Guardar Preferencias</button>
-                </div>
-            </div>
             </div>
         </div>
       </div>
@@ -335,9 +280,7 @@ import { useAuthStore } from '../../api/auth.js';
 // Store
 const authStore = useAuthStore();
 
-// ==========================================
-// ESTADO
-// ==========================================
+// === ESTADO ===
 const activeTab = ref('info');
 const saving = ref(false);
 const changingPassword = ref(false);
@@ -351,12 +294,7 @@ const showCurrentPassword = ref(false);
 const showNewPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-// Tema
-const selectedTheme = ref('light');
-
-// ==========================================
-// USUARIO
-// ==========================================
+// === USUARIO ===
 const user = computed(() => authStore.user);
 
 // Iniciales del usuario
@@ -371,9 +309,7 @@ const userRoles = computed(() => {
   return user.value.roles.map(r => r.nombre).join(', ');
 });
 
-// ==========================================
-// FORMULARIO DE PERFIL
-// ==========================================
+// === FORMULARIO DE PERFIL ===
 const profileForm = reactive({
   displayName: '',
   username: '',
@@ -381,18 +317,14 @@ const profileForm = reactive({
   phone: ''
 });
 
-// ==========================================
-// FORMULARIO DE CONTRASEÑA
-// ==========================================
+// === FORMULARIO DE CONTRASEÑA ===
 const passwordForm = reactive({
   current: '',
   new: '',
   confirm: ''
 });
 
-// ==========================================
-// PREFERENCIAS
-// ==========================================
+// === PREFERENCIAS ===
 const preferences = reactive({
   emailNotifications: true,
   browserNotifications: true,
@@ -400,9 +332,7 @@ const preferences = reactive({
   language: 'es'
 });
 
-// ==========================================
-// MÉTODOS
-// ==========================================
+// === MÉTODOS ===
 const formatDate = (date) => {
   if (!date) return 'N/A';
   const d = new Date(date);
@@ -451,9 +381,7 @@ const updateProfile = async () => {
   }
 };
 
-// ==========================================
-// CAMBIAR CONTRASEÑA
-// ==========================================
+// === CAMBIAR CONTRASEÑA ===
 const passwordStrength = computed(() => {
   const pass = passwordForm.new;
   if (!pass) return 'weak';
@@ -526,9 +454,7 @@ const resetPasswordForm = () => {
   passwordMessage.value = '';
 };
 
-// ==========================================
-// PREFERENCIAS
-// ==========================================
+// === PREFERENCIAS ===
 const savePreferences = () => {
   // Guardar preferencias en localStorage
   localStorage.setItem('user_preferences', JSON.stringify(preferences));
@@ -548,9 +474,7 @@ const applyTheme = (theme) => {
   }
 };
 
-// ==========================================
-// CICLO DE VIDA
-// ==========================================
+// === CICLO DE VIDA ===
 onMounted(() => {
   console.log('🔍 Profile - Usuario:', user.value);
   loadUserData();
@@ -571,9 +495,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ==========================================
-   PROFILE - ESTILOS PRINCIPALES
-   ========================================== */
+/* === PROFILE - ESTILOS PRINCIPALES === */
 html, body, #app, .profile-page {
   height: 100%;
   min-height: 100vh;
@@ -616,18 +538,14 @@ html, body, #app, .profile-page {
   margin: 0;
 }
 
-/* ==========================================
-   GRID
-   ========================================== */
+/* === GRID === */
 .profile-grid {
   display: grid;
   grid-template-columns: 340px 1fr;
   gap: 24px;
 }
 
-/* ==========================================
-   TARJETAS
-   ========================================== */
+/* === TARJETAS === */
 .profile-card {
   background: white;
   border-radius: 16px;
@@ -635,9 +553,7 @@ html, body, #app, .profile-page {
   padding: 24px;
 }
 
-/* ==========================================
-   AVATAR
-   ========================================== */
+/* === AVATAR === */
 .avatar-section {
   text-align: center;
   padding-bottom: 20px;
@@ -760,9 +676,7 @@ html, body, #app, .profile-page {
   color: #991b1b;
 }
 
-/* ==========================================
-   PESTAÑAS
-   ========================================== */
+/* === PESTAÑAS === */
 .profile-tabs-container {
   background: white;
   border-radius: 16px;
@@ -821,9 +735,7 @@ html, body, #app, .profile-page {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ==========================================
-   FORMULARIOS
-   ========================================== */
+/* === FORMULARIOS === */
 .profile-form {
   display: flex;
   flex-direction: column;
@@ -1004,9 +916,7 @@ html, body, #app, .profile-page {
   color: #991b1b;
 }
 
-/* ==========================================
-   PREFERENCIAS
-   ========================================== */
+/* === PREFERENCIAS === */
 .preferences-section {
   margin-bottom: 28px;
 }
@@ -1115,9 +1025,7 @@ html, body, #app, .profile-page {
   border-color: #cc0000;
 }
 
-/* ==========================================
-   RESPONSIVE
-   ========================================== */
+/* === RESPONSIVE === */
 @media (max-width: 1024px) {
   .profile-grid {
     grid-template-columns: 1fr;

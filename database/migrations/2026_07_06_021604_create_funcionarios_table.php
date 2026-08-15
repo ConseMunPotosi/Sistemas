@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nombres', 100);
             $table->string('apellidos', 100);
             $table->string('ci', 30)->unique();
+            $table->string('sexo', 20);
             $table->string('celular', 30)->nullable();
             $table->string('correo', 150)->nullable();
             $table->boolean('estado')->default(true);
