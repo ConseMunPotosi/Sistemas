@@ -53,10 +53,10 @@
       <div class="divider"></div>
 
       <!-- Perfil de Usuario con Submenú -->
-      <!-- 🔧 Mostrar solo si hay usuario -->
-      <div v-if="user" class="user-profile" @click.stop="toggleUserMenu">
+      <div v-if="authUser" class="user-profile" @click.stop="toggleUserMenu">
         <div class="user-info">
-          <span class="user-name">{{ user?.displayName || user?.usuario || 'Usuario' }}</span>
+          <!-- Mostramos Nombres y Apellidos del funcionario unidos -->
+          <span class="user-name">{{ fullName || authUser?.usuario || 'Usuario' }}</span>
           <span class="user-role">{{ userRoles }}</span>
         </div>
         <div class="user-avatar">
@@ -74,8 +74,8 @@
               <span class="avatar-text-large">{{ userInitials }}</span>
             </div>
             <div class="user-dropdown-info">
-              <span class="user-dropdown-name">{{ user?.displayName || user?.usuario || 'Usuario' }}</span>
-              <span class="user-dropdown-email">{{ user?.correo || 'usuario@ejemplo.com' }}</span>
+              <span class="user-dropdown-name">{{ fullName || authUser?.usuario || 'Usuario' }}</span>
+              <span class="user-dropdown-email">{{ authUser?.funcionario?.correo || 'Sin correo' }}</span>
             </div>
           </div>
 
@@ -96,13 +96,6 @@
             </router-link>
 
             <div class="dropdown-divider"></div>
-            <button @click="openChangePassword" class="dropdown-item">
-              <svg class="dropdown-icon" viewBox="0 0 24 24" width="20" height="20">
-                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" fill="currentColor"/>
-              </svg>
-              <span>Cambiar Contraseña</span>
-            </button>
-            <div class="dropdown-divider"></div>
 
             <!-- 🔧 Cerrar Sesión con manejo de evento -->
             <button @click="handleLogout" class="dropdown-item logout-item">
@@ -121,13 +114,10 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../api/auth.js'; // <--- IMPORTAMOS EL STORE
 
 // Props
 const props = defineProps({
-  user: {
-    type: Object,
-    default: null
-  },
   isExpanded: {
     type: Boolean,
     default: false
@@ -137,8 +127,9 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['toggle-sidebar', 'logout']);
 
-// Router
+// Router y Store
 const router = useRouter();
+const authStore = useAuthStore(); // <--- ACCEDEMOS AL STORE
 
 // ==========================================
 // ESTADO
@@ -159,17 +150,41 @@ const notifications = ref([
 ]);
 
 // ==========================================
-// COMPUTED
+// COMPUTED (BASADO EN AUTHSTORE)
 // ==========================================
+const authUser = computed(() => authStore.user);
+
+const fullName = computed(() => {
+  const user = authStore.user;
+  if (!user?.funcionario) return '';
+  const nombres = user.funcionario.nombres || '';
+  const apellidos = user.funcionario.apellidos || '';
+  return `${nombres} ${apellidos}`.trim();
+});
+
 const userInitials = computed(() => {
-  if (!props.user) return 'U';
-  const name = props.user?.displayName || props.user?.usuario || 'U';
-  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const user = authStore.user;
+  if (!user) return 'U';
+
+  // Intentar iniciales del funcionario
+  if (user.funcionario) {
+    const nombres = user.funcionario.nombres || '';
+    const apellidos = user.funcionario.apellidos || '';
+    if (nombres && apellidos) {
+      return (nombres[0] + apellidos[0]).toUpperCase();
+    }
+    if (nombres) return nombres[0].toUpperCase();
+  }
+
+  // Fallback al nombre de usuario
+  const name = user.usuario || 'U';
+  return name[0].toUpperCase();
 });
 
 const userRoles = computed(() => {
-  if (!props.user?.roles) return 'Usuario';
-  return props.user.roles.map(r => r.nombre).join(', ');
+  const user = authStore.user;
+  if (!user?.roles) return 'Usuario';
+  return user.roles.map(r => r.nombre).join(', ');
 });
 
 // ==========================================
@@ -223,7 +238,6 @@ const closeAllDropdowns = () => {
 // ==========================================
 // ACCIONES DEL SUBMENÚ
 // ==========================================
-// 🔧 Handle Logout - Emitir evento al padre
 const handleLogout = () => {
   showUserMenu.value = false;
   emit('logout');
@@ -272,7 +286,6 @@ onMounted(() => {
   });
 });
 </script>
-
 
 
 <style scoped>

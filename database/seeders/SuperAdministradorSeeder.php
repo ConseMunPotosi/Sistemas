@@ -41,6 +41,7 @@ class SuperAdministradorSeeder extends Seeder
                     'nombres' => 'Super',
                     'apellidos' => 'Administrador',
                     'ci' => '12345678',
+                    'sexo' => 'masculino',
                     'celular' => '',
                     'correo' => 'super.admin@concejopotosi.gob.bo',
                     'estado' => true,
@@ -87,7 +88,7 @@ class SuperAdministradorSeeder extends Seeder
             ]);
 
             $this->command->info('✅ Super Administrador creado exitosamente!');
-            $this->command->info('📋 Usuario: superadmin');
+            $this->command->info('📋 Usuario: admin');
             $this->command->info('🔑 Contraseña: Cmp@2026');
 
         });

@@ -17,9 +17,9 @@
                 <span class="edit-icon">📷</span>
                 </button>
             </div>
-            <h2 class="user-fullname">{{ user?.displayName || user?.nombre_completo || 'Usuario' }}</h2>
+            <h2 class="user-fullname">{{ profileForm.username || 'Usuario' }}</h2>
             <p class="user-role-badge">{{ userRoles }}</p>
-            <p class="user-email">{{ user?.correo || user?.email || 'usuario@ejemplo.com' }}</p>
+            <p class="user-email">{{ profileForm.email || 'usuario@ejemplo.com' }}</p>
             </div>
 
             <div class="info-divider"></div>
@@ -28,24 +28,24 @@
             <div class="info-section">
             <div class="info-item">
                 <span class="info-label">👤 Usuario</span>
-                <span class="info-value">{{ user?.usuario || 'N/A' }}</span>
+                <span class="info-value">{{ profileForm.username || 'N/A' }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">📧 Correo</span>
-                <span class="info-value">{{ user?.correo || user?.email || 'N/A' }}</span>
+                <span class="info-value">{{ profileForm.email || 'N/A' }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">📅 Miembro desde</span>
-                <span class="info-value">{{ formatDate(user?.fecha_creacion || user?.created_at) }}</span>
+                <span class="info-value">{{ formatDate(authStore.user?.fecha_creacion) }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">🔄 Último acceso</span>
-                <span class="info-value">{{ formatDate(user?.ultimo_acceso || user?.last_login) }}</span>
+                <span class="info-value">{{ formatDate(authStore.user?.ultimo_acceso) }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">📊 Estado</span>
-                <span class="info-value status-badge" :class="user?.activo ? 'status-active' : 'status-inactive'">
-                {{ user?.activo ? 'Activo' : 'Inactivo' }}
+                <span class="info-value status-badge" :class="authStore.user?.activo ? 'status-active' : 'status-inactive'">
+                {{ authStore.user?.activo ? 'Activo' : 'Inactivo' }}
                 </span>
             </div>
             </div>
@@ -81,50 +81,56 @@
                     <label for="name">Nombre Completo</label>
                     <input
                         id="name"
-                        v-model="name"
+                        v-model="profileForm.name"
                         type="text"
                         placeholder="Tus nombres"
                         required
+                        autocomplete="given-name"
                     />
                     </div>
                     <div class="form-group">
                     <label for="apellidos">Apellidos</label>
                     <input
                         id="apellidos"
-                        v-model="apellidos"
+                        v-model="profileForm.apellidos"
                         type="text"
                         placeholder="Tus apellidos"
                         required
+                        autocomplete="family-name"
                     />
                     </div>
                     <div class="form-group">
                     <label for="ci">Carnet de Identidad</label>
                     <input
                         id="ci"
-                        v-model="ci"
+                        v-model="profileForm.ci"
                         type="text"
                         placeholder="Tu Carnet de Identidad"
                         required
+                        autocomplete="off"
                     />
                     </div>
                     <div class="form-group">
                     <label for="cel">Celular</label>
                     <input
                         id="cel"
-                        v-model="cel"
+                        v-model="profileForm.cel"
                         type="tel"
                         placeholder="7XXXXXXX"
+                        autocomplete="tel"
                     />
                     </div>
                     <div class="form-group">
-                    <label for="username">Nombre de Usuario</label>
-                    <input
-                        id="username"
-                        v-model="profileForm.username"
-                        type="text"
-                        placeholder="Tu nombre de usuario"
-                        disabled
-                    />
+                        <label for="sexo">Sexo</label>
+                        <select
+                            id="sexo"
+                            v-model="profileForm.sexo"
+                            :disabled="saving"
+                        >
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro...</option>
+                        </select>
                     </div>
                     <div class="form-group">
                     <label for="email">Correo Electrónico</label>
@@ -134,27 +140,38 @@
                         type="email"
                         placeholder="tu@email.com"
                         required
+                        autocomplete="email"
                     />
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                    <label for="cargo">Cargo</label>
-                    <input
-                        id="cargo"
-                        :value="user?.funcionario?.cargo?.nombre || 'Sin cargo'"
-                        type="text"
-                        disabled
-                    />
+                        <label for="cargo">Cargo</label>
+                        <select id="cargo" v-model="profileForm.id_cargo" :disabled="saving" class="form-control">
+                            <option value="" disabled>Selecciona un cargo</option>
+                            <!-- Primero mostramos el cargo del usuario, si existe en la lista -->
+                            <option v-if="authStore.user?.funcionario?.cargo?.id_cargo" :value="authStore.user.funcionario.cargo.id_cargo" disabled selected>
+                                {{ authStore.user.funcionario.cargo.nombre }} (Actual)
+                            </option>
+                            <!-- Luego el resto de cargos -->
+                            <option v-for="cargo in cargoList" :key="cargo.id_cargo" :value="cargo.id_cargo">
+                                {{ cargo.nombre }}
+                            </option>
+                        </select>
                     </div>
                     <div class="form-group">
-                    <label for="unidad">Unidad</label>
-                    <input
-                        id="unidad"
-                        :value="user?.funcionario?.unidad?.nombre || 'Sin unidad'"
-                        type="text"
-                        disabled
-                    />
+                        <label for="unidad">Unidad</label>
+                        <select id="unidad" v-model="profileForm.id_unidad" :disabled="saving" class="form-control">
+                            <option value="" disabled>Selecciona una unidad</option>
+                            <!-- Primero mostramos la unidad del usuario -->
+                            <option v-if="authStore.user?.funcionario?.unidad?.id_unidad" :value="authStore.user.funcionario.unidad.id_unidad" disabled selected>
+                                {{ authStore.user.funcionario.unidad.nombre }} (Actual)
+                            </option>
+                            <!-- Luego el resto de unidades -->
+                            <option v-for="unidad in unidadList" :key="unidad.id_unidad" :value="unidad.id_unidad">
+                                {{ unidad.nombre }}
+                            </option>
+                        </select>
                     </div>
                 </div>
 
@@ -178,10 +195,12 @@
                     <label for="currentPassword">Usuario</label>
                     <input
                         id="username"
-                        v-model="username"
-                        type = "text"
+                        v-model="profileForm.username"
+                        type="text"
                         placeholder="Usuario"
                         required
+                        disabled
+                        autocomplete="username"
                     />
                     <label for="currentPassword">Contraseña Actual</label>
                     <div class="password-input-wrapper">
@@ -191,6 +210,7 @@
                         :type="showCurrentPassword ? 'text' : 'password'"
                         placeholder="Ingresa tu contraseña actual"
                         required
+                        autocomplete="current-password"
                     />
                     <button
                         type="button"
@@ -212,6 +232,7 @@
                         placeholder="Ingresa tu nueva contraseña"
                         required
                         minlength="6"
+                        autocomplete="new-password"
                     />
                     <button
                         type="button"
@@ -240,6 +261,7 @@
                         placeholder="Confirma tu nueva contraseña"
                         required
                         minlength="6"
+                        autocomplete="new-password"
                     />
                     <button
                         type="button"
@@ -276,9 +298,11 @@
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useAuthStore } from '../../api/auth.js';
+import api from '../../api/axios.js';
+import { useRouter } from 'vue-router';
 
-// Store
 const authStore = useAuthStore();
+const router = useRouter();
 
 // === ESTADO ===
 const activeTab = ref('info');
@@ -289,29 +313,17 @@ const updateType = ref('success');
 const passwordMessage = ref('');
 const passwordType = ref('success');
 
-// Mostrar contraseñas
 const showCurrentPassword = ref(false);
 const showNewPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-// === USUARIO ===
-const user = computed(() => authStore.user);
-
-// Iniciales del usuario
-const userInitials = computed(() => {
-  const name = user.value?.displayName || user.value?.nombre_completo || user.value?.usuario || 'U';
-  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-});
-
-// Roles del usuario
-const userRoles = computed(() => {
-  if (!user.value?.roles) return 'Sin roles';
-  return user.value.roles.map(r => r.nombre).join(', ');
-});
-
 // === FORMULARIO DE PERFIL ===
 const profileForm = reactive({
-  displayName: '',
+  name: '',
+  apellidos: '',
+  ci: '',
+  cel: '',
+  sexo: '',
   username: '',
   email: '',
   phone: ''
@@ -324,13 +336,9 @@ const passwordForm = reactive({
   confirm: ''
 });
 
-// === PREFERENCIAS ===
-const preferences = reactive({
-  emailNotifications: true,
-  browserNotifications: true,
-  soundNotifications: false,
-  language: 'es'
-});
+// === LISTAS PARA CARGOS Y UNIDADES ===
+const cargoList = ref([]);
+const unidadList = ref([]);
 
 // === MÉTODOS ===
 const formatDate = (date) => {
@@ -350,36 +358,57 @@ const resetForm = () => {
   updateMessage.value = '';
 };
 
-const loadUserData = () => {
-  const userData = user.value;
-  if (userData) {
-    profileForm.displayName = userData.displayName || userData.nombre_completo || '';
-    profileForm.username = userData.usuario || '';
-    profileForm.email = userData.correo || userData.email || '';
-    profileForm.phone = userData.telefono || userData.phone || '';
-  }
-};
-
-const updateProfile = async () => {
-  saving.value = true;
-  updateMessage.value = '';
-
+// === CARGAR DATOS DEL BACKEND ===
+const loadUserData = async () => {
   try {
-    // Simular actualización
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // No redirijas aquí. Solo verifica si no está autenticado para detener la carga.
+    if (!authStore.isAuthenticated) {
+      console.warn("No autenticado. No se cargarán datos.");
+      return;
+    }
 
-    // Aquí iría la llamada a la API
-    // await api.put('/profile', profileForm);
+    const response = await api.get('/profile');
+    const userData = response.data.data;
 
-    updateMessage.value = '✅ Perfil actualizado exitosamente';
-    updateType.value = 'success';
+    if (userData) {
+      const funcionario = userData.funcionario || {};
+
+      profileForm.name = funcionario.nombres || '';
+      profileForm.apellidos = funcionario.apellidos || '';
+      profileForm.ci = funcionario.ci || '';
+      profileForm.cel = funcionario.celular || '';
+      profileForm.sexo = funcionario.sexo || '';
+      profileForm.email = funcionario.correo || ''; // CORREGIDO: Solo el correo real
+      profileForm.username = userData.usuario || '';
+      profileForm.id_cargo = funcionario.id_cargo || '';
+    profileForm.id_unidad = funcionario.id_unidad || '';
+
+      // Actualizamos el store
+      authStore.user = userData;
+    }
   } catch (error) {
-    updateMessage.value = '❌ Error al actualizar el perfil';
+    console.error('Error al cargar el perfil:', error);
+    if (error.response && error.response.status === 401) {
+        authStore.clearAuth();
+        // Redirigir al login SOLO si la petición falla por token inválido
+        router.push('/loginCMP');
+    }
+    updateMessage.value = 'Error al cargar los datos del perfil';
     updateType.value = 'error';
-  } finally {
-    saving.value = false;
   }
 };
+
+// === ROLES ===
+const userRoles = computed(() => {
+  if (!authStore.user?.roles) return 'Sin roles';
+  return authStore.user.roles.map(r => r.nombre).join(', ');
+});
+
+// === INICIALES ===
+const userInitials = computed(() => {
+  const name = authStore.user?.funcionario?.nombres || authStore.user?.usuario || 'Usuario';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+});
 
 // === CAMBIAR CONTRASEÑA ===
 const passwordStrength = computed(() => {
@@ -393,6 +422,21 @@ const passwordStrength = computed(() => {
   }
   return 'weak';
 });
+
+// === MÉTODO PARA CARGAR CARGOS Y UNIDADES ===
+const loadCatalogs = async () => {
+  try {
+    // Petición para traer todos los cargos. Asegúrate de tener esta ruta en tu api.php
+    const resCargos = await api.get('/cargos');
+    cargoList.value = resCargos.data.data || resCargos.data; // Ajusta según tu API
+
+    // Petición para traer todas las unidades.
+    const resUnidades = await api.get('/unidades');
+    unidadList.value = resUnidades.data.data || resUnidades.data;
+  } catch (error) {
+    console.error('Error cargando catálogos:', error);
+  }
+};
 
 const passwordStrengthPercent = computed(() => {
   switch(passwordStrength.value) {
@@ -427,14 +471,11 @@ const changePassword = async () => {
   passwordMessage.value = '';
 
   try {
-    // Simular actualización
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Aquí iría la llamada a la API
-    // await api.post('/change-password', {
-    //   current_password: passwordForm.current,
-    //   new_password: passwordForm.new
-    // });
+    await api.post('/change-password', {
+      current_password: passwordForm.current,
+      new_password: passwordForm.new,
+      new_password_confirmation: passwordForm.confirm
+    });
 
     passwordMessage.value = '✅ Contraseña actualizada exitosamente';
     passwordType.value = 'success';
@@ -454,43 +495,18 @@ const resetPasswordForm = () => {
   passwordMessage.value = '';
 };
 
-// === PREFERENCIAS ===
-const savePreferences = () => {
-  // Guardar preferencias en localStorage
-  localStorage.setItem('user_preferences', JSON.stringify(preferences));
-  localStorage.setItem('theme', selectedTheme.value);
-
-  // Aplicar tema
-  applyTheme(selectedTheme.value);
-
-  alert('✅ Preferencias guardadas correctamente');
-};
-
-const applyTheme = (theme) => {
-  if (theme === 'dark') {
-    document.documentElement.classList.add('dark-theme');
-  } else {
-    document.documentElement.classList.remove('dark-theme');
-  }
-};
-
 // === CICLO DE VIDA ===
-onMounted(() => {
-  console.log('🔍 Profile - Usuario:', user.value);
-  loadUserData();
+let dataLoadAttempted = false; // Bandera para evitar dobles llamadas
 
-  // Cargar preferencias guardadas
-  const savedPrefs = localStorage.getItem('user_preferences');
-  if (savedPrefs) {
-    const parsed = JSON.parse(savedPrefs);
-    Object.assign(preferences, parsed);
-  }
+onMounted(async () => {
+  if (dataLoadAttempted) return;
+  dataLoadAttempted = true;
 
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) {
-    selectedTheme.value = savedTheme;
-    applyTheme(savedTheme);
+  // Intentar cargar datos si está autenticado
+  if (authStore.isAuthenticated) {
+    await loadUserData();
   }
+  await loadCatalogs();
 });
 </script>
 

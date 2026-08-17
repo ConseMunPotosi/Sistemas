@@ -442,4 +442,18 @@ class AuthController extends Controller
 
         return $permisos;
     }
+
+    public function profile(Request $request)
+    {
+        // Obtener el usuario autenticado
+        $user = $request->user();
+
+        // Cargar las relaciones necesarias (funcionario, y dentro de funcionario: cargo y unidad)
+        $user->load(['funcionario.cargo', 'funcionario.unidad', 'roles']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
+    }
 }

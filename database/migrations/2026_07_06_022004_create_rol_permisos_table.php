@@ -26,6 +26,8 @@ return new class extends Migration
                   ->references('id_permiso')
                   ->on('seguridad.permisos')
                   ->onDelete('cascade');
+
+                  $table->timestamps();
         });
     }
 

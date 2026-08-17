@@ -205,6 +205,14 @@ const handleLogin = async () => {
     })
 
     if (result.success) {
+       const token = result.data?.token;
+       if (token) {
+            localStorage.setItem('auth_token', token);
+            // También actualizamos el store para que sepa que está autenticado
+            authStore.token = token;
+            authStore.isAuthenticated = true;
+        }
+
       // Guardar preferencia de "recordarme"
       if (rememberMe.value) {
         localStorage.setItem('remember_me', 'true')

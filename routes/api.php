@@ -34,6 +34,26 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::middleware('auth:sanctum')->group(function () {
 
+    Route::get('/cargos', function () {
+        return response()->json([
+            'success' => true,
+            'data' => \App\Models\Institucional\Cargo::all() // Asegúrate de importar tu modelo
+        ]);
+    });
+
+    Route::get('/unidades', function () {
+        return response()->json([
+            'success' => true,
+            'data' => \App\Models\Institucional\Unidad::all()
+        ]);
+    });
+    /**
+     * Obtener perfil completo del usuario logueado (con funcionario, cargo y unidad)
+     * GET /api/profile
+     * Header: Authorization: Bearer {token}
+     */
+    Route::get('/profile', [AuthController::class, 'profile']);
+
     /**
      * Obtener usuario actual
      * GET /api/user
