@@ -59,10 +59,26 @@ const routes = [
         component: DashboardLayout,
         meta: { requiresAuth: true },
         children: [
+            // Rutas existentes
             { path: '', name: 'dashboard', component: Dashboard },
             { path: 'profile', name: 'profile', component: Profile },
             { path: 'settings', name: 'settings', component: Settings },
-            { path: 'users', name: 'users', component: Users }
+            { path: 'users', name: 'users', component: Users },
+
+            // ==========================================
+            // 🟢 NUEVAS RUTAS PARA EL SIDEBAR 🟢
+            // ==========================================
+
+            // 1. GESTIÓN INSTITUCIONAL
+            { path: 'institucional/funcionarios', name: 'funcionarios', component: () => import('@/components/institucional/FuncionariosList.vue') },
+            { path: 'institucional/unidades', name: 'unidades', component: () => import('@/components/institucional/UnidadesList.vue') },
+            { path: 'institucional/cargos', name: 'cargos', component: () => import('@/components/institucional/CargosList.vue') },
+            { path: 'institucional/roles', name: 'roles', component: () => import('@/components/institucional/RolesList.vue') },
+            { path: 'institucional/permisos', name: 'permisos', component: () => import('@/components/institucional/PermisosList.vue') },
+
+            // 2. GESTIÓN COMUNICACIONAL
+            { path: 'comunicacion/sesiones', name: 'sesiones', component: () => import('@/components/comunicacion/SesionesList.vue') },
+            { path: 'comunicacion/noticias', name: 'noticias', component: () => import('@/components/comunicacion/NoticiasList.vue') }
         ]
     },
     // 404

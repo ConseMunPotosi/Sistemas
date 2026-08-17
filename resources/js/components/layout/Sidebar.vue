@@ -30,19 +30,19 @@
         </div>
 
         <div v-if="!isCollapsed" class="submenu" :class="{ open: isInstitucionalOpen }">
-          <router-link to="/institucional/funcionarios" class="submenu-item" :class="{ active: $route.path.includes('/institucional/funcionarios') }">
+          <router-link :to="{ name: 'funcionarios' }" class="submenu-item" :class="{ active: $route.name === 'funcionarios' }">
             <span class="submenu-icon">👤</span> Funcionarios
           </router-link>
-          <router-link to="/institucional/unidades" class="submenu-item" :class="{ active: $route.path.includes('/institucional/unidades') }">
+          <router-link :to="{ name: 'unidades' }" class="submenu-item" :class="{ active: $route.name === 'unidades' }">
             <span class="submenu-icon">🏢</span> Unidades
           </router-link>
-          <router-link to="/institucional/cargos" class="submenu-item" :class="{ active: $route.path.includes('/institucional/cargos') }">
+          <router-link :to="{ name: 'cargos' }" class="submenu-item" :class="{ active: $route.name === 'cargos' }">
             <span class="submenu-icon">💼</span> Cargos
           </router-link>
-          <router-link to="/institucional/roles" class="submenu-item" :class="{ active: $route.path.includes('/institucional/roles') }">
+          <router-link :to="{ name: 'roles' }" class="submenu-item" :class="{ active: $route.name === 'roles' }">
             <span class="submenu-icon">🔑</span> Roles
           </router-link>
-          <router-link to="/institucional/permisos" class="submenu-item" :class="{ active: $route.path.includes('/institucional/permisos') }">
+          <router-link :to="{ name: 'permisos' }" class="submenu-item" :class="{ active: $route.name === 'permisos' }">
             <span class="submenu-icon">🛡️</span> Permisos
           </router-link>
         </div>
@@ -63,10 +63,10 @@
         </div>
 
         <div v-if="!isCollapsed" class="submenu" :class="{ open: isComunicacionalOpen }">
-          <router-link to="/comunicacion/sesiones" class="submenu-item" :class="{ active: $route.path.includes('/comunicacion/sesiones') }">
+          <router-link :to="{ name: 'sesiones' }" class="submenu-item" :class="{ active: $route.name === 'sesiones' }">
             <span class="submenu-icon">📋</span> Sesiones
           </router-link>
-          <router-link to="/comunicacion/noticias" class="submenu-item" :class="{ active: $route.path.includes('/comunicacion/noticias') }">
+          <router-link :to="{ name: 'noticias' }" class="submenu-item" :class="{ active: $route.name === 'noticias' }">
             <span class="submenu-icon">📰</span> Noticias
           </router-link>
         </div>
@@ -87,13 +87,13 @@
         </div>
 
         <div v-if="!isCollapsed" class="submenu" :class="{ open: isDocumentalOpen }">
-          <router-link to="/documental/documentos" class="submenu-item" :class="{ active: $route.path.includes('/documental/documentos') }">
+          <router-link :to="{ name: 'documentos' }" class="submenu-item" :class="{ active: $route.name === 'documentos' }">
             <span class="submenu-icon">📄</span> Documentos
           </router-link>
-          <router-link to="/documental/tipos" class="submenu-item" :class="{ active: $route.path.includes('/documental/tipos') }">
+          <router-link :to="{ name: 'tipos' }" class="submenu-item" :class="{ active: $route.name === 'tipos' }">
             <span class="submenu-icon">🏷️</span> Tipos de Documento
           </router-link>
-          <router-link to="/documental/archivos" class="submenu-item" :class="{ active: $route.path.includes('/documental/archivos') }">
+          <router-link :to="{ name: 'archivos' }" class="submenu-item" :class="{ active: $route.name === 'archivos' }">
             <span class="submenu-icon">📁</span> Archivos
           </router-link>
         </div>
@@ -114,19 +114,19 @@
         </div>
 
         <div v-if="!isCollapsed" class="submenu" :class="{ open: isRrhhOpen }">
-          <router-link to="/rrhh/empleados" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/empleados') }">
+          <router-link :to="{ name: 'empleados' }" class="submenu-item" :class="{ active: $route.name === 'empleados' }">
             <span class="submenu-icon">👨‍💼</span> Empleados
           </router-link>
-          <router-link to="/rrhh/asistencias" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/asistencias') }">
+          <router-link :to="{ name: 'asistencias' }" class="submenu-item" :class="{ active: $route.name === 'asistencias' }">
             <span class="submenu-icon">📅</span> Asistencias
           </router-link>
-          <router-link to="/rrhh/vacaciones" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/vacaciones') }">
+          <router-link :to="{ name: 'vacaciones' }" class="submenu-item" :class="{ active: $route.name === 'vacaciones' }">
             <span class="submenu-icon">🏖️</span> Vacaciones
           </router-link>
-          <router-link to="/rrhh/permisos" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/permisos') }">
+          <router-link :to="{ name: 'permisos_rrhh' }" class="submenu-item" :class="{ active: $route.name === 'permisos_rrhh' }">
             <span class="submenu-icon">📋</span> Permisos
           </router-link>
-          <router-link to="/rrhh/contratos" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/contratos') }">
+          <router-link :to="{ name: 'contratos' }" class="submenu-item" :class="{ active: $route.name === 'contratos' }">
             <span class="submenu-icon">📄</span> Contratos
           </router-link>
         </div>
@@ -147,28 +147,28 @@
         </div>
 
         <div v-if="!isCollapsed" class="submenu" :class="{ open: isActivosOpen }">
-          <router-link to="/activos/inventario" class="submenu-item" :class="{ active: $route.path.includes('/activos/inventario') }">
+          <router-link :to="{ name: 'inventario' }" class="submenu-item" :class="{ active: $route.name === 'inventario' }">
             <span class="submenu-icon">📦</span> Inventario
           </router-link>
-          <router-link to="/activos/bienes" class="submenu-item" :class="{ active: $route.path.includes('/activos/bienes') }">
+          <router-link :to="{ name: 'bienes' }" class="submenu-item" :class="{ active: $route.name === 'bienes' }">
             <span class="submenu-icon">🏷️</span> Bienes
           </router-link>
-          <router-link to="/activos/categorias" class="submenu-item" :class="{ active: $route.path.includes('/activos/categorias') }">
+          <router-link :to="{ name: 'categorias' }" class="submenu-item" :class="{ active: $route.name === 'categorias' }">
             <span class="submenu-icon">📂</span> Categorías
           </router-link>
-          <router-link to="/activos/asignaciones" class="submenu-item" :class="{ active: $route.path.includes('/activos/asignaciones') }">
+          <router-link :to="{ name: 'asignaciones' }" class="submenu-item" :class="{ active: $route.name === 'asignaciones' }">
             <span class="submenu-icon">📋</span> Asignaciones
           </router-link>
-          <router-link to="/activos/mantenimientos" class="submenu-item" :class="{ active: $route.path.includes('/activos/mantenimientos') }">
+          <router-link :to="{ name: 'mantenimientos' }" class="submenu-item" :class="{ active: $route.name === 'mantenimientos' }">
             <span class="submenu-icon">🔧</span> Mantenimientos
           </router-link>
-          <router-link to="/activos/bajas" class="submenu-item" :class="{ active: $route.path.includes('/activos/bajas') }">
+          <router-link :to="{ name: 'bajas' }" class="submenu-item" :class="{ active: $route.name === 'bajas' }">
             <span class="submenu-icon">🗑️</span> Bajas
           </router-link>
-          <router-link to="/activos/reportes" class="submenu-item" :class="{ active: $route.path.includes('/activos/reportes') }">
+          <router-link :to="{ name: 'reportes' }" class="submenu-item" :class="{ active: $route.name === 'reportes' }">
             <span class="submenu-icon">📊</span> Reportes
           </router-link>
-          <router-link to="/activos/proveedores" class="submenu-item" :class="{ active: $route.path.includes('/activos/proveedores') }">
+          <router-link :to="{ name: 'proveedores' }" class="submenu-item" :class="{ active: $route.name === 'proveedores' }">
             <span class="submenu-icon">🏢</span> Proveedores
           </router-link>
         </div>
@@ -197,13 +197,13 @@ const props = defineProps({
 const authStore = useAuthStore();
 
 // ==========================================
-// ESTADO DE MENÚS - TODOS ABIERTOS POR DEFECTO
+// ESTADO DE MENÚS - TODOS CERRADOS POR DEFECTO
 // ==========================================
-const isInstitucionalOpen = ref(true);
-const isComunicacionalOpen = ref(true);
-const isDocumentalOpen = ref(true);
-const isRrhhOpen = ref(true);
-const isActivosOpen = ref(true);
+const isInstitucionalOpen = ref(false);
+const isComunicacionalOpen = ref(false);
+const isDocumentalOpen = ref(false);
+const isRrhhOpen = ref(false);
+const isActivosOpen = ref(false);
 
 // ==========================================
 // COMPUTED
@@ -273,7 +273,7 @@ const hasRole = (roleName) => {
 }
 
 /* ==========================================
-   HEADER DEL SIDEBAR
+   HEADER DEL SIDEBAR (LOGO 80%)
    ========================================== */
 .sidebar-header {
   padding: 20px;
@@ -288,11 +288,14 @@ const hasRole = (roleName) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 .logo-image {
-  width: 50px;
-  height: 50px;
+  /* 📐 AQUÍ ESTÁ LA MAGIA: Ocupa el 80% del ancho del Sidebar */
+  width: 80%;
+  max-width: 200px; /* Opcional: un límite máximo para que no se vea gigante en pantallas enormes */
+  height: auto;
   object-fit: contain;
   display: block;
 }
@@ -451,17 +454,6 @@ const hasRole = (roleName) => {
 
 .sidebar.collapsed .submenu {
   display: none;
-}
-
-/* ==========================================
-   DEBUG
-   ========================================== */
-.debug-info {
-  margin-top: 10px;
-  padding: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.3);
 }
 
 /* ==========================================
