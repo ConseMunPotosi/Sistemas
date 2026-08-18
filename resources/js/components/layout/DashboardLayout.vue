@@ -132,6 +132,8 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .main-content.expanded {
@@ -142,7 +144,8 @@ onMounted(async () => {
   flex: 1;
   padding: 20px;
   margin-top: 70px;
-  overflow-y: auto;
+  overflow: hidden auto;
+  box-sizing: border-box;
 }
 
 .loading-screen {

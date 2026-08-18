@@ -76,9 +76,9 @@ const routes = [
             { path: 'institucional/roles', name: 'roles', component: () => import('@/components/institucional/RolesList.vue') },
             { path: 'institucional/permisos', name: 'permisos', component: () => import('@/components/institucional/PermisosList.vue') },
 
-            // 2. GESTIÓN COMUNICACIONAL
+            /*/ 2. GESTIÓN COMUNICACIONAL
             { path: 'comunicacion/sesiones', name: 'sesiones', component: () => import('@/components/comunicacion/SesionesList.vue') },
-            { path: 'comunicacion/noticias', name: 'noticias', component: () => import('@/components/comunicacion/NoticiasList.vue') }
+            { path: 'comunicacion/noticias', name: 'noticias', component: () => import('@/components/comunicacion/NoticiasList.vue') }*/
         ]
     },
     // 404

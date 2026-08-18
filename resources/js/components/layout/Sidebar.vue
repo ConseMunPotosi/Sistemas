@@ -21,15 +21,15 @@
       <div class="menu-section">
         <div
           class="nav-item menu-toggle"
-          :class="{ active: isInstitucionalOpen }"
+          :class="{ active: activeMenu === 'institucional' }"
           @click="toggleMenu('institucional')"
         >
           <span class="nav-icon">🏛️</span>
           <span v-if="!isCollapsed" class="nav-text">Gestión Institucional</span>
-          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: isInstitucionalOpen }">▶</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: activeMenu === 'institucional' }">▶</span>
         </div>
 
-        <div v-if="!isCollapsed" class="submenu" :class="{ open: isInstitucionalOpen }">
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: activeMenu === 'institucional' }">
           <router-link :to="{ name: 'funcionarios' }" class="submenu-item" :class="{ active: $route.name === 'funcionarios' }">
             <span class="submenu-icon">👤</span> Funcionarios
           </router-link>
@@ -54,15 +54,15 @@
       <div class="menu-section">
         <div
           class="nav-item menu-toggle"
-          :class="{ active: isComunicacionalOpen }"
+          :class="{ active: activeMenu === 'comunicacional' }"
           @click="toggleMenu('comunicacional')"
         >
           <span class="nav-icon">📢</span>
           <span v-if="!isCollapsed" class="nav-text">Gestión Comunicacional</span>
-          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: isComunicacionalOpen }">▶</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: activeMenu === 'comunicacional' }">▶</span>
         </div>
 
-        <div v-if="!isCollapsed" class="submenu" :class="{ open: isComunicacionalOpen }">
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: activeMenu === 'comunicacional' }">
           <router-link :to="{ name: 'sesiones' }" class="submenu-item" :class="{ active: $route.name === 'sesiones' }">
             <span class="submenu-icon">📋</span> Sesiones
           </router-link>
@@ -78,22 +78,23 @@
       <div class="menu-section">
         <div
           class="nav-item menu-toggle"
-          :class="{ active: isDocumentalOpen }"
+          :class="{ active: activeMenu === 'documental' }"
           @click="toggleMenu('documental')"
         >
           <span class="nav-icon">📄</span>
           <span v-if="!isCollapsed" class="nav-text">Gestión Documental</span>
-          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: isDocumentalOpen }">▶</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: activeMenu === 'documental' }">▶</span>
         </div>
 
-        <div v-if="!isCollapsed" class="submenu" :class="{ open: isDocumentalOpen }">
-          <router-link :to="{ name: 'documentos' }" class="submenu-item" :class="{ active: $route.name === 'documentos' }">
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: activeMenu === 'documental' }">
+          <!-- Si los enlaces no tienen name, puedes usar to="/ruta" -->
+          <router-link to="/documental/documentos" class="submenu-item" :class="{ active: $route.path.includes('/documental/documentos') }">
             <span class="submenu-icon">📄</span> Documentos
           </router-link>
-          <router-link :to="{ name: 'tipos' }" class="submenu-item" :class="{ active: $route.name === 'tipos' }">
+          <router-link to="/documental/tipos" class="submenu-item" :class="{ active: $route.path.includes('/documental/tipos') }">
             <span class="submenu-icon">🏷️</span> Tipos de Documento
           </router-link>
-          <router-link :to="{ name: 'archivos' }" class="submenu-item" :class="{ active: $route.name === 'archivos' }">
+          <router-link to="/documental/archivos" class="submenu-item" :class="{ active: $route.path.includes('/documental/archivos') }">
             <span class="submenu-icon">📁</span> Archivos
           </router-link>
         </div>
@@ -105,28 +106,28 @@
       <div class="menu-section">
         <div
           class="nav-item menu-toggle"
-          :class="{ active: isRrhhOpen }"
+          :class="{ active: activeMenu === 'rrhh' }"
           @click="toggleMenu('rrhh')"
         >
           <span class="nav-icon">👥</span>
           <span v-if="!isCollapsed" class="nav-text">Recursos Humanos</span>
-          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: isRrhhOpen }">▶</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: activeMenu === 'rrhh' }">▶</span>
         </div>
 
-        <div v-if="!isCollapsed" class="submenu" :class="{ open: isRrhhOpen }">
-          <router-link :to="{ name: 'empleados' }" class="submenu-item" :class="{ active: $route.name === 'empleados' }">
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: activeMenu === 'rrhh' }">
+          <router-link to="/rrhh/empleados" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/empleados') }">
             <span class="submenu-icon">👨‍💼</span> Empleados
           </router-link>
-          <router-link :to="{ name: 'asistencias' }" class="submenu-item" :class="{ active: $route.name === 'asistencias' }">
+          <router-link to="/rrhh/asistencias" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/asistencias') }">
             <span class="submenu-icon">📅</span> Asistencias
           </router-link>
-          <router-link :to="{ name: 'vacaciones' }" class="submenu-item" :class="{ active: $route.name === 'vacaciones' }">
+          <router-link to="/rrhh/vacaciones" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/vacaciones') }">
             <span class="submenu-icon">🏖️</span> Vacaciones
           </router-link>
-          <router-link :to="{ name: 'permisos_rrhh' }" class="submenu-item" :class="{ active: $route.name === 'permisos_rrhh' }">
+          <router-link to="/rrhh/permisos" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/permisos') }">
             <span class="submenu-icon">📋</span> Permisos
           </router-link>
-          <router-link :to="{ name: 'contratos' }" class="submenu-item" :class="{ active: $route.name === 'contratos' }">
+          <router-link to="/rrhh/contratos" class="submenu-item" :class="{ active: $route.path.includes('/rrhh/contratos') }">
             <span class="submenu-icon">📄</span> Contratos
           </router-link>
         </div>
@@ -138,37 +139,37 @@
       <div class="menu-section">
         <div
           class="nav-item menu-toggle"
-          :class="{ active: isActivosOpen }"
+          :class="{ active: activeMenu === 'activos' }"
           @click="toggleMenu('activos')"
         >
           <span class="nav-icon">💻</span>
           <span v-if="!isCollapsed" class="nav-text">Activos Fijos</span>
-          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: isActivosOpen }">▶</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: activeMenu === 'activos' }">▶</span>
         </div>
 
-        <div v-if="!isCollapsed" class="submenu" :class="{ open: isActivosOpen }">
-          <router-link :to="{ name: 'inventario' }" class="submenu-item" :class="{ active: $route.name === 'inventario' }">
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: activeMenu === 'activos' }">
+          <router-link to="/activos/inventario" class="submenu-item" :class="{ active: $route.path.includes('/activos/inventario') }">
             <span class="submenu-icon">📦</span> Inventario
           </router-link>
-          <router-link :to="{ name: 'bienes' }" class="submenu-item" :class="{ active: $route.name === 'bienes' }">
+          <router-link to="/activos/bienes" class="submenu-item" :class="{ active: $route.path.includes('/activos/bienes') }">
             <span class="submenu-icon">🏷️</span> Bienes
           </router-link>
-          <router-link :to="{ name: 'categorias' }" class="submenu-item" :class="{ active: $route.name === 'categorias' }">
+          <router-link to="/activos/categorias" class="submenu-item" :class="{ active: $route.path.includes('/activos/categorias') }">
             <span class="submenu-icon">📂</span> Categorías
           </router-link>
-          <router-link :to="{ name: 'asignaciones' }" class="submenu-item" :class="{ active: $route.name === 'asignaciones' }">
+          <router-link to="/activos/asignaciones" class="submenu-item" :class="{ active: $route.path.includes('/activos/asignaciones') }">
             <span class="submenu-icon">📋</span> Asignaciones
           </router-link>
-          <router-link :to="{ name: 'mantenimientos' }" class="submenu-item" :class="{ active: $route.name === 'mantenimientos' }">
+          <router-link to="/activos/mantenimientos" class="submenu-item" :class="{ active: $route.path.includes('/activos/mantenimientos') }">
             <span class="submenu-icon">🔧</span> Mantenimientos
           </router-link>
-          <router-link :to="{ name: 'bajas' }" class="submenu-item" :class="{ active: $route.name === 'bajas' }">
+          <router-link to="/activos/bajas" class="submenu-item" :class="{ active: $route.path.includes('/activos/bajas') }">
             <span class="submenu-icon">🗑️</span> Bajas
           </router-link>
-          <router-link :to="{ name: 'reportes' }" class="submenu-item" :class="{ active: $route.name === 'reportes' }">
+          <router-link to="/activos/reportes" class="submenu-item" :class="{ active: $route.path.includes('/activos/reportes') }">
             <span class="submenu-icon">📊</span> Reportes
           </router-link>
-          <router-link :to="{ name: 'proveedores' }" class="submenu-item" :class="{ active: $route.name === 'proveedores' }">
+          <router-link to="/activos/proveedores" class="submenu-item" :class="{ active: $route.path.includes('/activos/proveedores') }">
             <span class="submenu-icon">🏢</span> Proveedores
           </router-link>
         </div>
@@ -178,7 +179,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useAuthStore } from '../../api/auth.js';
 
 // Props
@@ -197,13 +198,9 @@ const props = defineProps({
 const authStore = useAuthStore();
 
 // ==========================================
-// ESTADO DE MENÚS - TODOS CERRADOS POR DEFECTO
+// 🟢 NUEVA LÓGICA: UNA SOLA VARIABLE PARA EL MENÚ ACTIVO 🟢
 // ==========================================
-const isInstitucionalOpen = ref(false);
-const isComunicacionalOpen = ref(false);
-const isDocumentalOpen = ref(false);
-const isRrhhOpen = ref(false);
-const isActivosOpen = ref(false);
+const activeMenu = ref(null); // Puede ser: 'institucional', 'comunicacional', etc. o null
 
 // ==========================================
 // COMPUTED
@@ -214,27 +211,17 @@ const userRoles = computed(() => {
 });
 
 // ==========================================
-// MÉTODOS
+// 🟢 NUEVO MÉTODO TOGGLE 🟢
 // ==========================================
 const toggleMenu = (menu) => {
   if (props.isCollapsed) return;
 
-  switch(menu) {
-    case 'institucional':
-      isInstitucionalOpen.value = !isInstitucionalOpen.value;
-      break;
-    case 'comunicacional':
-      isComunicacionalOpen.value = !isComunicacionalOpen.value;
-      break;
-    case 'documental':
-      isDocumentalOpen.value = !isDocumentalOpen.value;
-      break;
-    case 'rrhh':
-      isRrhhOpen.value = !isRrhhOpen.value;
-      break;
-    case 'activos':
-      isActivosOpen.value = !isActivosOpen.value;
-      break;
+  // Si el menú en el que hicimos clic ya está abierto, lo cerramos.
+  // Si estaba cerrado, lo abrimos (y esto cierra automáticamente cualquier otro).
+  if (activeMenu.value === menu) {
+    activeMenu.value = null;
+  } else {
+    activeMenu.value = menu;
   }
 };
 
@@ -245,7 +232,6 @@ const hasRole = (roleName) => {
   const userRoles = authStore.user?.roles || [];
   return userRoles.some(r => r.nombre === roleName);
 };
-
 </script>
 
 <style scoped>
@@ -258,7 +244,7 @@ const hasRole = (roleName) => {
   left: 0;
   width: 250px;
   height: 100vh;
-  background: #2c3e50;
+  background: #212529;
   color: white;
   display: flex;
   flex-direction: column;
@@ -292,9 +278,8 @@ const hasRole = (roleName) => {
 }
 
 .logo-image {
-  /* 📐 AQUÍ ESTÁ LA MAGIA: Ocupa el 80% del ancho del Sidebar */
   width: 80%;
-  max-width: 200px; /* Opcional: un límite máximo para que no se vea gigante en pantallas enormes */
+  max-width: 200px;
   height: auto;
   object-fit: contain;
   display: block;
@@ -341,9 +326,9 @@ const hasRole = (roleName) => {
 }
 
 .nav-item.active {
-  background: rgba(79, 70, 229, 0.3);
+  background: #706b6b79;
   color: white;
-  box-shadow: inset 3px 0 0 #4f46e5;
+  box-shadow: inset 3px 0 0 #CC0000;
 }
 
 .nav-icon {
@@ -420,7 +405,7 @@ const hasRole = (roleName) => {
 .submenu-item.active {
   background: rgba(79, 70, 229, 0.2);
   color: white;
-  box-shadow: inset 2px 0 0 #4f46e5;
+  box-shadow: inset 2px 0 0 #CC0000;
 }
 
 .submenu-icon {

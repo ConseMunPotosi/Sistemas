@@ -300,8 +300,26 @@ export default {
 .dashboard-container {
   padding: 20px;
   background: #f5f7fa;
-  min-height: 100vh;
+  width: 100%;       /* Toma todo el ancho del padre */
+  height: 100%;      /* Toma toda la altura del padre */
+  box-sizing: border-box; /* Importante para que el padding no añada ancho extra */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.dashboard-container > *,
+.dashboard-container .chart-container,
+.dashboard-container canvas {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Si usas Chart.js, a veces el canvas se estira. Esto lo corrige: */
+.chart-container {
+  position: relative;
+  height: 200px;
+  width: 100%;
 }
 
 /* Stats Grid */
