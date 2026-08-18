@@ -63,11 +63,9 @@
         </div>
 
         <div v-if="!isCollapsed" class="submenu" :class="{ open: activeMenu === 'comunicacional' }">
-          <router-link :to="{ name: 'sesiones' }" class="submenu-item" :class="{ active: $route.name === 'sesiones' }">
-            <span class="submenu-icon">📋</span> Sesiones
-          </router-link>
-          <router-link :to="{ name: 'noticias' }" class="submenu-item" :class="{ active: $route.name === 'noticias' }">
-            <span class="submenu-icon">📰</span> Noticias
+          <!-- Noticias -->
+          <router-link :to="{ name: 'informacion' }" class="submenu-item" :class="{ active: $route.name === 'informacion' }">
+            <span class="submenu-icon">📰</span> Información
           </router-link>
         </div>
       </div>

@@ -3,18 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Aquí puedes registrar las rutas de la API para tu aplicación.
-| Estas rutas son cargadas por el RouteServiceProvider y todas ellas
-| se asignarán al grupo de middleware "api".
-|
-*/
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Api\comunicacion\CategoriaNoticiaController;
+use App\Http\Controllers\Api\comunicacion\NoticiaController;
 
 // ==========================================
 // RUTAS PÚBLICAS (sin autenticación)
@@ -33,6 +24,18 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 // ==========================================
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    // RUTA DE CATEGORÍAS 
+    Route::get('/noticias/categorias', [CategoriaNoticiaController::class, 'index']);
+    Route::post('/noticias/categorias', [CategoriaNoticiaController::class, 'store']); // <--- VERIFICA ESTA LÍNEA
+    Route::put('/noticias/categorias/{id}', [CategoriaNoticiaController::class, 'update']);
+    Route::delete('/noticias/categorias/{id}', [CategoriaNoticiaController::class, 'destroy']);
+
+    // RUTA DE NOTICIAS
+    Route::get('/noticias', [NoticiaController::class, 'index']);
+    Route::post('/noticias', [NoticiaController::class, 'store']);
+    Route::put('/noticias/{id}', [NoticiaController::class, 'update']);
+    Route::delete('/noticias/{id}', [NoticiaController::class, 'destroy']);
 
     Route::get('/cargos', function () {
         return response()->json([
@@ -104,7 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * Si el usuario no es administrador: { "success": false, "message": "No tienes permisos" }
      */
     Route::get('/admin-only', function () {
-        $user = auth()->user();
+        $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -130,7 +133,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * Response: { "success": true, "data": [ { "user": {...}, "roles": [...] } ] }
      */
     Route::get('/users', function () {
-        $user = auth()->user();
+        $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -154,7 +157,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * Header: Authorization: Bearer {token}
      */
     Route::get('/users/{id}', function ($id) {
-        $user = auth()->user();
+        $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -185,7 +188,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * Body: { "id_funcionario": 1, "usuario": "jperez", "password": "123456", "correo": "jperez@test.com", "roles": [1, 2] }
      */
     Route::post('/users', function (Request $request) {
-        $user = auth()->user();
+        $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -230,7 +233,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * Header: Authorization: Bearer {token}
      */
     Route::put('/users/{id}', function (Request $request, $id) {
-        $user = auth()->user();
+        $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -275,7 +278,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * Header: Authorization: Bearer {token}
      */
     Route::delete('/users/{id}', function ($id) {
-        $user = auth()->user();
+        $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -316,7 +319,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * Header: Authorization: Bearer {token}
      */
     Route::get('/roles', function () {
-        $user = auth()->user();
+        $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -338,7 +341,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * Header: Authorization: Bearer {token}
      */
     Route::get('/permisos', function () {
-        $user = auth()->user();
+        $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -381,7 +384,7 @@ if (app()->environment('local', 'development')) {
         return response()->json([
             'success' => true,
             'message' => 'Ruta de prueba de autenticación',
-            'user' => auth()->user() ?? 'No autenticado'
+            'user' => Auth::user() ?? 'No autenticado'
         ]);
     });
 }
