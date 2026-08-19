@@ -26,7 +26,6 @@ class ArchivoNoticia extends Model
         'peso_bytes',
         'subido_por',
         'fecha_subida',
-        'estado'
     ];
 
     protected $casts = [

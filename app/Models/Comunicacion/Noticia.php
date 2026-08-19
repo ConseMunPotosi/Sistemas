@@ -22,7 +22,6 @@ class Noticia extends Model
         'titulo',
         'resumen',
         'contenido',
-        'imagen_portada',
         'id_categoria',
         'id_usuario_creador',
         'estado_publicacion',

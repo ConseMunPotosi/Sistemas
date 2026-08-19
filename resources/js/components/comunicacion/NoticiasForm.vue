@@ -11,9 +11,25 @@
           <div class="form-group">
             <label>Categoría</label>
             <select v-model="form.id_categoria" required>
+              <option
+                v-if="isEditing && props.noticia?.id_categoria && !store.categorias.some(c => c.id_categoria === props.noticia.id_categoria)"
+                :value="props.noticia.id_categoria"
+              >
+                {{ getCategoriaNombre(props.noticia.id_categoria) }} (Inactiva)
+              </option>
               <option value="">Seleccionar...</option>
-              <option v-for="cat in store.categorias" :key="cat.id_categoria" :value="cat.id_categoria">
-                {{ cat.nombre }}
+              <template v-if="store.categorias && Array.isArray(store.categorias)">
+                <!-- Filtramos solo las activas directamente en el v-for -->
+                <option
+                  v-for="cat in store.categorias.filter(c => c.estado === true)"
+                  :key="cat.id_categoria"
+                  :value="cat.id_categoria"
+                >
+                  {{ cat.nombre }}
+                </option>
+              </template>
+              <option v-else disabled>
+                {{ store.loading ? 'Cargando categorías...' : 'No hay categorías activas disponibles' }}
               </option>
             </select>
           </div>
@@ -26,11 +42,6 @@
           <label>Contenido</label>
           <textarea v-model="form.contenido" rows="5"></textarea>
         </div>
-        <div class="form-group">
-          <label>Imagen de Portada (URL)</label>
-          <input v-model="form.imagen_portada" type="url" />
-        </div>
-
         <h4>Opciones de Publicación</h4>
         <div class="grid-2">
           <div class="form-group">
@@ -108,6 +119,11 @@ const handleSubmit = async () => {
   else res = await store.createNoticia(form);
 
   if (res.success) { closeModal(); emit('saved'); }
+};
+const getCategoriaNombre = (id) => {
+  if (!id) return 'Sin categoría';
+  const cat = store.categorias.find(c => c.id_categoria === id);
+  return cat ? cat.nombre : 'Categoría no encontrada';
 };
 </script>
 

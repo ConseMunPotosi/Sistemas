@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('titulo', 200)->nullable();
             $table->text('resumen')->nullable();
             $table->text('contenido')->nullable();
-            $table->text('imagen_portada')->nullable();
             //$table->integer('id_categoria')->nullable();
             $table->unsignedBigInteger('id_categoria');
             $table->foreign('id_categoria')

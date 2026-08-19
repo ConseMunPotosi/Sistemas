@@ -33,10 +33,6 @@ return new class extends Migration
                   ->onDelete('set null');
 
             $table->timestamp('fecha_subida')->nullable();
-            $table->boolean('estado')->default(true);
-
-
-
         });
     }
 
