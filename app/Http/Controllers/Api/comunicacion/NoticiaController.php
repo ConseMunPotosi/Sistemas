@@ -53,7 +53,10 @@ class NoticiaController extends Controller
             'id_usuario_creador' => Auth::id(),
             'estado_publicacion' => $request->estado_publicacion,
             'fecha_creacion' => now(),
-            'fecha_publicacion' => $request->fecha_publicacion ?? null,
+            // Lógica inteligente: Si es publicado, pon fecha de hoy si no enviaron nada
+            'fecha_publicacion' => $request->estado_publicacion === 'publicado'
+                                    ? ($request->fecha_publicacion ?? now())
+                                    : $request->fecha_publicacion,
             'publicado_web' => $request->publicado_web ?? true,
             'publicado_facebook' => $request->publicado_facebook ?? false,
             'enlace_facebook' => $request->enlace_facebook,
@@ -64,7 +67,7 @@ class NoticiaController extends Controller
         // 🔥 PASO CRUCIAL: Recargamos la noticia desde la BD para obtener el ID real
         $noticia->refresh();
 
-                // 2. PROCESAR Y GUARDAR TODOS LOS ARCHIVOS (CORREGIDO PARA EVITAR ERROR DE TEMP EN WINDOWS)
+        // 2. PROCESAR Y GUARDAR TODOS LOS ARCHIVOS (CORREGIDO PARA EVITAR ERROR DE TEMP EN WINDOWS)
         if ($request->hasFile('archivos')) {
 
             $archivosSubidos = $request->file('archivos');
@@ -140,7 +143,7 @@ class NoticiaController extends Controller
         return response()->json(['success' => true, 'data' => $noticia]);
     }
 
-    // Actualizar una noticia
+    // Actualizar una noticia (¡CORREGIDO!)
     public function update(Request $request, $id)
     {
         $noticia = Noticia::find($id);
@@ -161,7 +164,19 @@ class NoticiaController extends Controller
             ], 422);
         }
 
-        $noticia->update($request->all());
+        // 🛑 IMPORTANTE: NO usar $request->all() directamente, porque borra la fecha si llega vacía.
+        $datosParaActualizar = $request->except(['fecha_publicacion']); // Excluimos la fecha por ahora
+
+        // Aplicamos la lógica inteligente de la fecha solo si el usuario está publicando
+        if ($request->estado_publicacion === 'publicado') {
+            // Si viene una fecha en el request, úsala. Si no, usa la fecha actual del servidor (now())
+            $datosParaActualizar['fecha_publicacion'] = $request->fecha_publicacion ?? now();
+        } elseif ($request->has('estado_publicacion')) {
+            // Si cambia a borrador o programado, y viene null, dejamos que la BD ponga null
+            $datosParaActualizar['fecha_publicacion'] = $request->fecha_publicacion;
+        }
+
+        $noticia->update($datosParaActualizar);
         return response()->json([
             'success' => true,
             'data' => $noticia->load('categoria')

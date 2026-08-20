@@ -41,63 +41,63 @@
               <thead>
                 <tr>
                   <th class="col-icon">Archivos</th>
-                  <th class="col-auto">Título</th>
                   <th class="col-rest">Resumen</th>
-                  <th class="col-auto">Categoría</th>
-                  <th class="col-auto">Estado</th>
                   <th class="col-auto">Fecha Pub.</th>
                   <th class="col-actions">Acciones</th>
                 </tr>
               </thead>
               <tbody v-if="!store.noticias || !Array.isArray(store.noticias) || store.noticias.length === 0">
                 <tr>
-                  <td colspan="7" class="empty-text">No hay noticias registradas.</td>
+                  <td colspan="4" class="empty-text">No hay noticias registradas.</td>
                 </tr>
               </tbody>
               <tbody v-else>
                 <tr v-for="noticia in store.noticias" :key="noticia.id_noticia || noticia.id">
 
                   <!-- ========================================== -->
-                  <!-- ✨ NUEVO: COLLAGE DE IMÁGENES E ÍCONOS    -->
+                  <!-- 📁 ÍCONO ÚNICO REPRESENTATIVO             -->
                   <!-- ========================================== -->
                   <td class="col-icon text-center">
-                    <div v-if="noticia.archivos && noticia.archivos.length > 0" class="file-collage">
-                      <span
-                        v-for="(archivo, index) in noticia.archivos"
-                        :key="archivo.id_archivo || index"
-                        class="file-thumb-wrapper"
-                        :title="archivo.nombre_archivo"
-                        @click="openFileModal(archivo)"
-                      >
-                        <!-- Si es imagen, mostrar miniatura -->
-                        <img
-                          v-if="isImage(archivo)"
-                          :src="getFileUrl(archivo.ruta_archivo)"
-                          class="file-thumb"
-                          @error="handleThumbError"
-                        />
-                        <!-- Si es video, mostrar ícono de video -->
-                        <span v-else-if="isVideo(archivo)" class="file-icon-large">🎬</span>
-                        <!-- Si es PDF, mostrar ícono de PDF -->
-                        <span v-else-if="isPdf(archivo)" class="file-icon-large">📕</span>
-                        <!-- Cualquier otro archivo -->
-                        <span v-else class="file-icon-large">📄</span>
+                    <div
+                      v-if="noticia.archivos && noticia.archivos.length > 0"
+                      class="file-icon-wrapper"
+                      @click="openGalleryModal(noticia)"
+                      title="Ver archivos adjuntos"
+                    >
+                      <span class="file-badge-icon">
+                        {{ getFolderIcon(noticia.archivos) }}
                       </span>
+                      <span class="file-count-badge">{{ noticia.archivos.length }}</span>
                     </div>
                     <span v-else class="text-gray-400">-</span>
                   </td>
 
-                  <td class="col-auto font-bold">{{ noticia.titulo || 'Sin título' }}</td>
-                  <td class="col-rest text-sm text-gray-600">
-                    {{ noticia.resumen ? (noticia.resumen.length > 50 ? noticia.resumen.substring(0, 50) + '...' : noticia.resumen) : '-' }}
+                  <!-- ========================================== -->
+                  <!-- 📌 NUEVA COLUMNA: NOTICIA (Título + Badges) -->
+                  <!-- ========================================== -->
+                  <td class="col-rest">
+                    <div class="noticia-content">
+                      <div class="noticia-header">
+                        <span class="font-bold">{{ noticia.titulo || 'Sin título' }}</span>
+                        <span class="status-badge" :class="noticia.estado_publicacion || 'borrador'">
+                          {{ noticia.estado_publicacion || 'Borrador' }}
+                        </span>
+                      </div>
+                      <div class="noticia-footer">
+                        <span class="categoria-badge">{{ getCategoriaNombre(noticia.id_categoria) }}</span>
+                        <span class="text-sm text-gray-600 truncate">{{ noticia.resumen || '-' }}</span>
+                      </div>
+                    </div>
                   </td>
-                  <td class="col-auto">{{ getCategoriaNombre(noticia.id_categoria) }}</td>
-                  <td class="col-auto">
-                    <span class="status-badge" :class="noticia.estado_publicacion || 'borrador'">
-                      {{ noticia.estado_publicacion || 'Borrador' }}
-                    </span>
-                  </td>
+
+                  <!-- ========================================== -->
+                  <!-- 📅 FECHA DE PUBLICACIÓN                   -->
+                  <!-- ========================================== -->
                   <td class="col-auto">{{ formatDate(noticia.fecha_publicacion) }}</td>
+
+                  <!-- ========================================== -->
+                  <!-- ⚙️ ACCIONES                              -->
+                  <!-- ========================================== -->
                   <td class="col-actions">
                     <div class="action-buttons">
                       <button class="btn-edit" @click="openEditNoticia(noticia)" title="Editar esta noticia">✏️</button>
@@ -152,69 +152,73 @@
 
       </div>
 
-      <!-- ========================================== -->
-      <!-- MODAL DE NOTICIAS (COMPARTIDO)             -->
-      <!-- ========================================== -->
-      <NoticiaForm
-        v-model:show="showNoticiaModal"
-        :noticia="selectedNoticia"
-        @saved="refreshNoticias"
-      />
+      <!-- MODALS -->
+      <NoticiaForm v-model:show="showNoticiaModal" :noticia="selectedNoticia" @saved="refreshNoticias" />
+      <CategoriaForm v-model:show="showCategoriaModal" :categoria="selectedCategoria" @saved="refreshCategorias" />
 
-      <!-- ========================================== -->
-      <!-- MODAL DE CATEGORÍAS (COMPARTIDO)           -->
-      <!-- ========================================== -->
-      <CategoriaForm
-        v-model:show="showCategoriaModal"
-        :categoria="selectedCategoria"
-        @saved="refreshCategorias"
-      />
-
-      <!-- ========================================== -->
-      <!-- MODAL PARA VISUALIZAR ARCHIVOS             -->
-      <!-- ========================================== -->
-      <div v-if="showFileModal" class="modal-overlay" @click.self="closeFileModal">
+      <!-- GALERÍA DE ARCHIVOS -->
+      <div v-if="showGalleryModal" class="modal-overlay" @click.self="closeGalleryModal">
         <div class="modal-container-file">
           <div class="modal-header-file">
-            <h3>{{ selectedFile.nombre_archivo }}</h3>
-            <button class="close-btn" @click="closeFileModal">×</button>
+            <h3>📂 Archivos de: {{ galleryNoticia.titulo }}</h3>
+            <button class="close-btn" @click="closeGalleryModal">×</button>
           </div>
-          <div class="modal-body-file">
-
-            <!-- Renderizado según el tipo de archivo -->
-            <div v-if="isImage(selectedFile)" class="file-viewer">
-              <img
-                :src="getFileUrl(selectedFile.ruta_archivo)"
-                :alt="selectedFile.nombre_archivo"
-                @error="handleImageError"
-              />
-              <p v-if="imageLoadError" class="text-error">No se pudo cargar la imagen.</p>
-            </div>
-
-            <div v-else-if="isVideo(selectedFile)" class="file-viewer">
-              <video controls autoplay class="video-player">
-                <source :src="getFileUrl(selectedFile.ruta_archivo)" :type="selectedFile.tipo_mime" />
-                Tu navegador no soporta video.
-              </video>
-            </div>
-
-            <div v-else-if="isPdf(selectedFile)" class="file-viewer">
-              <iframe :src="getFileUrl(selectedFile.ruta_archivo)" class="pdf-viewer"></iframe>
-              <div class="pdf-download-link">
-                <a :href="getFileUrl(selectedFile.ruta_archivo)" target="_blank" class="btn-download-pdf">
-                  ⬇️ Descargar PDF
-                </a>
+          <div class="modal-body-file gallery-mode">
+            <div v-if="galleryNoticia.archivos && galleryNoticia.archivos.length > 0" class="gallery-grid">
+              <div v-for="(archivo, index) in galleryNoticia.archivos" :key="archivo.id_archivo || index" class="gallery-item">
+                <div v-if="isImage(archivo)" class="gallery-image-wrapper" @click="openSingleFileModal(archivo)">
+                  <img :src="getFileUrl(archivo.ruta_archivo)" :alt="archivo.nombre_archivo" class="gallery-img" />
+                  <div class="gallery-overlay"><span>🖼️ Ver imagen</span></div>
+                </div>
+                <div v-else-if="isVideo(archivo)" class="gallery-media-wrapper" @click="openSingleFileModal(archivo)">
+                  <div class="gallery-icon-large">🎬</div>
+                  <div class="gallery-filename">{{ archivo.nombre_archivo }}</div>
+                  <div class="gallery-overlay"><span>▶️ Reproducir</span></div>
+                </div>
+                <div v-else-if="isPdf(archivo)" class="gallery-media-wrapper" @click="openSingleFileModal(archivo)">
+                  <div class="gallery-icon-large">📕</div>
+                  <div class="gallery-filename">{{ archivo.nombre_archivo }}</div>
+                  <div class="gallery-overlay"><span>📄 Ver PDF</span></div>
+                </div>
+                <div v-else class="gallery-media-wrapper" @click="openSingleFileModal(archivo)">
+                  <div class="gallery-icon-large">📄</div>
+                  <div class="gallery-filename">{{ archivo.nombre_archivo }}</div>
+                  <div class="gallery-overlay"><span>⬇️ Descargar</span></div>
+                </div>
               </div>
             </div>
+            <div v-else class="empty-text">Esta noticia no tiene archivos.</div>
+          </div>
+        </div>
+      </div>
 
+      <!-- MODAL INDIVIDUAL -->
+      <div v-if="showSingleFileModal" class="modal-overlay" @click.self="closeSingleFileModal">
+        <div class="modal-container-file">
+          <div class="modal-header-file">
+            <h3>{{ singleSelectedFile.nombre_archivo }}</h3>
+            <button class="close-btn" @click="closeSingleFileModal">×</button>
+          </div>
+          <div class="modal-body-file">
+            <div v-if="isImage(singleSelectedFile)" class="file-viewer">
+              <img :src="getFileUrl(singleSelectedFile.ruta_archivo)" :alt="singleSelectedFile.nombre_archivo" />
+            </div>
+            <div v-else-if="isVideo(singleSelectedFile)" class="file-viewer">
+              <video controls autoplay class="video-player">
+                <source :src="getFileUrl(singleSelectedFile.ruta_archivo)" :type="singleSelectedFile.tipo_mime" />
+              </video>
+            </div>
+            <div v-else-if="isPdf(singleSelectedFile)" class="file-viewer">
+              <iframe :src="getFileUrl(singleSelectedFile.ruta_archivo)" class="pdf-viewer"></iframe>
+              <div class="pdf-download-link">
+                <a :href="getFileUrl(singleSelectedFile.ruta_archivo)" target="_blank" class="btn-download-pdf">⬇️ Descargar PDF</a>
+              </div>
+            </div>
             <div v-else class="file-viewer unknown-file">
               <div class="unknown-icon">📄</div>
-              <p>No se puede previsualizar este archivo.</p>
-              <a :href="getFileUrl(selectedFile.ruta_archivo)" target="_blank" class="btn-download-unknown">
-                ⬇️ Descargar Archivo
-              </a>
+              <p>No se puede previsualizar.</p>
+              <a :href="getFileUrl(singleSelectedFile.ruta_archivo)" target="_blank" class="btn-download-unknown">⬇️ Descargar</a>
             </div>
-
           </div>
         </div>
       </div>
@@ -232,42 +236,37 @@ import CategoriaForm from './CategoriaForm.vue';
 const store = useNoticiasStore();
 const activeTab = ref('noticias');
 
-// Computed para depuración
 const categoriasCount = computed(() => store.categorias?.length || 0);
 const noticiasCount = computed(() => store.noticias?.length || 0);
 
-// Estado de los modales (Noticia y Categoría)
 const showNoticiaModal = ref(false);
 const showCategoriaModal = ref(false);
 const selectedNoticia = ref(null);
 const selectedCategoria = ref(null);
 
 // ==========================================
-// ESTADO DEL MODAL DE ARCHIVOS
+// ESTADO: GALERÍA Y ARCHIVO INDIVIDUAL
 // ==========================================
-const showFileModal = ref(false);
-const selectedFile = ref({});
-const imageLoadError = ref(false);
+const showGalleryModal = ref(false);
+const galleryNoticia = ref({});
+const showSingleFileModal = ref(false);
+const singleSelectedFile = ref({});
 
-const openFileModal = (archivo) => {
-  selectedFile.value = archivo;
-  showFileModal.value = true;
-  imageLoadError.value = false;
+const openGalleryModal = (noticia) => {
+  galleryNoticia.value = noticia;
+  showGalleryModal.value = true;
 };
-
-const closeFileModal = () => {
-  showFileModal.value = false;
-  selectedFile.value = {};
-  imageLoadError.value = false;
+const closeGalleryModal = () => {
+  showGalleryModal.value = false;
+  galleryNoticia.value = {};
 };
-
-const handleImageError = () => {
-  imageLoadError.value = true;
+const openSingleFileModal = (archivo) => {
+  singleSelectedFile.value = archivo;
+  showSingleFileModal.value = true;
 };
-
-// Manejar errores de las miniaturas (si la imagen no carga, no se rompe la tabla)
-const handleThumbError = (event) => {
-  event.target.style.display = 'none'; // Ocultar la miniatura rota
+const closeSingleFileModal = () => {
+  showSingleFileModal.value = false;
+  singleSelectedFile.value = {};
 };
 
 // ==========================================
@@ -276,86 +275,47 @@ const handleThumbError = (event) => {
 const getFileIcon = (extension) => {
   if (!extension) return '📄';
   const ext = extension.toLowerCase();
-
-  const videoExts = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm'];
-  if (videoExts.includes(ext)) return '🎬';
-
-  const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
-  if (imageExts.includes(ext)) return '🖼️';
-
+  if (['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm'].includes(ext)) return '🎬';
+  if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) return '🖼️';
   if (ext === 'pdf') return '📕';
   if (['doc', 'docx'].includes(ext)) return '📘';
   if (['xls', 'xlsx'].includes(ext)) return '📗';
   if (ext === 'zip') return '📦';
-
   return '📄';
 };
 
-const isImage = (file) => {
-  if (!file || !file.tipo_mime) return false;
-  return file.tipo_mime.startsWith('image/');
+const getFolderIcon = (archivos) => {
+  if (!archivos || archivos.length === 0) return '📁';
+  if (archivos.some(a => a.tipo_mime?.startsWith('image/'))) return '🖼️';
+  if (archivos.some(a => a.tipo_mime?.startsWith('video/'))) return '🎬';
+  if (archivos.some(a => a.tipo_mime?.includes('pdf'))) return '📕';
+  return '📁';
 };
 
-const isVideo = (file) => {
-  if (!file || !file.tipo_mime) return false;
-  return file.tipo_mime.startsWith('video/');
-};
+const isImage = (file) => file?.tipo_mime?.startsWith('image/') || false;
+const isVideo = (file) => file?.tipo_mime?.startsWith('video/') || false;
+const isPdf = (file) => file?.tipo_mime?.includes('pdf') || false;
 
-const isPdf = (file) => {
-  if (!file || !file.tipo_mime) return false;
-  return file.tipo_mime.includes('pdf');
-};
-
-// 🔥 RUTA CORRECTA PARA ARCHIVOS
 const getFileUrl = (ruta) => {
   if (!ruta) return '#';
   return `/${ruta}`;
 };
 
 // ==========================================
-// MÉTODOS PARA NOTICIAS
+// MÉTODOS PRINCIPALES
 // ==========================================
-const openCreateNoticia = () => {
-  selectedNoticia.value = null;
-  showNoticiaModal.value = true;
-};
-
-const openEditNoticia = (noticia) => {
-  selectedNoticia.value = noticia;
-  showNoticiaModal.value = true;
-};
-
-const refreshNoticias = () => {
-  store.fetchNoticias();
-};
-
+const openCreateNoticia = () => { selectedNoticia.value = null; showNoticiaModal.value = true; };
+const openEditNoticia = (noticia) => { selectedNoticia.value = noticia; showNoticiaModal.value = true; };
+const refreshNoticias = () => { store.fetchNoticias(); };
 const confirmDeleteNoticia = async (noticia) => {
-  if (confirm(`¿Estás seguro de eliminar la noticia "${noticia.titulo}"?`)) {
-    await store.deleteNoticia(noticia.id_noticia);
-  }
+  if (confirm(`¿Eliminar "${noticia.titulo}"?`)) await store.deleteNoticia(noticia.id_noticia);
 };
 
-// ==========================================
-// MÉTODOS PARA CATEGORÍAS
-// ==========================================
-const openCreateCategoria = () => {
-  selectedCategoria.value = null;
-  showCategoriaModal.value = true;
-};
-
-const openEditCategoria = (cat) => {
-  selectedCategoria.value = cat;
-  showCategoriaModal.value = true;
-};
-
-const refreshCategorias = () => {
-  store.fetchCategorias();
-};
-
+const openCreateCategoria = () => { selectedCategoria.value = null; showCategoriaModal.value = true; };
+const openEditCategoria = (cat) => { selectedCategoria.value = cat; showCategoriaModal.value = true; };
+const refreshCategorias = () => { store.fetchCategorias(); };
 const confirmDeleteCategoria = async (cat) => {
-  if (confirm(`¿Estás seguro de eliminar la categoría "${cat.nombre}"?`)) {
-    await store.deleteCategoria(cat.id_categoria);
-  }
+  if (confirm(`¿Eliminar "${cat.nombre}"?`)) await store.deleteCategoria(cat.id_categoria);
 };
 
 // ==========================================
@@ -363,7 +323,6 @@ const confirmDeleteCategoria = async (cat) => {
 // ==========================================
 const getCategoriaNombre = (id) => {
   if (!id) return 'Sin categoría';
-  if (!Array.isArray(store.categorias)) return 'Sin categoría';
   const cat = store.categorias.find(c => c.id_categoria === id);
   return cat ? cat.nombre : 'Sin categoría';
 };
@@ -372,29 +331,16 @@ const formatDate = (date) => {
   if (!date) return '-';
   try {
     const d = new Date(date);
-    if (isNaN(d.getTime())) return '-';
-    return d.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  } catch (e) {
-    return '-';
-  }
+    return isNaN(d.getTime()) ? '-' : d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  } catch { return '-'; }
 };
 
 // ==========================================
 // CICLO DE VIDA
 // ==========================================
 onMounted(async () => {
-  try {
-    await Promise.all([
-      store.fetchNoticias(),
-      store.fetchCategorias()
-    ]);
-  } catch (error) {
-    console.error('❌ Error al cargar datos:', error);
-  }
+  try { await Promise.all([store.fetchNoticias(), store.fetchCategorias()]); }
+  catch (error) { console.error('❌ Error al cargar datos:', error); }
 });
 </script>
 
@@ -424,11 +370,7 @@ onMounted(async () => {
   align-items: center;
   margin-bottom: 20px;
 }
-.manager-header h2 {
-  margin: 0;
-  font-size: 20px;
-  color: #1a1a2e;
-}
+.manager-header h2 { margin: 0; font-size: 20px; color: #1a1a2e; }
 
 .btn-primary {
   padding: 8px 20px;
@@ -438,16 +380,10 @@ onMounted(async () => {
   border-radius: 6px;
   cursor: pointer;
 }
-.btn-primary:hover {
-  background: #a30000;
-}
+.btn-primary:hover { background: #a30000; }
 
 /* Tabs */
-.tabs-container {
-  display: flex;
-  border-bottom: 2px solid #eee;
-  margin-bottom: 20px;
-}
+.tabs-container { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
 .tab-btn {
   padding: 10px 20px;
   background: none;
@@ -459,12 +395,8 @@ onMounted(async () => {
   position: relative;
   transition: all 0.3s;
 }
-.tab-btn:hover {
-  color: #1a1a2e;
-}
-.tab-btn.active {
-  color: #cc0000;
-}
+.tab-btn:hover { color: #1a1a2e; }
+.tab-btn.active { color: #cc0000; }
 .tab-btn.active::after {
   content: '';
   position: absolute;
@@ -475,57 +407,25 @@ onMounted(async () => {
   background: #cc0000;
 }
 
-/* Tablas */
-.table-wrapper {
-  overflow-x: auto;
-}
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: auto;
-}
-.data-table th,
-.data-table td {
+/* ========================================= */
+/* NUEVO ESTILO DE TABLA MÁS LIMPIO          */
+/* ========================================= */
+.table-wrapper { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; table-layout: auto; }
+.data-table th, .data-table td {
   padding: 14px 16px;
   text-align: left;
   border-bottom: 1px solid #eee;
   vertical-align: middle;
 }
 
-.data-table th.col-auto,
-.data-table td.col-auto {
-  width: auto;
-  white-space: nowrap;
-}
+.data-table th.col-auto, .data-table td.col-auto { width: auto; white-space: nowrap; }
+.data-table td.col-rest { width: 100%; max-width: 0; white-space: normal; word-wrap: break-word; }
 
-.data-table td.col-rest {
-  width: 100%;
-  max-width: 0;
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-/* Columna para los íconos e imágenes */
-.data-table th.col-icon,
-.data-table td.col-icon {
-  width: 140px; /* Un poco más ancha para el collage */
-  text-align: center;
-}
-
-.data-table th.col-actions,
-.data-table td.col-actions {
-  width: 120px;
-  text-align: center;
-}
-
-.data-table th {
-  background: #f9fafb;
-  font-weight: 600;
-  color: #374151;
-}
-.data-table tr:hover {
-  background: #f9fafb;
-}
+.data-table th.col-icon, .data-table td.col-icon { width: 100px; text-align: center; }
+.data-table th.col-actions, .data-table td.col-actions { width: 120px; text-align: center; }
+.data-table th { background: #f9fafb; font-weight: 600; color: #374151; }
+.data-table tr:hover { background: #f9fafb; }
 
 /* Textos auxiliares */
 .text-center { text-align: center !important; }
@@ -533,83 +433,105 @@ onMounted(async () => {
 .text-sm { font-size: 0.875rem; }
 .text-gray-400 { color: #9ca3af; }
 .text-gray-600 { color: #6b7280; }
-.text-error { color: #dc2626; font-weight: bold; margin-top: 10px; }
+.truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px; display: inline-block; }
 
-/* ========================================= */
-/* ✨ ESTILOS DEL COLLAGE DE ARCHIVOS        */
-/* ========================================= */
-.file-collage {
-  display: flex;
+/* 📁 ÍCONO ÚNICO DE ARCHIVOS */
+.file-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.file-thumb-wrapper {
   cursor: pointer;
+  position: relative;
   transition: transform 0.2s;
-  display: inline-block;
+  padding: 8px;
+  border-radius: 8px;
 }
-
-.file-thumb-wrapper:hover {
-  transform: scale(1.15);
-  z-index: 10;
-}
-
-/* Miniaturas para imágenes */
-.file-thumb {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-}
-
-/* Íconos grandes para PDF, Videos, etc. */
-.file-icon-large {
+.file-icon-wrapper:hover { transform: scale(1.1); background: #f3f4f6; }
+.file-badge-icon { font-size: 32px; }
+.file-count-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #cc0000;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  font-size: 24px;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* ========================================= */
+/* 📌 CONTENIDO DE LA NOTICIA (Título + Badges) */
+.noticia-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.noticia-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.noticia-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
-/* Estados y badges */
+/* 🏷️ BADGE DE CATEGORÍA (Color único) */
+.categoria-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  background: #e0f2fe;      /* Azul claro */
+  color: #0369a1;           /* Azul oscuro */
+  border: 1px solid #bae6fd;
+}
+
+/* 📊 BADGE DE ESTADO (Colores según estado) */
 .status-badge {
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   display: inline-block;
 }
 .status-badge.borrador {
   background: #fef2f2;
   color: #991b1b;
+  border: 1px solid #fecaca;
 }
 .status-badge.programado {
-  background: #fffaf0;
-  color: #c05621;
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
 }
 .status-badge.publicado {
-  background: #d1fae5;
-  color: #065f46;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
 }
 .status-badge.active {
-  background: #d1fae5;
-  color: #065f46;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
 }
 .status-badge.inactive {
   background: #fef2f2;
   color: #991b1b;
+  border: 1px solid #fecaca;
 }
 
+/* ⚙️ ACCIONES */
 .action-buttons {
   display: flex;
   align-items: center;
@@ -618,32 +540,13 @@ onMounted(async () => {
   min-height: 60px;
   padding: 4px 10px;
 }
-
-.btn-edit {
-  background: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-}
-.btn-edit:hover {
-  background: #ffe4e4;
-}
-.btn-delete {
-  background: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-}
-.btn-delete:hover {
-  background: #ffe4e4;
-}
+.btn-edit { background: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+.btn-edit:hover { background: #ffe4e4; }
+.btn-delete { background: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+.btn-delete:hover { background: #ffe4e4; }
 
 /* ========================================= */
-/* ESTILOS DEL MODAL DE ARCHIVOS             */
+/* MODAL DE ARCHIVOS                          */
 /* ========================================= */
 .modal-overlay {
   position: fixed;
@@ -669,14 +572,8 @@ onMounted(async () => {
 }
 
 @keyframes slideIn {
-  from {
-    transform: translateY(-30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 .modal-header-file {
@@ -688,30 +585,9 @@ onMounted(async () => {
   background: #f9fafb;
   border-radius: 12px 12px 0 0;
 }
-
-.modal-header-file h3 {
-  margin: 0;
-  font-size: 16px;
-  color: #1a1a2e;
-  max-width: 80%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 28px;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0 8px;
-  transition: color 0.2s;
-}
-
-.close-btn:hover {
-  color: #cc0000;
-}
+.modal-header-file h3 { margin: 0; font-size: 16px; color: #1a1a2e; max-width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.close-btn { background: none; border: none; font-size: 28px; color: #6b7280; cursor: pointer; padding: 0 8px; transition: color 0.2s; }
+.close-btn:hover { color: #cc0000; }
 
 .modal-body-file {
   flex: 1;
@@ -725,77 +601,71 @@ onMounted(async () => {
   border-radius: 0 0 12px 12px;
 }
 
-.file-viewer {
+.gallery-mode { display: block !important; padding: 20px; overflow-y: auto; }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: white;
+  cursor: pointer;
+  aspect-ratio: 1 / 1;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.gallery-item:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+
+.gallery-image-wrapper, .gallery-media-wrapper {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  background: #f3f4f6;
+  position: relative;
 }
-
-.file-viewer img {
-  max-width: 100%;
-  max-height: 70vh;
-  object-fit: contain;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.video-player {
-  width: 100%;
-  max-height: 70vh;
-  border-radius: 4px;
-  background: #000;
-}
-
-.pdf-viewer {
-  width: 100%;
-  height: 70vh;
-  border: none;
-  border-radius: 4px;
-}
-
-.pdf-download-link {
-  margin-top: 16px;
-}
-
-.btn-download-pdf,
-.btn-download-unknown {
-  display: inline-block;
-  padding: 10px 20px;
-  background: #cc0000;
+.gallery-img { width: 100%; height: 100%; object-fit: cover; }
+.gallery-icon-large { font-size: 48px; margin-bottom: 8px; }
+.gallery-filename { font-size: 12px; text-align: center; padding: 0 8px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
   color: white;
-  text-decoration: none;
-  border-radius: 6px;
   font-weight: 500;
-  transition: background 0.2s;
 }
+.gallery-item:hover .gallery-overlay { opacity: 1; }
 
-.btn-download-pdf:hover,
-.btn-download-unknown:hover {
-  background: #a30000;
-}
-
-.unknown-file {
-  text-align: center;
-}
-.unknown-icon {
-  font-size: 64px;
-  margin-bottom: 16px;
-}
-.unknown-file p {
-  color: #6b7280;
-  margin-bottom: 20px;
-}
+.file-viewer { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.file-viewer img { max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.video-player { width: 100%; max-height: 70vh; border-radius: 4px; background: #000; }
+.pdf-viewer { width: 100%; height: 70vh; border: none; border-radius: 4px; }
+.pdf-download-link { margin-top: 16px; }
+.btn-download-pdf, .btn-download-unknown { display: inline-block; padding: 10px 20px; background: #cc0000; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background 0.2s; }
+.btn-download-pdf:hover, .btn-download-unknown:hover { background: #a30000; }
+.unknown-file { text-align: center; }
+.unknown-icon { font-size: 64px; margin-bottom: 16px; }
+.unknown-file p { color: #6b7280; margin-bottom: 20px; }
 
 /* ========================================= */
-/* RESPONSIVE                               */
+/* RESPONSIVE                                */
 /* ========================================= */
-.loading-text,
-.empty-text {
-  text-align: center;
-  padding: 20px;
-  color: #6b7280;
+@media (max-width: 768px) {
+  .data-table th.col-icon, .data-table td.col-icon { width: 80px; }
+  .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
 }
+
+.loading-text, .empty-text { text-align: center; padding: 20px; color: #6b7280; }
 </style>

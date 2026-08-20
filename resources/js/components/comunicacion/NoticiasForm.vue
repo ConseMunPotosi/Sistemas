@@ -172,7 +172,9 @@
           </div>
         </div>
 
-        <!-- Mostrar archivos existentes (en modo edición) -->
+        <!-- ========================================== -->
+        <!-- LISTA DE ARCHIVOS EXISTENTES (AL EDITAR)    -->
+        <!-- ========================================== -->
         <div v-if="isEditing && archivosExistentes.length > 0" class="files-list existing-files">
           <div class="files-list-header">
             <span>📁 Archivos existentes ({{ archivosExistentes.length }})</span>
@@ -294,10 +296,8 @@ const getFileType = (mimeType) => {
   return 'Archivo';
 };
 
-// 🔥 CAMBIO DEFINITIVO: Apuntar directamente a la carpeta public/archivos_noticia
 const getFileUrl = (ruta) => {
   if (!ruta) return '#';
-  // La ruta en BD ya es 'archivos_noticia/nombre.jpg', así que solo añadimos la barra
   return `/${ruta}`;
 };
 
@@ -340,21 +340,19 @@ const clearFiles = () => {
   }
 };
 
+// ==========================================
+// ELIMINAR ARCHIVOS EXISTENTES (AL EDITAR)
+// ==========================================
 const deleteExistingFile = async (idArchivo) => {
   if (confirm('¿Eliminar este archivo permanentemente?')) {
     try {
       await store.deleteArchivo(idArchivo);
-      await loadExistingFiles();
+      // Recargamos la lista de archivos existentes desde la noticia actual
+      archivosExistentes.value = archivosExistentes.value.filter(a => a.id_archivo !== idArchivo);
       alert('✅ Archivo eliminado exitosamente');
     } catch (error) {
       alert('❌ Error al eliminar el archivo');
     }
-  }
-};
-
-const loadExistingFiles = async () => {
-  if (isEditing.value && props.noticia?.id_noticia) {
-    archivosExistentes.value = await store.fetchArchivosByNoticia(props.noticia.id_noticia);
   }
 };
 
@@ -402,7 +400,9 @@ watch(() => props.show, async (val) => {
         enlace_facebook: props.noticia.enlace_facebook || '',
       });
 
-      await loadExistingFiles();
+      // 🔥 CORRECCIÓN: Usamos los archivos que ya vienen en el objeto noticia
+      archivosExistentes.value = props.noticia.archivos || [];
+
     } else {
       resetForm();
     }
@@ -415,7 +415,7 @@ const closeModal = () => {
 };
 
 // ==========================================
-// ✅ ENVÍO DEL FORMULARIO
+// ✅ ENVÍO DEL FORMULARIO (CREAR Y ACTUALIZAR)
 // ==========================================
 const handleSubmit = async () => {
   if (!form.titulo.trim()) {
@@ -436,22 +436,31 @@ const handleSubmit = async () => {
   try {
     const formData = new FormData();
 
-    // 1. Agregar campos de texto
+    // 🔥 CORRECCIÓN DE FECHA: Formatear si existe
+    if (form.fecha_publicacion) {
+        const dateObj = new Date(form.fecha_publicacion);
+        if (!isNaN(dateObj.getTime())) {
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            formData.append('fecha_publicacion', `${year}-${month}-${day}`);
+        }
+    }
+
     Object.keys(form).forEach(key => {
-      if (form[key] !== undefined && form[key] !== null) {
+      if (form[key] !== undefined && form[key] !== null && key !== 'fecha_publicacion') {
         formData.append(key, form[key]);
       }
     });
 
-    // 2. Agregar TODOS los archivos seleccionados con el nombre 'archivos[]'
+    // Agregar NUEVOS archivos seleccionados
     selectedFiles.value.forEach((file) => {
       formData.append('archivos[]', file);
     });
 
-    // 3. Obtener Token
     const token = localStorage.getItem('auth_token');
     if (!token) {
-      alert('No se encontró el token de autenticación. Por favor, recarga la página o inicia sesión.');
+      alert('No se encontró el token de autenticación.');
       isSubmitting.value = false;
       return;
     }
@@ -465,7 +474,7 @@ const handleSubmit = async () => {
 
     let response;
     if (isEditing.value) {
-      formData.append('_method', 'PUT'); // Simula un PUT para Laravel
+      formData.append('_method', 'PUT');
       response = await axios.post(`/api/noticias/${props.noticia.id_noticia}`, formData, config);
     } else {
       response = await axios.post('/api/noticias', formData, config);
@@ -479,7 +488,7 @@ const handleSubmit = async () => {
     console.error('Error completo:', error);
     let mensajeError = '❌ Error al guardar la noticia.';
     if (error.response && error.response.status === 401) {
-        mensajeError = '❌ Sesión expirada o no autenticado. El token no es válido.';
+        mensajeError = '❌ Sesión expirada.';
     } else if (error.response && error.response.status === 422) {
         const erroresBackend = error.response.data.errors;
         let detalles = '';
