@@ -54,7 +54,7 @@ class Noticia extends Model
 
     public function archivos(): HasMany
     {
-        return $this->hasMany(ArchivoNoticia::class, 'id_noticia', 'id_noticia');
+        return $this->hasMany(ArchivoNoticia::class, 'id_noticia');
     }
 
     public function historialPublicacion(): HasMany
