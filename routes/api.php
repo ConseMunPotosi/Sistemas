@@ -19,20 +19,23 @@ use App\Http\Controllers\Api\comunicacion\NoticiaController;
  */
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
+// ✅ RUTA DE LISTADO DE NOTICIAS (PÚBLICA - Sin autenticación)
+Route::get('/noticias', [NoticiaController::class, 'index']);
+
 // ==========================================
 // RUTAS PROTEGIDAS (requieren autenticación)
 // ==========================================
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    // RUTA DE CATEGORÍAS 
+    // RUTA DE CATEGORÍAS
     Route::get('/noticias/categorias', [CategoriaNoticiaController::class, 'index']);
-    Route::post('/noticias/categorias', [CategoriaNoticiaController::class, 'store']); // <--- VERIFICA ESTA LÍNEA
+    Route::post('/noticias/categorias', [CategoriaNoticiaController::class, 'store']);
     Route::put('/noticias/categorias/{id}', [CategoriaNoticiaController::class, 'update']);
     Route::delete('/noticias/categorias/{id}', [CategoriaNoticiaController::class, 'destroy']);
 
-    // RUTA DE NOTICIAS
-    Route::get('/noticias', [NoticiaController::class, 'index']);
+    // RUTA DE NOTICIAS (CREAR, EDITAR, ELIMINAR - Solo para administradores)
+    // ✅ Se eliminó el 'get' duplicado. Solo quedan las rutas de escritura aquí.
     Route::post('/noticias', [NoticiaController::class, 'store']);
     Route::put('/noticias/{id}', [NoticiaController::class, 'update']);
     Route::delete('/noticias/{id}', [NoticiaController::class, 'destroy']);

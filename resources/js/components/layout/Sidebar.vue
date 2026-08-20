@@ -401,7 +401,7 @@ const hasRole = (roleName) => {
 }
 
 .submenu-item.active {
-  background: rgba(79, 70, 229, 0.2);
+  background: rgba(118, 117, 146, 0.2);
   color: white;
   box-shadow: inset 2px 0 0 #CC0000;
 }

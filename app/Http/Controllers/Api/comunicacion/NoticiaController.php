@@ -55,8 +55,8 @@ class NoticiaController extends Controller
             'fecha_creacion' => now(),
             // Lógica inteligente: Si es publicado, pon fecha de hoy si no enviaron nada
             'fecha_publicacion' => $request->estado_publicacion === 'publicado'
-                                    ? ($request->fecha_publicacion ?? now())
-                                    : $request->fecha_publicacion,
+                                    ? ($request->fecha_publicacion ?: now())
+                                    : ($request->fecha_publicacion ?? null),
             'publicado_web' => $request->publicado_web ?? true,
             'publicado_facebook' => $request->publicado_facebook ?? false,
             'enlace_facebook' => $request->enlace_facebook,
@@ -164,19 +164,22 @@ class NoticiaController extends Controller
             ], 422);
         }
 
-        // 🛑 IMPORTANTE: NO usar $request->all() directamente, porque borra la fecha si llega vacía.
-        $datosParaActualizar = $request->except(['fecha_publicacion']); // Excluimos la fecha por ahora
+        // 🛑 IMPORTANTE: NO usar $request->all() directamente.
+        $datosParaActualizar = $request->except(['fecha_publicacion']);
 
-        // Aplicamos la lógica inteligente de la fecha solo si el usuario está publicando
+        // Aplicamos la lógica de la fecha
         if ($request->estado_publicacion === 'publicado') {
-            // Si viene una fecha en el request, úsala. Si no, usa la fecha actual del servidor (now())
-            $datosParaActualizar['fecha_publicacion'] = $request->fecha_publicacion ?? now();
-        } elseif ($request->has('estado_publicacion')) {
-            // Si cambia a borrador o programado, y viene null, dejamos que la BD ponga null
-            $datosParaActualizar['fecha_publicacion'] = $request->fecha_publicacion;
+            // Si enviaron fecha, úsala. Si no, usa el día de hoy (NOW).
+            $datosParaActualizar['fecha_publicacion'] = !empty($request->fecha_publicacion)
+                                                          ? $request->fecha_publicacion
+                                                          : now();
+        } else {
+            // Si el estado no es publicado, permitimos que sea null o el valor enviado
+            $datosParaActualizar['fecha_publicacion'] = $request->fecha_publicacion ?? null;
         }
 
         $noticia->update($datosParaActualizar);
+        
         return response()->json([
             'success' => true,
             'data' => $noticia->load('categoria')

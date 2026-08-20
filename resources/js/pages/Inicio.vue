@@ -29,36 +29,53 @@
                 :key="index"
                 class="carousel-slide"
               >
-                <img :src="slide.image" :alt="slide.title" />
-                <div class="slide-overlay">
-                  <h3>{{ slide.title }}</h3>
-                  <p>{{ slide.description }}</p>
+                <!-- Bloque Izquierdo: Imagen -->
+                <div class="slide-image-wrapper">
+                  <img :src="slide.image" :alt="slide.title" class="slide-img" />
+                </div>
+
+                <!-- Bloque Derecho: Texto (Fondo blanco) -->
+                <div class="slide-content">
+                  <div class="text-container">
+                    <h2 class="slide-title">{{ slide.title }}</h2>
+                    <p class="slide-description">{{ slide.description }}</p>
+                    <p class="slide-date">📅 {{ slide.date }}</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Controles del carrusel -->
-            <button class="carousel-btn prev" @click="prevSlide">
-              <svg viewBox="0 0 24 24" width="24" height="24">
-                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="white"/>
-              </svg>
-            </button>
-            <button class="carousel-btn next" @click="nextSlide">
-              <svg viewBox="0 0 24 24" width="24" height="24">
-                <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" fill="white"/>
-              </svg>
-            </button>
+            <!-- ===== CONTROLES UNIFICADOS ===== -->
+            <div class="carousel-controls-group">
 
-            <!-- Indicadores -->
-            <div class="carousel-dots">
-              <span
-                v-for="(slide, index) in slides"
-                :key="index"
-                class="dot"
-                :class="{ active: currentSlide === index }"
-                @click="goToSlide(index)"
-              ></span>
+              <!-- Botones -->
+              <div class="carousel-buttons">
+                <button class="carousel-btn" @click="prevSlide">
+                  <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="white"/>
+                  </svg>
+                </button>
+                <button class="carousel-btn" @click="nextSlide">
+                  <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" fill="white"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Indicadores (Puntos) -->
+              <div class="carousel-dots">
+                <span
+                  v-for="(slide, index) in slides"
+                  :key="index"
+                  class="dot"
+                  :class="{ active: currentSlide === index }"
+                  @click="goToSlide(index)"
+                ></span>
+              </div>
+
             </div>
+            <!-- ===== FIN CONTROLES UNIFICADOS ===== -->
+
           </div>
         </div>
       </div>
@@ -87,7 +104,6 @@
         </div>
         <div class="informacion">
           <div class="inf_titulo">Información Importante</div>
-          <!-- Estadísticas -->
           <div class="bienvenida-stats">
           <div class="stat">
             <i class="bi bi-people-fill"></i>
@@ -150,79 +166,127 @@
 
 <script>
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import { useNoticiasStore } from '@/stores/noticias.js'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 
 export default {
   name: 'RightAlignedCarousel',
-  data() {
-    return {
-      currentSlide: 0,
-      modalVisible: false, // ✅ Modal definido aquí
-      slides: [
-        {
-          image: 'https://picsum.photos/seed/1/1200/800',
-          title: 'Slide 1',
-          description: 'Descripción del primer slide'
-        },
-        {
-          image: 'https://picsum.photos/seed/2/1200/800',
-          title: 'Slide 2',
-          description: 'Descripción del segundo slide'
-        },
-        {
-          image: 'https://picsum.photos/seed/3/1200/800',
-          title: 'Slide 3',
-          description: 'Descripción del tercer slide'
-        },
-        {
-          image: 'https://picsum.photos/seed/4/1200/800',
-          title: 'Slide 4',
-          description: 'Descripción del cuarto slide'
-        }
-      ],
-      autoplayInterval: null
-    };
-  },
-  mounted() {
-    this.startAutoplay();
-  },
-  beforeDestroy() {
-    this.stopAutoplay();
-  },
-  methods: {
-    // ✅ Métodos del carrusel
-    nextSlide() {
-      this.currentSlide = (this.currentSlide + 1) % this.slides.length;
-    },
-    prevSlide() {
-      this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
-    },
-    goToSlide(index) {
-      this.currentSlide = index;
-    },
-    startAutoplay() {
-      this.autoplayInterval = setInterval(() => {
-        this.nextSlide();
-      }, 4000);
-    },
-    stopAutoplay() {
-      if (this.autoplayInterval) {
-        clearInterval(this.autoplayInterval);
-        this.autoplayInterval = null;
+  setup() {
+    const store = useNoticiasStore()
+    const currentSlide = ref(0)
+    const modalVisible = ref(false)
+    const autoplayInterval = ref(null)
+
+    const slides = computed(() => {
+      const todas = store.noticias || []
+      // Cambia el 1 por el ID real de tu categoría "Noticias"
+      const noticiasFiltradas = todas.filter(n => n.id_categoria === 1)
+
+      const ordenadas = [...noticiasFiltradas].sort((a, b) =>
+        new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
+      )
+
+      const ultimas5 = ordenadas.slice(0, 5)
+
+      return ultimas5.map(noticia => ({
+        title: noticia.titulo,
+        description: noticia.resumen || '',
+        date: formatDate(noticia.fecha_creacion),
+        image: getMainImage(noticia)
+      }))
+    })
+
+    const formatDate = (dateString) => {
+      if (!dateString) return 'Fecha no disponible'
+      try {
+        const date = new Date(dateString)
+        if (isNaN(date.getTime())) return 'Fecha inválida'
+        const day = String(date.getDate()).padStart(2, '0')
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const year = date.getFullYear()
+        return `${day}/${month}/${year}`
+      } catch {
+        return dateString
       }
-    },
-    // ✅ Métodos del modal
-    abrirModal() {
-      this.modalVisible = true;
-      document.body.style.overflow = 'hidden';
-      console.log('Modal abierto'); // Para debug
-    },
-    cerrarModal() {
-      this.modalVisible = false;
-      document.body.style.overflow = '';
-      console.log('Modal cerrado'); // Para debug
+    }
+
+    const getMainImage = (noticia) => {
+      if (noticia.archivos && noticia.archivos.length > 0) {
+        const img = noticia.archivos.find(a => a.tipo_mime?.startsWith('image/'))
+        if (img) return getFileUrl(img.ruta_archivo)
+      }
+      return 'https://picsum.photos/seed/default/1200/800'
+    }
+
+    const getFileUrl = (ruta) => {
+      if (!ruta) return '#'
+      return `/${ruta}`
+    }
+
+    const nextSlide = () => {
+      if (slides.value.length > 0) {
+        currentSlide.value = (currentSlide.value + 1) % slides.value.length
+      }
+    }
+
+    const prevSlide = () => {
+      if (slides.value.length > 0) {
+        currentSlide.value = (currentSlide.value - 1 + slides.value.length) % slides.value.length
+      }
+    }
+
+    const goToSlide = (index) => {
+      currentSlide.value = index
+    }
+
+    const startAutoplay = () => {
+      if (autoplayInterval.value) clearInterval(autoplayInterval.value)
+      autoplayInterval.value = setInterval(() => {
+        if (slides.value.length > 0) {
+          nextSlide()
+        }
+      }, 4000)
+    }
+
+    const stopAutoplay = () => {
+      if (autoplayInterval.value) {
+        clearInterval(autoplayInterval.value)
+        autoplayInterval.value = null
+      }
+    }
+
+    const abrirModal = () => {
+      modalVisible.value = true
+      document.body.style.overflow = 'hidden'
+    }
+
+    const cerrarModal = () => {
+      modalVisible.value = false
+      document.body.style.overflow = ''
+    }
+
+    onMounted(async () => {
+      await store.fetchNoticias()
+      startAutoplay()
+    })
+
+    onBeforeUnmount(() => {
+      stopAutoplay()
+    })
+
+    return {
+      store,
+      currentSlide,
+      modalVisible,
+      slides,
+      nextSlide,
+      prevSlide,
+      goToSlide,
+      abrirModal,
+      cerrarModal
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -408,44 +472,81 @@ export default {
   flex: 0 0 100%;
   height: 100%;
   position: relative;
+  display: flex;
+  flex-direction: row;
+  background: white;
 }
 
-.carousel-slide img {
+/* 📸 Bloque Izquierdo: Imagen (30%) */
+.slide-image-wrapper {
+  width: 30%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.slide-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.slide-overlay {
+/* 📝 Bloque Derecho: Texto (70%) */
+.slide-content {
+  width: 70%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start; /* Corregido: flex-start en lugar de left */
+  justify-content: center;
+  padding: 2rem;
+  background: white;
+}
+
+.text-container {
+  max-width: 100%;
+  text-align: left;
+}
+
+.slide-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.slide-description {
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.slide-date {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #cc0000;
+}
+
+/* ===== CONTROLES UNIFICADOS (DERECHA, ABAJO) ===== */
+.carousel-controls-group {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 2rem 2rem;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-  color: white;
-  text-align: right;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  z-index: 10;
 }
 
-.slide-overlay h3 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 0.3rem;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+.carousel-buttons {
+  display: flex;
+  gap: 8px;
 }
 
-.slide-overlay p {
-  font-size: 0.95rem;
-  opacity: 0.85;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
-}
-
-/* ===== CONTROLES ===== */
 .carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
   background: rgba(0, 0, 0, 0.5);
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
@@ -457,56 +558,43 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(4px);
-  z-index: 10;
 }
 
 .carousel-btn:hover {
   background: rgba(0, 0, 0, 0.7);
-  transform: translateY(-50%) scale(1.1);
+  transform: scale(1.1);
   border-color: white;
 }
 
-.carousel-btn.prev {
-  left: 205px;
-}
-
-.carousel-btn.next {
-  right: 16px;
-}
-
 .carousel-btn svg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 .carousel-dots {
-  position: absolute;
-  bottom: 16px;
-  left: 58%;
-  transform: translateX(-50%);
   display: flex;
-  gap: 10px;
-  z-index: 10;
+  gap: 8px;
+  align-items: center;
 }
 
 .dot {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .dot:hover {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.4);
   transform: scale(1.2);
 }
 
 .dot.active {
-  background: white;
+  background: #cc0000;
   transform: scale(1.25);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 12px rgba(204, 0, 0, 0.3);
 }
 
 /* ========== MODAL ========== */
@@ -689,30 +777,19 @@ export default {
     width: 55%;
   }
 
-  .slide-overlay h3 {
-    font-size: 1.5rem;
+  .slide-title {
+    font-size: 1.8rem;
   }
-
-  .slide-overlay p {
-    font-size: 0.85rem;
+  .slide-description {
+    font-size: 1rem;
   }
-
   .carousel-btn {
     width: 40px;
     height: 40px;
   }
-
   .carousel-btn svg {
     width: 20px;
     height: 20px;
-  }
-
-  .bottom-content h2 {
-    font-size: 1.6rem;
-  }
-
-  .bottom-content p {
-    font-size: 1rem;
   }
 }
 
@@ -726,7 +803,6 @@ export default {
     overflow-y: auto;
   }
 
-  /* === Cambio de imagen en mobile === */
   .left-content {
     position: relative;
     width: 100%;
@@ -734,15 +810,9 @@ export default {
     min-height: 300px;
   }
 
-  .desktop-image {
-    display: none !important;
-  }
+  .desktop-image { display: none !important; }
+  .mobile-image { display: block !important; }
 
-  .mobile-image {
-    display: block !important;
-  }
-
-  /* === Contenido derecho === */
   .right-content {
     position: relative;
     left: 0;
@@ -762,231 +832,46 @@ export default {
     padding: 2rem 1.5rem;
   }
 
-  .bottom-content {
-    max-width: 100%;
-  }
+  .slide-image-wrapper { width: 30%; }
+  .slide-content { width: 70%; padding: 1rem; }
 
-  .bottom-content h2 {
-    font-size: 1.5rem;
-  }
-
-  .bottom-content p {
-    font-size: 0.95rem;
-  }
-
-  /* === Carrusel === */
-  .slide-overlay {
-    padding: 1.5rem 1.2rem;
-  }
-
-  .slide-overlay h3 {
-    font-size: 1.3rem;
-  }
-
-  .slide-overlay p {
-    font-size: 0.8rem;
-  }
+  .slide-title { font-size: 1.2rem; }
+  .slide-description { font-size: 0.9rem; }
+  .slide-date { font-size: 0.8rem; }
 
   .carousel-btn {
     width: 36px;
     height: 36px;
   }
-
-  .carousel-btn svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .carousel-btn.prev {
-    left: 12px;
-  }
-
-  .carousel-btn.next {
-    right: 12px;
-  }
-
-  .carousel-dots {
-    bottom: 12px;
-    gap: 8px;
-  }
-
-  .dot {
-    width: 10px;
-    height: 10px;
-  }
+  .carousel-btn svg { width: 18px; height: 18px; }
 }
 
 /* ============================================================ */
 /* ===== RESPONSIVE: MOBILE PEQUEÑO (480px) ===== */
 /* ============================================================ */
 @media (max-width: 480px) {
-  .left-content {
-    height: 30vh;
-    min-height: 200px;
-  }
+  .left-content { height: 30vh; min-height: 200px; }
+  .top { height: 35vh; min-height: 200px; }
 
-  .top {
-    height: 35vh;
-    min-height: 200px;
-  }
+  .slide-image-wrapper { width: 30%; }
+  .slide-content { width: 70%; padding: 0.5rem; }
 
-  .bottom {
-    min-height: 200px;
-    padding: 1.5rem 1rem;
-  }
+  .slide-title { font-size: 1rem; }
+  .slide-description { font-size: 0.8rem; }
+  .slide-date { font-size: 0.7rem; }
 
-  .bottom-content h2 {
-    font-size: 1.3rem;
-  }
-
-  .bottom-content p {
-    font-size: 0.85rem;
-  }
-
-  .slide-overlay {
-    padding: 1rem 0.8rem;
-  }
-
-  .slide-overlay h3 {
-    font-size: 1.1rem;
-  }
-
-  .slide-overlay p {
-    font-size: 0.7rem;
-  }
-
-  .carousel-btn {
-    width: 30px;
-    height: 30px;
-  }
-
-  .carousel-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .carousel-btn.prev {
-    left: 8px;
-  }
-
-  .carousel-btn.next {
-    right: 8px;
-  }
-
-  .carousel-dots {
-    bottom: 10px;
-    gap: 6px;
-  }
-
-  .dot {
-    width: 8px;
-    height: 8px;
-  }
+  .carousel-btn { width: 30px; height: 30px; }
+  .carousel-btn svg { width: 16px; height: 16px; }
 }
 
 /* ============================================================ */
-/* ===== RESPONSIVE: LANDSCAPE (orientación horizontal) ===== */
+/* ===== RESPONSIVE: LANDSCAPE ===== */
 /* ============================================================ */
 @media (max-height: 600px) and (orientation: landscape) {
-  .left-content {
-    height: 100vh;
-    width: 40%;
-  }
+  .left-content { width: 40%; }
+  .right-content { left: 40%; width: 60%; }
 
-  .right-content {
-    left: 40%;
-    width: 60%;
-  }
-
-  .top {
-    height: 40vh;
-    min-height: 150px;
-  }
-
-  .bottom {
-    height: 60vh;
-    min-height: 150px;
-    padding: 1rem;
-  }
-
-  .bottom-content h2 {
-    font-size: 1.2rem;
-  }
-
-  .bottom-content p {
-    font-size: 0.8rem;
-  }
-
-  .slide-overlay {
-    padding: 1rem 1.2rem;
-  }
-
-  .slide-overlay h3 {
-    font-size: 1.2rem;
-  }
-
-  .slide-overlay p {
-    font-size: 0.75rem;
-  }
-
-  .carousel-btn {
-    width: 32px;
-    height: 32px;
-  }
-
-  .carousel-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .carousel-dots {
-    bottom: 8px;
-    gap: 6px;
-  }
-
-  .dot {
-    width: 8px;
-    height: 8px;
-  }
-}
-
-/* ============================================================ */
-/* ===== RESPONSIVE: PANTALLAS GRANDES (1440px+) ===== */
-/* ============================================================ */
-@media (min-width: 1440px) {
-  .slide-overlay {
-    padding: 3rem 3rem;
-  }
-
-  .slide-overlay h3 {
-    font-size: 2.5rem;
-  }
-
-  .slide-overlay p {
-    font-size: 1.2rem;
-  }
-
-  .bottom-content h2 {
-    font-size: 2.5rem;
-  }
-
-  .bottom-content p {
-    font-size: 1.3rem;
-  }
-
-  .carousel-btn {
-    width: 56px;
-    height: 56px;
-  }
-
-  .carousel-btn svg {
-    width: 28px;
-    height: 28px;
-  }
-
-  .dot {
-    width: 14px;
-    height: 14px;
-  }
+  .slide-title { font-size: 1.2rem; }
+  .slide-description { font-size: 0.9rem; }
 }
 </style>

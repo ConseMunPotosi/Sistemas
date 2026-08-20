@@ -95,6 +95,15 @@
             <option value="publicado">Publicado</option>
           </select>
         </div>
+        <div class="form-group">
+          <label for="fecha_publicacion">Fecha de Publicación</label>
+          <input
+            id="fecha_publicacion"
+            v-model="form.fecha_publicacion"
+            type="date"
+            class="form-input"
+          />
+        </div>
 
         <!-- Redes Sociales -->
         <h4 class="section-title">Redes Sociales</h4>
@@ -312,7 +321,7 @@ const formatFileSize = (bytes) => {
 const handleFileUpload = (event) => {
   const files = event.target.files;
   if (files.length > 0) {
-    if (selectedFiles.value.length + files.length > 5) {
+    if (selectedFiles.value.length + files.length > 8) {
       alert('Máximo 5 archivos por noticia');
       fileInput.value.value = '';
       return;
@@ -436,17 +445,24 @@ const handleSubmit = async () => {
   try {
     const formData = new FormData();
 
-    // 🔥 CORRECCIÓN DE FECHA: Formatear si existe
-    if (form.fecha_publicacion) {
-        const dateObj = new Date(form.fecha_publicacion);
-        if (!isNaN(dateObj.getTime())) {
-            const year = dateObj.getFullYear();
-            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const day = String(dateObj.getDate()).padStart(2, '0');
-            formData.append('fecha_publicacion', `${year}-${month}-${day}`);
+    // 🔥 CORRECCIÓN DEFINITIVA: Si el estado NO es 'publicado', NO enviar fecha.
+    // Si el estado es 'publicado', el Backend (Laravel) pondrá la fecha actual automáticamente
+    // si el campo llega vacío. Así que simplemente NO enviamos el campo si no es necesario.
+    if (form.estado_publicacion === 'publicado') {
+        // Si el usuario seleccionó una fecha manualmente, la enviamos.
+        if (form.fecha_publicacion) {
+            const dateObj = new Date(form.fecha_publicacion);
+            if (!isNaN(dateObj.getTime())) {
+                const year = dateObj.getFullYear();
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                formData.append('fecha_publicacion', `${year}-${month}-${day}`);
+            }
         }
+        // Si no seleccionó fecha, NO enviamos nada. Laravel pondrá now() automáticamente.
     }
 
+    // Agregamos el resto de campos (excluyendo fecha_publicacion si ya la enviamos)
     Object.keys(form).forEach(key => {
       if (form[key] !== undefined && form[key] !== null && key !== 'fecha_publicacion') {
         formData.append(key, form[key]);

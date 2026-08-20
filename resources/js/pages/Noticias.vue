@@ -20,57 +20,55 @@
         placeholder="Buscar noticias..."
         class="search-input"
       />
-      <select v-model="selectedCategory" class="filter-select">
-        <option value="">Todas las categorías</option>
-        <option v-for="cat in allCategories" :key="cat" :value="cat">
-          {{ cat }}
-        </option>
-      </select>
       <select v-model="sortOrder" class="filter-select">
         <option value="desc">Más recientes</option>
         <option value="asc">Más antiguos</option>
       </select>
     </div>
 
+    <!-- ========== ESTADO DE CARGA ========== -->
+    <div v-if="store.loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando noticias...</p>
+    </div>
+
     <!-- ========== CONTENIDO PRINCIPAL ========== -->
-    <div v-if="filteredNoticias.length > 0" class="noticias-grid">
+    <div v-else-if="filteredNoticias.length > 0" class="noticias-grid">
       <div
         v-for="noticia in paginatedNoticias"
-        :key="noticia.id"
+        :key="noticia.id_noticia"
         class="noticia-card"
-        :class="{ destacado: noticia.destacado }"
       >
-        <!-- Badge de tipo -->
+        <!-- Badge de tipo (basado en archivos) -->
         <div class="card-tipo-badge">
           <span>📰 Noticia</span>
           <span v-if="noticia.destacado" class="destacado-badge">⭐ Destacado</span>
         </div>
 
-        <!-- Imagen -->
+        <!-- Imagen (Si tiene archivos, muestra el primero; si no, imagen por defecto) -->
         <div class="card-img-wrapper">
           <img
-            :src="noticia.imagen || '/images/default-noticia.jpg'"
+            :src="getMainImage(noticia)"
             class="card-img"
             :alt="noticia.titulo"
             loading="lazy"
           />
-          <span v-if="noticia.imagenes && noticia.imagenes.length > 1" class="multi-badge">
-            📸 {{ noticia.imagenes.length }}
+          <span v-if="noticia.archivos && noticia.archivos.length > 1" class="multi-badge">
+            📸 {{ noticia.archivos.length }}
           </span>
         </div>
 
         <!-- Información -->
         <div class="card-body">
           <div class="card-meta">
-            <span class="meta-categoria">{{ noticia.categoria }}</span>
             <span class="meta-fecha">
               <span class="meta-icon">📅</span>
-              {{ formatDate(noticia.fecha) }}
+              {{ formatDate(noticia.fecha_creacion) }}
             </span>
           </div>
 
           <h3 class="card-title">{{ noticia.titulo }}</h3>
-          <p class="card-resumen">{{ noticia.resumen }}</p>
+          <p class="card-resumen">{{ noticia.resumen || '-' }}</p>
         </div>
 
         <!-- Footer -->
@@ -105,24 +103,10 @@
 
       <div class="pagination-controls">
         <!-- Primera página -->
-        <button
-          class="page-btn"
-          :disabled="currentPage === 1"
-          @click="goToPage(1)"
-          title="Primera página"
-        >
-          ⟪
-        </button>
+        <button class="page-btn" :disabled="currentPage === 1" @click="goToPage(1)" title="Primera página">⟪</button>
 
         <!-- Anterior -->
-        <button
-          class="page-btn"
-          :disabled="currentPage === 1"
-          @click="currentPage--"
-          title="Página anterior"
-        >
-          ←
-        </button>
+        <button class="page-btn" :disabled="currentPage === 1" @click="currentPage--" title="Página anterior">←</button>
 
         <!-- Números de página -->
         <div class="page-numbers">
@@ -130,10 +114,7 @@
             v-for="page in pageNumbers"
             :key="page"
             class="page-num"
-            :class="{
-              active: page === currentPage,
-              dots: page === '...'
-            }"
+            :class="{ active: page === currentPage, dots: page === '...' }"
             :disabled="page === '...'"
             @click="page !== '...' && (currentPage = page)"
           >
@@ -142,33 +123,15 @@
         </div>
 
         <!-- Siguiente -->
-        <button
-          class="page-btn"
-          :disabled="currentPage === totalPages"
-          @click="currentPage++"
-          title="Página siguiente"
-        >
-          →
-        </button>
+        <button class="page-btn" :disabled="currentPage === totalPages" @click="currentPage++" title="Página siguiente">→</button>
 
         <!-- Última página -->
-        <button
-          class="page-btn"
-          :disabled="currentPage === totalPages"
-          @click="goToPage(totalPages)"
-          title="Última página"
-        >
-          ⟫
-        </button>
+        <button class="page-btn" :disabled="currentPage === totalPages" @click="goToPage(totalPages)" title="Última página">⟫</button>
       </div>
     </div>
 
     <!-- ========== MODAL DETALLADO ========== -->
-    <div
-      class="modal-overlay"
-      v-if="modalVisible"
-      @click.self="cerrarModal"
-    >
+    <div class="modal-overlay" v-if="modalVisible" @click.self="cerrarModal">
       <div class="modal-contenedor">
         <!-- Header -->
         <div class="modal-header-custom header-noticia">
@@ -176,63 +139,57 @@
             <span class="modal-tipo-icon">📰</span>
             {{ noticiaSeleccionada.titulo }}
           </h5>
-          <button type="button" class="btn-close-custom" @click="cerrarModal">
-            ✕
-          </button>
+          <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
         </div>
 
         <div class="modal-body-custom">
-          <!-- Galería de imágenes -->
-          <div v-if="noticiaSeleccionada.imagenes && noticiaSeleccionada.imagenes.length" class="galeria-container">
+          <!-- Galería de imágenes desde archivos -->
+          <div v-if="noticiaSeleccionada.archivos && noticiaSeleccionada.archivos.length" class="galeria-container">
             <div class="modal-img-wrapper">
               <img
-                :src="imagenActual"
+                :src="getFileUrl(imagenActual)"
                 class="img-fluid"
                 :alt="noticiaSeleccionada.titulo"
               />
-              <div class="contador-imagenes" v-if="noticiaSeleccionada.imagenes.length > 1">
-                {{ indiceActual + 1 }} / {{ noticiaSeleccionada.imagenes.length }}
+              <div class="contador-imagenes" v-if="noticiaSeleccionada.archivos.length > 1">
+                {{ indiceActual + 1 }} / {{ noticiaSeleccionada.archivos.length }}
               </div>
               <button
                 class="btn-nav btn-nav-izquierda"
-                v-if="noticiaSeleccionada.imagenes.length > 1"
+                v-if="noticiaSeleccionada.archivos.length > 1"
                 @click="cambiarImagenNavegacion(-1)"
               >
                 ‹
               </button>
               <button
                 class="btn-nav btn-nav-derecha"
-                v-if="noticiaSeleccionada.imagenes.length > 1"
+                v-if="noticiaSeleccionada.archivos.length > 1"
                 @click="cambiarImagenNavegacion(1)"
               >
                 ›
               </button>
             </div>
-            <div class="miniaturas-container" v-if="noticiaSeleccionada.imagenes.length > 1">
+            <div class="miniaturas-container" v-if="noticiaSeleccionada.archivos.length > 1">
               <div
-                v-for="(img, index) in noticiaSeleccionada.imagenes"
+                v-for="(img, index) in noticiaSeleccionada.archivos"
                 :key="index"
                 class="miniatura-item"
-                :class="{ activa: imagenActual === img }"
-                @click="cambiarImagen(img)"
+                :class="{ activa: imagenActual === img.ruta_archivo }"
+                @click="cambiarImagen(img.ruta_archivo)"
               >
-                <img :src="img" :alt="`Imagen ${index + 1}`" />
+                <img :src="getFileUrl(img.ruta_archivo)" :alt="`Imagen ${index + 1}`" />
               </div>
             </div>
           </div>
 
           <!-- Metadatos -->
           <div class="modal-meta">
-            <span class="meta-badge" style="background-color: #cc0000;">
-              <span class="meta-icon">🏷️</span> {{ noticiaSeleccionada.categoria }}
-            </span>
             <span class="meta-badge" style="background-color: #6c757d;">
-              <span class="meta-icon">📅</span> {{ formatDate(noticiaSeleccionada.fecha) }}
+              <span class="meta-icon">📅</span> {{ formatDate(noticiaSeleccionada.fecha_creacion) }}
             </span>
           </div>
           <!-- Contenido -->
           <div class="modal-contenido">
-            <h6 class="contenido-titulo">📄 Descripción completa</h6>
             <p class="contenido-texto">
               {{ noticiaSeleccionada.contenido || 'No hay contenido disponible.' }}
             </p>
@@ -241,14 +198,9 @@
 
         <!-- Footer -->
         <div class="modal-footer-custom">
-          <button type="button" class="btn btn-secondary" @click="cerrarModal">
-            ✕ Cerrar
-          </button>
+          <button type="button" class="btn btn-secondary" @click="cerrarModal">✕ Cerrar</button>
           <button type="button" class="btn btn-compartir" @click="compartirNoticia">
             <span class="btn-icon">📤</span> Compartir
-          </button>
-          <button v-if="isAdmin" type="button" class="btn btn-editar" @click="editarNoticia">
-            <span class="btn-icon">✏️</span> Editar
           </button>
         </div>
       </div>
@@ -258,20 +210,18 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
+import { useNoticiasStore } from '@/stores/noticias.js' // Asegúrate de que esta ruta sea correcta
 
 export default {
   name: 'Noticias',
-  props: {
-    isAdmin: {
-      type: Boolean,
-      default: false
-    },
-    initialNoticias: {
-      type: Array,
-      default: () => []
-    }
-  },
-  setup(props, { emit }) {
+  setup() {
+    const store = useNoticiasStore()
+
+    // 🔥 CAMBIO AQUÍ: ID de la categoría "Noticias" en tu base de datos.
+    // Si en tu tabla 'categorias_noticia' el id de la categoría Noticias es 1, déjalo así.
+    // Si es otro número, cámbialo aquí.
+    const CATEGORIA_NOTICIAS_ID = 1;
+
     // ===== STATE =====
     const searchQuery = ref('')
     const selectedCategory = ref('')
@@ -282,143 +232,36 @@ export default {
     const imagenActual = ref('')
     const indiceActual = ref(0)
     const noticiaSeleccionada = ref({
-      id: null,
+      id_noticia: null,
       titulo: '',
       resumen: '',
       contenido: '',
-      fecha: '',
-      categoria: '',
-      imagen: '',
-      imagenes: [],
-      tags: [],
-      destacado: false,
-      autor: ''
+      fecha_creacion: '',
+      id_categoria: '',
+      archivos: []
     })
-
-    // ===== DATOS =====
-    const noticias = ref([
-      {
-        id: 1,
-        titulo: 'REUNIÓN DE COORDINACIÓN SOBRE LA FESTIVIDAD DE CHUTILLOS',
-        resumen: 'Con el objetivo de optimizar la planificación, promoción y desarrollo de la Festividad de Chutillos, la concejal municipal Lic. Jacqueline Lourdes Gutiérrez Carrasco, presidenta de la Comisión de Turismo, Cultura y Preservación de Áreas Históricas junto al personal del presidente de la comisión Jurídica y Desarrollo Institucional...',
-        contenido: 'Con el objetivo de optimizar la planificación, promoción y desarrollo de la Festividad de Chutillos, la concejal municipal Lic. Jacqueline Lourdes Gutiérrez Carrasco, presidenta de la Comisión de Turismo, Cultura y Preservación de Áreas Históricas junto al personal del presidente de la comisión Jurídica y Desarrollo Institucional que preside el Ing. Guido Armando Cruz Mora, participaron en la reunión estratégica de socialización y coordinación interinstitucional organizada junto al Órgano Ejecutivo Municipal y sus distintas secretarías. El encuentro contó con la participación activa de representantes de la Federación de Empresarios Privados de Potosí FEPP, la Cámara de Mujeres Empresarias de Bolivia CAMEBOL filial Potosí, la Cámara Hotelera, así como de diversas agencias y operadoras de turismo. El propósito central de la reunión, fue unificar esfuerzos sectoriales para garantizar una organización eficiente y de alto impacto para esta festividad, la cual ostenta el título de Patrimonio Cultural Inmaterial de la Humanidad, declarada por la UNESCO.',
-        fecha: '2026-07-10',
-        categoria: 'Turismo y Cultura',
-        imagen: '/images/noticias/chutillos.jpg',
-        imagenes: [
-          '/images/noticias/chutillos.jpg',
-          '/images/noticias/chutillos2.jpg',
-          '/images/noticias/chutillos3.jpg'
-        ],
-        autor: 'Departamento de Prensa'
-      },
-      {
-        id: 2,
-        titulo: 'CONCEJAL ASIGNADO AL DISTRITO 20 REALIZA GESTIONES CON EL EJECUTIVO Y EL CONTROL SOCIAL',
-        resumen: 'Con el objetivo de gestionar la atención de las demandas del distrito 20, el concejal asignado a este importante sector de la ciudad, Ing. Guido Armando Cruz Mora, sostuvo reunión con la participación del Secretario General y el responsable de salud del municipio...',
-        contenido: 'Con el objetivo de gestionar la atención de las demandas del distrito 20, el concejal asignado a este importante sector de la ciudad, Ing. Guido Armando Cruz Mora, sostuvo reunión con la participación del Secretario General y el responsable de salud del municipio, como representantes vecinales. En esta importante reunión, se conoció y evaluó el tema de predios destinados a la construcción de la nueva infraestructura de la Unidad Educativa Evo Morales, ubicada en la zona de Rollo Kucho, asimismo la necesidad de proyectar la edificación del nuevo Centro de Salud Ambulatorio en Cantumarca. Temas que serán atendidos en el marco de las competencias.',
-        fecha: '2026-07-10',
-        categoria: 'Gestión',
-        imagen: '/images/noticias/gestionD-20.jpg',
-        imagenes: [
-          '/images/noticias/gestionD-20-1.jpg',
-          '/images/noticias/gestionD-20-2.jpg',
-          '/images/noticias/gestionD-20-3.jpg'
-        ],
-        autor: 'Departamento de Comunicación'
-      },
-      {
-        id: 3,
-        titulo: 'APROBACIÓN DEL PRESUPUESTO 2027 PARA EL MUNICIPIO',
-        resumen: 'En sesión ordinaria del Concejo Municipal, se aprobó el presupuesto general para la gestión 2027, priorizando obras de infraestructura y servicios básicos...',
-        contenido: 'En sesión ordinaria del Concejo Municipal, se aprobó el presupuesto general para la gestión 2027, priorizando obras de infraestructura y servicios básicos para los diferentes distritos del municipio. El presupuesto asciende a Bs. 450 millones, destinados principalmente a proyectos de saneamiento básico, pavimentación y mejoramiento de espacios públicos. Los concejales destacaron la importancia de una gestión transparente y participativa.',
-        fecha: '2026-07-05',
-        categoria: 'Presupuesto',
-        imagen: '/images/noticias/presupuesto.jpg',
-        imagenes: [
-          '/images/noticias/presupuesto.jpg'
-        ],
-        autor: 'Departamento Financiero'
-      },
-      {
-        id: 4,
-        titulo: 'CAMPAÑA DE VACUNACIÓN EN DISTRITOS PERIFÉRICOS',
-        resumen: 'El Concejo Municipal en coordinación con el Servicio Departamental de Salud, lanza campaña de vacunación gratuita en los distritos periféricos de la ciudad...',
-        contenido: 'El Concejo Municipal en coordinación con el Servicio Departamental de Salud, lanza campaña de vacunación gratuita en los distritos periféricos de la ciudad. La campaña busca inmunizar a más de 5,000 personas contra enfermedades prevenibles, con especial énfasis en niños y adultos mayores. Los puntos de vacunación estarán habilitados en los centros de salud de cada distrito.',
-        fecha: '2026-07-03',
-        categoria: 'Salud',
-        imagen: '/images/noticias/vacunacion.jpg',
-        imagenes: [
-          '/images/noticias/vacunacion.jpg',
-          '/images/noticias/vacunacion2.jpg'
-        ],
-        autor: 'Departamento de Salud'
-      },
-      {
-        id: 5,
-        titulo: 'CONVOCATORIA A CONCURSO DE FOTOGRAFÍA "POTOSÍ EN IMÁGENES"',
-        resumen: 'La Comisión de Turismo y Cultura invita a todos los fotógrafos aficionados y profesionales a participar en el concurso "Potosí en Imágenes"...',
-        contenido: 'La Comisión de Turismo y Cultura invita a todos los fotógrafos aficionados y profesionales a participar en el concurso "Potosí en Imágenes", que busca resaltar la riqueza cultural, histórica y paisajística de la ciudad. Los trabajos ganadores serán exhibidos en una muestra fotográfica y recibirán premios en efectivo. El plazo de inscripción vence el 15 de agosto.',
-        fecha: '2026-07-01',
-        categoria: 'Cultura',
-        imagen: '/images/noticias/concurso.jpg',
-        imagenes: [
-          '/images/noticias/concurso.jpg'
-        ],
-        autor: 'Departamento de Cultura'
-      },
-      {
-        id: 6,
-        titulo: 'REUNIÓN DE COORDINACIÓN CON LA FEDERACIÓN DE JUNTAS VECINALES',
-        resumen: 'Los concejales sostuvieron una reunión de coordinación con la Federación de Juntas Vecinales para atender las principales demandas de los barrios...',
-        contenido: 'Los concejales sostuvieron una reunión de coordinación con la Federación de Juntas Vecinales para atender las principales demandas de los barrios. Se abordaron temas relacionados con alumbrado público, recolección de residuos y mantenimiento de áreas verdes. Se conformó una comisión de seguimiento para garantizar la ejecución de los proyectos priorizados.',
-        fecha: '2026-06-28',
-        categoria: 'Vecinal',
-        imagen: '/images/noticias/vecinales.jpg',
-        imagenes: [
-          '/images/noticias/vecinales.jpg',
-          '/images/noticias/vecinales2.jpg',
-          '/images/noticias/vecinales3.jpg'
-        ],
-        autor: 'Departamento de Participación Ciudadana'
-      }
-    ])
-
-    // Cargar noticias iniciales si se proporcionan
-    if (props.initialNoticias && props.initialNoticias.length) {
-      noticias.value = props.initialNoticias
-    }
 
     // ===== COMPUTED =====
-    const allCategories = computed(() => {
-      const cats = new Set()
-      noticias.value.forEach(n => cats.add(n.categoria))
-      return Array.from(cats)
-    })
-
     const filteredNoticias = computed(() => {
-      let filtered = [...noticias.value]
+      let filtered = store.noticias ? [...store.noticias] : []
+
+      // 🔥 FILTRO OBLIGATORIO: Solo mostrar noticias de la categoría "Noticias"
+      filtered = filtered.filter(noticia => noticia.id_categoria === CATEGORIA_NOTICIAS_ID)
 
       // Búsqueda
       if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
         filtered = filtered.filter(noticia =>
           noticia.titulo.toLowerCase().includes(query) ||
-          noticia.resumen.toLowerCase().includes(query) ||
-          noticia.contenido.toLowerCase().includes(query) ||
-          (noticia.tags && noticia.tags.some(t => t.toLowerCase().includes(query)))
+          noticia.resumen?.toLowerCase().includes(query) ||
+          noticia.contenido?.toLowerCase().includes(query)
         )
-      }
-
-      // Categoría
-      if (selectedCategory.value) {
-        filtered = filtered.filter(noticia => noticia.categoria === selectedCategory.value)
       }
 
       // Ordenamiento
       filtered.sort((a, b) => {
-        const dateA = new Date(a.fecha)
-        const dateB = new Date(b.fecha)
+        const dateA = new Date(a.fecha_creacion || a.fecha_publicacion)
+        const dateB = new Date(b.fecha_creacion || b.fecha_publicacion)
         return sortOrder.value === 'desc' ? dateB - dateA : dateA - dateB
       })
 
@@ -469,10 +312,32 @@ export default {
       }
     }
 
+    const getCategoriaNombre = (id) => {
+      if (!id) return 'Sin categoría'
+      const cat = store.categorias?.find(c => c.id_categoria === id)
+      return cat ? cat.nombre : 'Sin categoría'
+    }
+
+    // Obtener la URL de un archivo desde la ruta guardada en BD
+    const getFileUrl = (ruta) => {
+      if (!ruta) return ''
+      return `/${ruta}` // Ya que guardaste en public/archivos_noticia
+    }
+
+    // Obtener la imagen principal de la noticia (prioriza archivos tipo imagen)
+    const getMainImage = (noticia) => {
+      if (noticia.archivos && noticia.archivos.length > 0) {
+        // Buscar la primera imagen en la lista de archivos
+        const img = noticia.archivos.find(a => a.tipo_mime?.startsWith('image/'))
+        if (img) return getFileUrl(img.ruta_archivo)
+      }
+      // Si no hay imagen, mostrar la imagen por defecto
+      return '/images/default-noticia.jpg'
+    }
+
     const goToPage = (page) => {
       if (page >= 1 && page <= totalPages.value) {
         currentPage.value = page
-        // Scroll al inicio de la lista
         const container = document.querySelector('.noticias-grid')
         if (container) {
           container.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -483,15 +348,13 @@ export default {
     const abrirModal = (noticia) => {
       noticiaSeleccionada.value = { ...noticia }
 
-      // Configurar galería
-      if (noticia.imagenes && noticia.imagenes.length > 0) {
-        imagenActual.value = noticia.imagenes[0]
-        indiceActual.value = 0
-      } else if (noticia.imagen) {
-        imagenActual.value = noticia.imagen
-        indiceActual.value = 0
-        if (!noticia.imagenes) {
-          noticiaSeleccionada.value.imagenes = [noticia.imagen]
+      // Configurar galería desde archivos
+      if (noticia.archivos && noticia.archivos.length > 0) {
+        // Solo mostramos imágenes en la galería pública
+        const imagenes = noticia.archivos.filter(a => a.tipo_mime?.startsWith('image/'))
+        if (imagenes.length > 0) {
+          imagenActual.value = imagenes[0].ruta_archivo
+          indiceActual.value = 0
         }
       }
 
@@ -504,24 +367,25 @@ export default {
       document.body.style.overflow = ''
     }
 
-    const cambiarImagen = (img) => {
-      imagenActual.value = img
-      indiceActual.value = noticiaSeleccionada.value.imagenes.indexOf(img)
+    const cambiarImagen = (ruta) => {
+      imagenActual.value = ruta
+      const imagenes = noticiaSeleccionada.value.archivos.filter(a => a.tipo_mime?.startsWith('image/'))
+      indiceActual.value = imagenes.findIndex(a => a.ruta_archivo === ruta)
     }
 
     const cambiarImagenNavegacion = (direccion) => {
-      if (!noticiaSeleccionada.value.imagenes || noticiaSeleccionada.value.imagenes.length <= 1) return
-      const total = noticiaSeleccionada.value.imagenes.length
+      const imagenes = noticiaSeleccionada.value.archivos.filter(a => a.tipo_mime?.startsWith('image/'))
+      if (!imagenes || imagenes.length <= 1) return
+      const total = imagenes.length
       let nuevoIndice = indiceActual.value + direccion
       if (nuevoIndice < 0) nuevoIndice = total - 1
       if (nuevoIndice >= total) nuevoIndice = 0
       indiceActual.value = nuevoIndice
-      imagenActual.value = noticiaSeleccionada.value.imagenes[nuevoIndice]
+      imagenActual.value = imagenes[nuevoIndice].ruta_archivo
     }
 
     const compartirNoticia = () => {
       const texto = `📰 ${noticiaSeleccionada.value.titulo}\n\n${noticiaSeleccionada.value.resumen}\n\nLeer más en: ${window.location.href}`
-
       if (navigator.share) {
         navigator.share({
           title: noticiaSeleccionada.value.titulo,
@@ -537,11 +401,6 @@ export default {
       }
     }
 
-    const editarNoticia = () => {
-      emit('edit-noticia', noticiaSeleccionada.value)
-      cerrarModal()
-    }
-
     const resetFilters = () => {
       searchQuery.value = ''
       selectedCategory.value = ''
@@ -550,14 +409,13 @@ export default {
     }
 
     // ===== LIFECYCLE =====
-    onMounted(() => {
-      // Si hay datos iniciales, cargarlos
-      if (props.initialNoticias && props.initialNoticias.length) {
-        noticias.value = props.initialNoticias
-      }
+    onMounted(async () => {
+      // Cargar noticias al montar el componente
+      await store.fetchNoticias()
     })
 
     return {
+      store,
       searchQuery,
       selectedCategory,
       sortOrder,
@@ -567,20 +425,20 @@ export default {
       imagenActual,
       indiceActual,
       noticiaSeleccionada,
-      noticias,
-      allCategories,
       filteredNoticias,
       totalPages,
       paginatedNoticias,
       pageNumbers,
       formatDate,
+      getCategoriaNombre,
+      getFileUrl,
+      getMainImage,
       goToPage,
       abrirModal,
       cerrarModal,
       cambiarImagen,
       cambiarImagenNavegacion,
       compartirNoticia,
-      editarNoticia,
       resetFilters
     }
   }
@@ -588,19 +446,18 @@ export default {
 </script>
 
 <style scoped>
-/* ========== CONTENEDOR PRINCIPAL ========== */
+/* (Mantén todos tus estilos CSS tal como los tenías, sin cambios) */
 .noticias-container {
   margin: 0 auto;
   padding: 2rem;
   min-height: 100vh;
-  background-image:url('/images/fondo.png');
+  background-image: url('/images/fondo.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
 }
 
-/* ========== HEADER ========== */
 .noticias-header {
   text-align: center;
   margin-bottom: 2.5rem;
@@ -625,7 +482,6 @@ export default {
   line-height: 1.6;
 }
 
-/* ========== FILTROS ========== */
 .noticias-filtros {
   display: flex;
   gap: 1rem;
@@ -662,7 +518,6 @@ export default {
   min-width: 150px;
 }
 
-/* ========== GRID ========== */
 .noticias-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -670,7 +525,6 @@ export default {
   margin-bottom: 2rem;
 }
 
-/* ========== TARJETAS ========== */
 .noticia-card {
   background: white;
   backdrop-filter: blur(10px);
@@ -688,7 +542,6 @@ export default {
   background: rgba(255, 255, 255, 0.96);
 }
 
-/* ========== BADGE ========== */
 .card-tipo-badge {
   padding: 0.5rem 1rem;
   background: rgba(247, 250, 252, 0.5);
@@ -700,7 +553,6 @@ export default {
   color: #cc0000;
 }
 
-/* ========== IMAGEN ========== */
 .card-img-wrapper {
   position: relative;
   width: 100%;
@@ -735,7 +587,6 @@ export default {
   font-weight: 500;
 }
 
-/* ========== CARD BODY ========== */
 .card-body {
   padding: 1.25rem;
   flex: 1;
@@ -750,15 +601,6 @@ export default {
   margin-bottom: 0.75rem;
   flex-wrap: wrap;
   gap: 0.5rem;
-}
-
-.meta-categoria {
-  background: #cc0000;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 500;
 }
 
 .meta-fecha {
@@ -794,23 +636,6 @@ export default {
   overflow: hidden;
 }
 
-.card-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.tag {
-  background: #edf2f7;
-  color: #4a5568;
-  padding: 0.15rem 0.6rem;
-  border-radius: 9999px;
-  font-size: 0.7rem;
-  font-weight: 500;
-}
-
-/* ========== CARD FOOTER ========== */
 .card-footer {
   padding: 0.75rem 1.25rem;
   border-top: 1px solid #e2e8f0;
@@ -847,7 +672,6 @@ export default {
   transform: translateX(4px);
 }
 
-/* ========== ESTADO VACÍO ========== */
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
@@ -887,7 +711,6 @@ export default {
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-/* ========== PAGINACIÓN ========== */
 .pagination {
   display: flex;
   flex-direction: column;
@@ -988,57 +811,31 @@ export default {
   border-color: transparent;
 }
 
-.pagination-options {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+/* Loading Spinner */
+.loading-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1rem;
 }
 
-.per-page-select {
-  padding: 0.4rem 0.75rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.5rem;
-  font-size: 0.85rem;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.spinner {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #cc0000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
 }
 
-.per-page-select:focus {
-  outline: none;
-  border-color: #cc0000;
-  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .pagination {
-    padding: 0.75rem;
-  }
-
-  .pagination-controls {
-    gap: 0.3rem;
-  }
-
-  .page-btn {
-    padding: 0.35rem 0.5rem;
-    min-width: 32px;
-    font-size: 0.85rem;
-  }
-
-  .page-num {
-    padding: 0.35rem 0.5rem;
-    min-width: 32px;
-    font-size: 0.85rem;
-  }
-
-  .pagination-options {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* ========== MODAL ========== */
+/* MODAL (Mantén tus estilos de modal igual) */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1068,7 +865,6 @@ export default {
   overflow: hidden;
 }
 
-/* ========== MODAL HEADER ========== */
 .modal-header-custom {
   display: flex;
   justify-content: space-between;
@@ -1112,7 +908,6 @@ export default {
   transform: rotate(90deg);
 }
 
-/* ========== MODAL BODY ========== */
 .modal-body-custom {
   padding: 1.5rem;
   overflow-y: auto;
@@ -1133,7 +928,6 @@ export default {
   border-radius: 10px;
 }
 
-/* ========== GALERÍA ========== */
 .galeria-container {
   margin-bottom: 1.5rem;
 }
@@ -1247,7 +1041,6 @@ export default {
   object-fit: cover;
 }
 
-/* ========== MODAL META ========== */
 .modal-meta {
   display: flex;
   flex-wrap: wrap;
@@ -1270,23 +1063,8 @@ export default {
   font-size: 0.9rem;
 }
 
-.modal-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-/* ========== MODAL CONTENIDO ========== */
 .modal-contenido {
   margin-top: 0.5rem;
-}
-
-.contenido-titulo {
-  color: #2d3748;
-  margin-bottom: 0.75rem;
-  font-size: 1rem;
-  font-weight: 700;
 }
 
 .contenido-texto {
@@ -1297,7 +1075,6 @@ export default {
   margin: 0;
 }
 
-/* ========== MODAL FOOTER ========== */
 .modal-footer-custom {
   padding: 1rem 1.5rem;
   border-top: 1px solid #e9ecef;
@@ -1342,18 +1119,6 @@ export default {
   box-shadow: 0 4px 12px rgba(204, 0, 0, 0.3);
 }
 
-.btn-editar {
-  background: #667eea;
-  color: white;
-}
-
-.btn-editar:hover {
-  background: #5a67d8;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-/* ========== ANIMACIONES ========== */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -1370,7 +1135,6 @@ export default {
   }
 }
 
-/* ========== RESPONSIVE ========== */
 @media (max-width: 1024px) {
   .noticias-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -1378,93 +1142,28 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .noticias-container {
-    padding: 1rem;
-  }
-
-  .noticias-titulo {
-    font-size: 1.8rem;
-  }
-
-  .noticias-subtitulo {
-    max-width: 100%;
-    font-size: 0.95rem;
-  }
-
-  .noticias-filtros {
-    flex-direction: column;
-  }
-
-  .search-input,
-  .filter-select {
-    width: 100%;
-  }
-
-  .noticias-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-contenedor {
-    max-height: 98vh;
-  }
-
-  .modal-header-custom {
-    padding: 1rem;
-  }
-
-  .modal-titulo {
-    font-size: 1rem;
-  }
-
-  .modal-body-custom {
-    padding: 1rem;
-  }
-
-  .modal-img-wrapper {
-    max-height: 250px;
-  }
-
-  .modal-img-wrapper img {
-    max-height: 250px;
-  }
-
-  .modal-footer-custom {
-    flex-direction: column;
-  }
-
-  .modal-footer-custom .btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .miniatura-item {
-    flex: 0 0 60px;
-    height: 45px;
-  }
-
-  .btn-nav {
-    width: 30px;
-    height: 30px;
-    font-size: 1rem;
-  }
-
-  .pagination {
-    flex-wrap: wrap;
-  }
-
-  .page-numbers {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+  .noticias-container { padding: 1rem; }
+  .noticias-titulo { font-size: 1.8rem; }
+  .noticias-subtitulo { max-width: 100%; font-size: 0.95rem; }
+  .noticias-filtros { flex-direction: column; }
+  .search-input, .filter-select { width: 100%; }
+  .noticias-grid { grid-template-columns: 1fr; }
+  .modal-contenedor { max-height: 98vh; }
+  .modal-header-custom { padding: 1rem; }
+  .modal-titulo { font-size: 1rem; }
+  .modal-body-custom { padding: 1rem; }
+  .modal-img-wrapper { max-height: 250px; }
+  .modal-img-wrapper img { max-height: 250px; }
+  .modal-footer-custom { flex-direction: column; }
+  .modal-footer-custom .btn { width: 100%; justify-content: center; }
+  .miniatura-item { flex: 0 0 60px; height: 45px; }
+  .btn-nav { width: 30px; height: 30px; font-size: 1rem; }
+  .pagination { flex-wrap: wrap; }
+  .page-numbers { flex-wrap: wrap; justify-content: center; }
 }
 
 @media (max-width: 480px) {
-  .noticias-titulo {
-    font-size: 1.5rem;
-  }
-
-  .card-img-wrapper {
-    height: 180px;
-  }
+  .noticias-titulo { font-size: 1.5rem; }
+  .card-img-wrapper { height: 180px; }
 }
 </style>
