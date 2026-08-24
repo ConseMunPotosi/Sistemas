@@ -13,7 +13,7 @@
         <div class="input-group mb-4">
           <span class="input-group-text"><i class="fas fa-search"></i></span>
           <input type="text" class="form-control" v-model="busqueda"
-                 placeholder="Buscar leyes por título, número o año...">
+                 placeholder="Buscar leyes por título, número, año o resumen...">
         </div>
 
         <div class="table-container">
@@ -21,7 +21,6 @@
             <table class="table table-hover">
               <thead>
                 <tr class="fila-encabezado"> <!-- Clase para el encabezado rojo -->
-                  <th>#</th>
                   <th>Número</th>
                   <th>Estado</th>
                   <th>Fecha Promulgación</th>
@@ -32,7 +31,6 @@
               </thead>
               <tbody>
                 <tr v-for="ley in leyesFiltradas" :key="ley.id">
-                  <td>{{ ley.id }}</td>
                   <td>{{ ley.numero }}</td>
                   <td>{{ ley.estado }}</td>
                   <td>{{ ley.fecha }}</td>
@@ -64,40 +62,35 @@ export default {
             busqueda: '',
             leyes: [
                 {
-                    id: 1,
-                    numero: 'L-001/2024',
+                    numero: '544/2025',
                     estado: 'Vigente',
-                    fecha: '15/01/2024',
-                    titulo: 'Ley de Promoción del Desarrollo Económico Local',
-                    resumen: 'Ley que promueve el desarrollo económico local',
+                    fecha: '19/12/2025',
+                    titulo: 'DECLARATORIA DEL EDIFICIO DE LA BRIGADA PARLAMENTARIA DE POTOSI DE LA ASAMBLEA LEGISLATIVA PLURINACIONAL DE BOLIVIA- DISTRITO 6 DEL MUNICIPIO DE POTOSI COMO PATRIMONIO CULTURAL, MATERIAL, y ARQUITECTONICO',
+                    resumen: 'La presente Ley Municipal tiene por objeto DECLARAR como PATRIMONIO CULTURAL MATERIAL ARQUITECTONICO del Municipio de Potosí el EDIFICIO DE LA BRIGADA PARLAMENTARIA DE POTOSI, por su valor histórico, arquitectónico...',
                 },
                 {
-                    id: 2,
-                    numero: 'L-002/2024',
+                    numero: '543/2025',
                     estado: 'Vigente',
-                    fecha: '28/02/2024',
-                    titulo: 'Ley de Protección del Patrimonio Cultural',
-                    resumen: 'Ley que protege el patrimonio cultural del municipio',
+                    fecha: '19/12/2025',
+                    titulo: 'DECRETO',
+                    resumen: 'URBANIZACION "JUSTINO COLQUE Q. y HNOS...',
                 },
                 {
-                    id: 3,
-                    numero: 'L-003/2024',
-                    estado: 'En revisión',
-                    fecha: '10/03/2024',
-                    titulo: 'Ley de Ordenamiento Territorial',
-                    resumen: 'Ley que regula el ordenamiento territorial urbano',
-                },
-                {
-                    id: 4,
-                    numero: 'L-004/2024',
+                    numero: '542/2025',
                     estado: 'Vigente',
-                    fecha: '22/04/2024',
-                    titulo: 'Ley de Gestión de Riesgos',
-                    resumen: 'Ley para la gestión de riesgos y desastres',
+                    fecha: '19/12/2025',
+                    titulo: 'DECRETO',
+                    resumen: 'PREDIOS IDENTIFICADOS PARA SU REGISTRO',
                 },
                 {
-                    id: 5,
-                    numero: 'L-005/2024',
+                    numero: '541/2025',
+                    estado: 'Vigente',
+                    fecha: '19/12/2025',
+                    titulo: 'LEY MUNICIPAL QUE DECLARA DE NECESIDAD Y UTILIDAD PÚBLICA LA EXPROPIACIÓN DE UN TERRENO CON UNA SUPERFICIE DE 0,4615 HAS, UBICADO EN EL DISTRITO MUNICIPAL N° 18, COMUNIDAD DE MANQUIRI, DESTINADO A LA CONSTRUCCIÓN DEL COLISEO CERRADO DE LA COMUNIDAD MANQUIRI, DISTRIТО 18',
+                    resumen: 'Se declara de necesidad y utilidad pública la expropiación de un terreno con una superficie de 0,4615 has, ubicado en el distrito municipal N° 18, comunidad de Manquiri, destinado a',
+                },
+                {
+                    numero: '340/2025',
                     estado: 'Derogada',
                     fecha: '05/05/2024',
                     titulo: 'Ley de Fomento al Turismo',
@@ -109,10 +102,14 @@ export default {
     computed: {
         leyesFiltradas() {
             if (!this.busqueda) return this.leyes;
+
+            const query = this.busqueda.toLowerCase();
+
             return this.leyes.filter(ley =>
-                ley.titulo.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-                ley.numero.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-                ley.estado.toLowerCase().includes(this.busqueda.toLowerCase())
+                ley.titulo.toLowerCase().includes(query) ||
+                ley.numero.toLowerCase().includes(query) ||
+                ley.estado.toLowerCase().includes(query) ||
+                ley.resumen.toLowerCase().includes(query) // 👈 AHORA BUSCA EN EL RESUMEN
             );
         }
     }

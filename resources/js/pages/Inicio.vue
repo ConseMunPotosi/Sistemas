@@ -55,24 +55,22 @@
                     <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="white"/>
                   </svg>
                 </button>
+                <!-- Indicadores (Puntos) -->
+                <div class="carousel-dots">
+                    <span
+                    v-for="(slide, index) in slides"
+                    :key="index"
+                    class="dot"
+                    :class="{ active: currentSlide === index }"
+                    @click="goToSlide(index)"
+                    ></span>
+                </div>
                 <button class="carousel-btn" @click="nextSlide">
                   <svg viewBox="0 0 24 24" width="20" height="20">
                     <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" fill="white"/>
                   </svg>
                 </button>
               </div>
-
-              <!-- Indicadores (Puntos) -->
-              <div class="carousel-dots">
-                <span
-                  v-for="(slide, index) in slides"
-                  :key="index"
-                  class="dot"
-                  :class="{ active: currentSlide === index }"
-                  @click="goToSlide(index)"
-                ></span>
-              </div>
-
             </div>
             <!-- ===== FIN CONTROLES UNIFICADOS ===== -->
 
@@ -454,8 +452,9 @@ export default {
 }
 
 .carousel-container {
+  margin-left: 13%;
   position: relative;
-  width: 100%;
+  width: 87%;
   height: 100%;
   overflow: hidden;
 }
@@ -474,7 +473,6 @@ export default {
   position: relative;
   display: flex;
   flex-direction: row;
-  background: white;
 }
 
 /* 📸 Bloque Izquierdo: Imagen (30%) */
@@ -499,7 +497,6 @@ export default {
   align-items: flex-start; /* Corregido: flex-start en lugar de left */
   justify-content: center;
   padding: 2rem;
-  background: white;
 }
 
 .text-container {
@@ -508,7 +505,7 @@ export default {
 }
 
 .slide-title {
-  font-size: 2.2rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: #1a1a2e;
   margin-bottom: 1rem;

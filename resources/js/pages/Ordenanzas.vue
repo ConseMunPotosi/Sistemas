@@ -20,7 +20,6 @@
             <table class="table table-hover">
               <thead>
                 <tr class="fila-encabezado"> <!-- Clase para el encabezado rojo -->
-                  <th>#</th>
                   <th>Número</th>
                   <th>Estado</th>
                   <th>Fecha Promulgación</th>
@@ -31,7 +30,6 @@
               </thead>
               <tbody>
                 <tr v-for="ley in leyesFiltradas" :key="ley.id">
-                  <td>{{ ley.id }}</td>
                   <td>{{ ley.numero }}</td>
                   <td>{{ ley.estado }}</td>
                   <td>{{ ley.fecha }}</td>
@@ -63,44 +61,39 @@ export default {
             busqueda: '',
             leyes: [
                 {
-                    id: 1,
-                    numero: 'R-001/2024',
+                    numero: 'R-028/2025',
                     estado: 'Vigente',
-                    fecha: '15/01/2024',
-                    titulo: 'Ley de Promoción del Desarrollo Económico Local',
-                    resumen: 'Ley que promueve el desarrollo económico local',
+                    fecha: '05/12/2025',
+                    titulo: 'Concesión de título honorifico',
+                    resumen: 'Otorgar el título honorifico de: "HIJO DISTINGUIDO" en el grado "ORGULLO POTOSINO" Del Gobierno Autónomo Municipal de Potosí a los estudiantes: ANDREI PIETRO RAMIREZ CÁRDENAS, LIAM MATIAS VARGAS FERNANDEZ y...',
                 },
                 {
-                    id: 2,
-                    numero: 'R-002/2024',
+                    numero: 'R-026/2025',
                     estado: 'Vigente',
-                    fecha: '28/02/2024',
-                    titulo: 'Ley de Protección del Patrimonio Cultural',
-                    resumen: 'Ley que protege el patrimonio cultural del municipio',
+                    fecha: '26/11/2025',
+                    titulo: 'Declaración Huésped Ilustre',
+                    resumen: 'Declarar "HUÉSPED ILUSTRE" AI SR. FERNANDO GARCÍA CASAS EMBAJADOR DEL REINO DE ESPAÑA EN EL ESTADO PLURINACIONAL DE BOLIVIA.',
                 },
                 {
-                    id: 3,
-                    numero: 'R-003/2024',
-                    estado: 'En revisión',
-                    fecha: '10/03/2024',
-                    titulo: 'Ley de Ordenamiento Territorial',
-                    resumen: 'Ley que regula el ordenamiento territorial urbano',
-                },
-                {
-                    id: 4,
-                    numero: 'R-004/2024',
+                    numero: 'R-025/2025',
                     estado: 'Vigente',
-                    fecha: '22/04/2024',
-                    titulo: 'Ley de Gestión de Riesgos',
-                    resumen: 'Ley para la gestión de riesgos y desastres',
+                    fecha: '21/11/2025',
+                    titulo: 'Declaración Huésped Ilustre',
+                    resumen: 'Declarar: "HUÉSPED ILUSTRE" Al Sr. ROHIT VADHWANA, Embajador de la India ante el Estado Plurinacional de Bolivia y al Sr. ARVINDER SINGH DUTTA, Primer Secretario de la Embajada de la...',
                 },
                 {
-                    id: 5,
-                    numero: 'R-005/2024',
-                    estado: 'Derogada',
-                    fecha: '05/05/2024',
-                    titulo: 'Ley de Fomento al Turismo',
-                    resumen: 'Ley que fomenta el turismo sostenible',
+                    numero: 'R-024/2025',
+                    estado: 'Vigente',
+                    fecha: '21/11/2025',
+                    titulo: 'Concesión de la Condecoración Municipal',
+                    resumen: 'Otorgar la Condecoración Municipal: " MÉRITO CIUDADANO: CHAQUI KATARI"',
+                },
+                {
+                    numero: 'R-021/2025',
+                    estado: 'Vigente',
+                    fecha: '05/11/2025',
+                    titulo: 'Declaratoria honorifica de "HUESPED ILUSTRE" del Municipio de Potosí',
+                    resumen: 'Otorgar la declaratoria honorifica de "HUESPED ILUSTRE" del Municipio de Potosí a las autoridades del Órgano Judicial del Estado, Tribunal Constitucional Plurinacional y Fiscalía General del Estado...',
                 }
             ]
         };

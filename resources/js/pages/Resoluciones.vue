@@ -20,7 +20,6 @@
             <table class="table table-hover">
               <thead>
                 <tr class="fila-encabezado"> <!-- Clase para el encabezado rojo -->
-                  <th>#</th>
                   <th>Número</th>
                   <th>Estado</th>
                   <th>Fecha Promulgación</th>
@@ -31,7 +30,6 @@
               </thead>
               <tbody>
                 <tr v-for="ley in leyesFiltradas" :key="ley.id">
-                  <td>{{ ley.id }}</td>
                   <td>{{ ley.numero }}</td>
                   <td>{{ ley.estado }}</td>
                   <td>{{ ley.fecha }}</td>
@@ -63,44 +61,39 @@ export default {
             busqueda: '',
             leyes: [
                 {
-                    id: 1,
-                    numero: 'R-001/2024',
+                    numero: 'R-120/2025',
                     estado: 'Vigente',
-                    fecha: '15/01/2024',
-                    titulo: 'Ley de Promoción del Desarrollo Económico Local',
-                    resumen: 'Ley que promueve el desarrollo económico local',
+                    fecha: '23/01/2025',
+                    titulo: 'En el marco de la Ley N° 482 de Gobiernos Autónomos Municipales, aprobar la suscripción de CONTRATO DE ARRENDAMIENTO AMBIENTE DE INGRESO PRINCIPAL NUEVA TERMINAL DE BUSES POTOSİ (PARA TIENDA Y OTROS), con la Sra. Silvia Alejandra Fernández Mollo',
+                    resumen: 'EI Órgano Ejecutivo Municipal quedara encargado del estricto cumplimiento del referido contrato de arrendamiento.',
                 },
                 {
-                    id: 2,
-                    numero: 'R-002/2024',
+                    numero: 'R-119/2025',
                     estado: 'Vigente',
-                    fecha: '28/02/2024',
-                    titulo: 'Ley de Protección del Patrimonio Cultural',
-                    resumen: 'Ley que protege el patrimonio cultural del municipio',
+                    fecha: '23/01/2025',
+                    titulo: 'Autorizar a la Ejecutiva Municipal del Gobierno Autónomo Municipal de Potosí, la suscripción del contrato administrativo para la prestación del servicio de seguro N°002/2025 del proceso de contratación en la modalidad licitación publica',
+                    resumen: 'La comisión de recepción, bajo su exclusiva responsabilidad, deberá verificar la CONTRATACIÓN DE SEGURO PARA TODO TIPO DE RIESGO DE DAÑOS A LA PROPIEDAD INMUEBLES Y ACTIVOS DEL G.A.M.P. 2025-2026...',
                 },
                 {
-                    id: 3,
-                    numero: 'R-003/2024',
-                    estado: 'En revisión',
-                    fecha: '10/03/2024',
-                    titulo: 'Ley de Ordenamiento Territorial',
-                    resumen: 'Ley que regula el ordenamiento territorial urbano',
-                },
-                {
-                    id: 4,
-                    numero: 'R-004/2024',
+                    numero: 'R-118/2025',
                     estado: 'Vigente',
-                    fecha: '22/04/2024',
-                    titulo: 'Ley de Gestión de Riesgos',
-                    resumen: 'Ley para la gestión de riesgos y desastres',
+                    fecha: '23/01/2025',
+                    titulo: 'AUTORIZAR a la Máxima Autoridad Ejecutiva, suscribir el CONTRATO ADMINISTRATIVO DE OBRA N° 061/2022',
+                    resumen: 'Queda claramente establecido que en función a los principios de "buena fe" y "responsabilidad" que debe existir en la actuación de los servidores públicos el proceso de contratación para la...',
                 },
                 {
-                    id: 5,
-                    numero: 'R-005/2024',
+                    numero: 'R-117/2025',
+                    estado: 'Vigente',
+                    fecha: '23/01/2025',
+                    titulo: 'Autorizar la suscripción del contrato administrativo de obra N° 063/2025',
+                    resumen: 'Queda claramente establecido que en función a los principios de "buena fe" y "responsabilidad" que debe existir en la actuación de los servidores públicos el proceso de contratación para la...',
+                },
+                {
+                    numero: 'R-113/2025',
                     estado: 'Derogada',
-                    fecha: '05/05/2024',
-                    titulo: 'Ley de Fomento al Turismo',
-                    resumen: 'Ley que fomenta el turismo sostenible',
+                    fecha: '17/12/2025',
+                    titulo: 'En aplicación a la normativa vigente y conforme a determinación del Concejo Municipal, se autoriza el viaje de la Alcaldesa Municipal Interina LESLY JANETH FLORES MOLLO, a la ciudad de La Paz, para participar en la reunión que tendrá lugar el día jueves 18 de diciembre en Despacho del Ministerio de Hidrocarburos y Energías; a objeto de poder suscribir el convenio "luminarias para la Alcaldía de Potosí"',
+                    resumen: 'Queda encargado del cumplimiento de la presente Resolución Municipal el Ejecutivo Municipal a través de las instancias respetivas del Gobierno Autónomo Municipal de Potosí en toda su estructura orgánica',
                 }
             ]
         };
