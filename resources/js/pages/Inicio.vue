@@ -29,9 +29,24 @@
                 :key="index"
                 class="carousel-slide"
               >
-                <!-- Bloque Izquierdo: Imagen -->
                 <div class="slide-image-wrapper">
-                  <img :src="slide.image" :alt="slide.title" class="slide-img" />
+                <!-- Si es una imagen, mostramos el img -->
+                <img
+                    v-if="slide.type === 'image'"
+                    :src="slide.image"
+                    :alt="slide.title"
+                    class="slide-img"
+                />
+
+                <!-- Si es un video, mostramos el video con autoplay y muted -->
+                <video
+                    v-else-if="slide.type === 'video'"
+                    :src="slide.video"
+                    autoplay
+                    muted
+                    loop
+                    class="slide-img"
+                ></video>
                 </div>
 
                 <!-- Bloque Derecho: Texto (Fondo blanco) -->
@@ -175,24 +190,47 @@ export default {
     const modalVisible = ref(false)
     const autoplayInterval = ref(null)
 
+    // Función para obtener el tipo de archivo (image o video)
+    const getTipoArchivo = (noticia) => {
+    if (noticia.archivos && noticia.archivos.length > 0) {
+        const primerArchivo = noticia.archivos[0];
+        if (primerArchivo.tipo_mime?.startsWith('video/')) {
+        return 'video';
+        }
+    }
+    return 'image';
+    };
     const slides = computed(() => {
-      const todas = store.noticias || []
-      // Cambia el 1 por el ID real de tu categoría "Noticias"
-      const noticiasFiltradas = todas.filter(n => n.id_categoria === 1)
+  const todas = store.noticias || [];
+  // Cambia el 1 por el ID real de tu categoría "Noticias"
+  const noticiasFiltradas = todas.filter(n => n.id_categoria === 1);
 
-      const ordenadas = [...noticiasFiltradas].sort((a, b) =>
-        new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
-      )
+  const ordenadas = [...noticiasFiltradas].sort((a, b) =>
+    new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
+  );
 
-      const ultimas5 = ordenadas.slice(0, 5)
+  const ultimas5 = ordenadas.slice(0, 5);
 
-      return ultimas5.map(noticia => ({
-        title: noticia.titulo,
-        description: noticia.resumen || '',
-        date: formatDate(noticia.fecha_creacion),
-        image: getMainImage(noticia)
-      }))
-    })
+  return ultimas5.map(noticia => {
+    // Obtener el primer archivo (puede ser imagen o video)
+    const primerArchivo = noticia.archivos?.[0];
+
+    return {
+      title: noticia.titulo,
+      description: noticia.resumen || '',
+      date: formatDate(noticia.fecha_creacion),
+
+      // 🔥 Para imágenes:
+      type: getTipoArchivo(noticia),
+      image: getMainImage(noticia),
+
+      // 🔥 Para videos:
+      video: primerArchivo && primerArchivo.tipo_mime?.startsWith('video/')
+        ? getFileUrl(primerArchivo.ruta_archivo)
+        : null
+    };
+  });
+});
 
     const formatDate = (dateString) => {
       if (!dateString) return 'Fecha no disponible'

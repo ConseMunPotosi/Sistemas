@@ -32,8 +32,9 @@ class NoticiaController extends Controller
             'titulo' => 'required|string|max:255',
             'id_categoria' => 'required|exists:categorias_noticia,id_categoria',
             'contenido' => 'required|string',
-            'estado_publicacion' => 'required|in:borrador,programado,publicado',
-            'archivos.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'estado_publicacion' => 'nullable|string|max:30',
+            'fecha_publicacion' => 'nullable|date',
+            'archivos.*' => 'nullable|file|max:10240',
         ]);
 
         if ($validator->fails()) {
@@ -53,10 +54,7 @@ class NoticiaController extends Controller
             'id_usuario_creador' => Auth::id(),
             'estado_publicacion' => $request->estado_publicacion,
             'fecha_creacion' => now(),
-            // Lógica inteligente: Si es publicado, pon fecha de hoy si no enviaron nada
-            'fecha_publicacion' => $request->estado_publicacion === 'publicado'
-                                    ? ($request->fecha_publicacion ?: now())
-                                    : ($request->fecha_publicacion ?? null),
+            'fecha_publicacion' => $request->fecha_publicacion ?: null,
             'publicado_web' => $request->publicado_web ?? true,
             'publicado_facebook' => $request->publicado_facebook ?? false,
             'enlace_facebook' => $request->enlace_facebook,
@@ -113,8 +111,8 @@ class NoticiaController extends Controller
 
                     // GUARDAR EL REGISTRO EN LA BASE DE DATOS
                     ArchivoNoticia::create([
-                        'id_noticia'    => $noticia->id_noticia, // Todos los archivos usan este ID
-                        'nombre_archivo'=> $nombreOriginal,      // Guardamos el nombre original en la BD
+                        'id_noticia'    => $noticia->id_noticia,
+                        'nombre_archivo'=> $nombreOriginal,
                         'ruta_archivo'  => $rutaArchivo,
                         'tipo_mime'     => $archivo->getMimeType(),
                         'extension'     => $extension,
@@ -154,7 +152,8 @@ class NoticiaController extends Controller
         $validator = Validator::make($request->all(), [
             'titulo' => 'sometimes|string|max:255',
             'id_categoria' => 'sometimes|exists:categorias_noticia,id_categoria',
-            'estado_publicacion' => 'sometimes|in:borrador,programado,publicado',
+            'estado_publicacion' => 'sometimes|string|max:30',
+            'fecha_publicacion' => 'nullable|date',
         ]);
 
         if ($validator->fails()) {
@@ -164,22 +163,16 @@ class NoticiaController extends Controller
             ], 422);
         }
 
-        // 🛑 IMPORTANTE: NO usar $request->all() directamente.
         $datosParaActualizar = $request->except(['fecha_publicacion']);
 
-        // Aplicamos la lógica de la fecha
-        if ($request->estado_publicacion === 'publicado') {
-            // Si enviaron fecha, úsala. Si no, usa el día de hoy (NOW).
-            $datosParaActualizar['fecha_publicacion'] = !empty($request->fecha_publicacion)
-                                                          ? $request->fecha_publicacion
-                                                          : now();
+        if ($request->has('fecha_publicacion')) {
+            $datosParaActualizar['fecha_publicacion'] = $request->fecha_publicacion;
         } else {
-            // Si el estado no es publicado, permitimos que sea null o el valor enviado
-            $datosParaActualizar['fecha_publicacion'] = $request->fecha_publicacion ?? null;
+            $datosParaActualizar['fecha_publicacion'] = null;
         }
 
         $noticia->update($datosParaActualizar);
-        
+
         return response()->json([
             'success' => true,
             'data' => $noticia->load('categoria')

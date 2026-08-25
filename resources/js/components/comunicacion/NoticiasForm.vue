@@ -84,17 +84,26 @@
         <h4 class="section-title">Opciones de Publicación</h4>
 
         <div class="form-group">
-          <label for="estado_publicacion" class="form-label">Estado de Publicación *</label>
+          <label for="estado_publicacion" class="form-label">Comisión a la que pertenece la noticia *</label>
           <select
             id="estado_publicacion"
             v-model="form.estado_publicacion"
             class="form-select"
           >
-            <option value="borrador">Borrador</option>
-            <option value="programado">Programado</option>
-            <option value="publicado">Publicado</option>
+            <option value="CMP">Institucional</option>
+            <option value="CJyDI">Comision Jurídica y Desarrollo Institucional</option>
+            <option value="CEF">Comisión Económica Financiera</option>
+            <option value="CDTyL">Comisión de Desarrollo Territorial y límites</option>
+            <option value="CT">Comisión Técnica</option>
+            <option value="CDH">Comisión de Desarrollo Humano</option>
+            <option value="CGG">Comisión de Género Generacional</option>
+            <option value="CDEPyA">Comisión de Desarrollo Económico, Productivo y Agropecuario</option>
+            <option value="CTCyPAH">Comisión de Turismo, Cultura y Preservcón de Áreas Históricas</option>
+            <option value="CMAMyF">Comisión de Medio Ambiente, Minería y Forestación</option>
+            <option value="CSP">Comisión de Servicios Públicos</option>
           </select>
         </div>
+
         <div class="form-group">
           <label for="fecha_publicacion">Fecha de Publicación</label>
           <input
@@ -259,7 +268,8 @@ const form = reactive({
   resumen: '',
   contenido: '',
   id_categoria: '',
-  estado_publicacion: 'borrador',
+  estado_publicacion: '',
+  fecha_publicacion: '',
   publicado_web: true,
   publicado_facebook: false,
   enlace_facebook: '',
@@ -322,7 +332,7 @@ const handleFileUpload = (event) => {
   const files = event.target.files;
   if (files.length > 0) {
     if (selectedFiles.value.length + files.length > 8) {
-      alert('Máximo 5 archivos por noticia');
+      alert('Máximo 8 archivos por noticia');
       fileInput.value.value = '';
       return;
     }
@@ -356,7 +366,6 @@ const deleteExistingFile = async (idArchivo) => {
   if (confirm('¿Eliminar este archivo permanentemente?')) {
     try {
       await store.deleteArchivo(idArchivo);
-      // Recargamos la lista de archivos existentes desde la noticia actual
       archivosExistentes.value = archivosExistentes.value.filter(a => a.id_archivo !== idArchivo);
       alert('✅ Archivo eliminado exitosamente');
     } catch (error) {
@@ -381,7 +390,8 @@ const resetForm = () => {
     resumen: '',
     contenido: '',
     id_categoria: '',
-    estado_publicacion: 'borrador',
+    estado_publicacion: '',
+    fecha_publicacion: '',
     publicado_web: true,
     publicado_facebook: false,
     enlace_facebook: '',
@@ -403,13 +413,13 @@ watch(() => props.show, async (val) => {
         resumen: props.noticia.resumen || '',
         contenido: props.noticia.contenido || '',
         id_categoria: props.noticia.id_categoria || '',
-        estado_publicacion: props.noticia.estado_publicacion || 'borrador',
+        estado_publicacion: props.noticia.estado_publicacion || '',
+        fecha_publicacion: props.noticia.fecha_publicacion || '',
         publicado_web: props.noticia.publicado_web !== undefined ? props.noticia.publicado_web : true,
         publicado_facebook: props.noticia.publicado_facebook || false,
         enlace_facebook: props.noticia.enlace_facebook || '',
       });
 
-      // 🔥 CORRECCIÓN: Usamos los archivos que ya vienen en el objeto noticia
       archivosExistentes.value = props.noticia.archivos || [];
 
     } else {
@@ -445,24 +455,20 @@ const handleSubmit = async () => {
   try {
     const formData = new FormData();
 
-    // 🔥 CORRECCIÓN DEFINITIVA: Si el estado NO es 'publicado', NO enviar fecha.
-    // Si el estado es 'publicado', el Backend (Laravel) pondrá la fecha actual automáticamente
-    // si el campo llega vacío. Así que simplemente NO enviamos el campo si no es necesario.
-    if (form.estado_publicacion === 'publicado') {
-        // Si el usuario seleccionó una fecha manualmente, la enviamos.
-        if (form.fecha_publicacion) {
-            const dateObj = new Date(form.fecha_publicacion);
-            if (!isNaN(dateObj.getTime())) {
-                const year = dateObj.getFullYear();
-                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                formData.append('fecha_publicacion', `${year}-${month}-${day}`);
-            }
-        }
-        // Si no seleccionó fecha, NO enviamos nada. Laravel pondrá now() automáticamente.
+    // 🔥 CORREGIDO: SIEMPRE enviamos la fecha (si está vacía, enviamos '')
+    if (form.fecha_publicacion) {
+      const dateObj = new Date(form.fecha_publicacion);
+      if (!isNaN(dateObj.getTime())) {
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        formData.append('fecha_publicacion', `${year}-${month}-${day}`);
+      }
+    } else {
+      formData.append('fecha_publicacion', '');
     }
 
-    // Agregamos el resto de campos (excluyendo fecha_publicacion si ya la enviamos)
+    // 🔥 Agregamos el resto de campos (EXCEPTO fecha_publicacion)
     Object.keys(form).forEach(key => {
       if (form[key] !== undefined && form[key] !== null && key !== 'fecha_publicacion') {
         formData.append(key, form[key]);
@@ -482,10 +488,10 @@ const handleSubmit = async () => {
     }
 
     const config = {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`
-        }
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`
+      }
     };
 
     let response;
@@ -504,16 +510,16 @@ const handleSubmit = async () => {
     console.error('Error completo:', error);
     let mensajeError = '❌ Error al guardar la noticia.';
     if (error.response && error.response.status === 401) {
-        mensajeError = '❌ Sesión expirada.';
+      mensajeError = '❌ Sesión expirada.';
     } else if (error.response && error.response.status === 422) {
-        const erroresBackend = error.response.data.errors;
-        let detalles = '';
-        for (const campo in erroresBackend) {
-            detalles += `\n- ${erroresBackend[campo].join(' ')}`;
-        }
-        mensajeError = `❌ Error de validación:${detalles}`;
+      const erroresBackend = error.response.data.errors;
+      let detalles = '';
+      for (const campo in erroresBackend) {
+        detalles += `\n- ${erroresBackend[campo].join(' ')}`;
+      }
+      mensajeError = `❌ Error de validación:${detalles}`;
     } else if (error.response) {
-        mensajeError = `❌ Error del servidor (${error.response.status})`;
+      mensajeError = `❌ Error del servidor (${error.response.status})`;
     }
     alert(mensajeError);
   } finally {
@@ -907,6 +913,7 @@ onMounted(() => {
   border-color: #d1fae5;
   background: #f0fdf4;
 }
+
 /* ===== FILE UPLOAD ===== */
 .file-upload-wrapper {
   margin-bottom: 18px;

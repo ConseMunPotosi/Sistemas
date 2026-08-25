@@ -172,7 +172,7 @@
                 </div>
                 <div v-else-if="isVideo(archivo)" class="gallery-media-wrapper" @click="openSingleFileModal(archivo)">
                   <div class="gallery-icon-large">🎬</div>
-                  <div class="gallery-filename">{{ archivo.nombre_archivo }}</div>
+                  <div class="gallery-filename">{{ archivo.titulo }}</div>
                   <div class="gallery-overlay"><span>▶️ Reproducir</span></div>
                 </div>
                 <div v-else-if="isPdf(archivo)" class="gallery-media-wrapper" @click="openSingleFileModal(archivo)">
@@ -196,7 +196,7 @@
       <div v-if="showSingleFileModal" class="modal-overlay" @click.self="closeSingleFileModal">
         <div class="modal-container-file">
           <div class="modal-header-file">
-            <h3>{{ singleSelectedFile.nombre_archivo }}</h3>
+            <h3>{{ singleSelectedFile.tituloNoticia || singleSelectedFile.nombre_archivo }}</h3>
             <button class="close-btn" @click="closeSingleFileModal">×</button>
           </div>
           <div class="modal-body-file">
@@ -261,7 +261,11 @@ const closeGalleryModal = () => {
   galleryNoticia.value = {};
 };
 const openSingleFileModal = (archivo) => {
-  singleSelectedFile.value = archivo;
+  // 🔥 CAMBIO AQUÍ: Guardamos el título de la noticia en el archivo seleccionado
+  singleSelectedFile.value = {
+    ...archivo,
+    tituloNoticia: galleryNoticia.value.titulo || ''
+  };
   showSingleFileModal.value = true;
 };
 const closeSingleFileModal = () => {

@@ -15,9 +15,7 @@
 
     <!-- Navegación -->
     <nav class="sidebar-nav">
-      <!-- ========================================== -->
-      <!-- 1. GESTIÓN INSTITUCIONAL                    -->
-      <!-- ========================================== -->
+      <!-- 1. GESTIÓN INSTITUCIONAL -->
       <div class="menu-section">
         <div
           class="nav-item menu-toggle"
@@ -48,9 +46,7 @@
         </div>
       </div>
 
-      <!-- ========================================== -->
-      <!-- 2. GESTIÓN COMUNICACIONAL                  -->
-      <!-- ========================================== -->
+      <!-- 2. GESTIÓN COMUNICACIONAL -->
       <div class="menu-section">
         <div
           class="nav-item menu-toggle"
@@ -63,16 +59,33 @@
         </div>
 
         <div v-if="!isCollapsed" class="submenu" :class="{ open: activeMenu === 'comunicacional' }">
-          <!-- Noticias -->
           <router-link :to="{ name: 'informacion' }" class="submenu-item" :class="{ active: $route.name === 'informacion' }">
             <span class="submenu-icon">📰</span> Información
           </router-link>
         </div>
       </div>
 
-      <!-- ========================================== -->
-      <!-- 3. GESTIÓN DOCUMENTAL                      -->
-      <!-- ========================================== -->
+      <!-- 3. GESTIÓN DE ARCHIVOS -->
+      <div class="menu-section">
+        <div
+          class="nav-item menu-toggle"
+          :class="{ active: activeMenu === 'archivos' }"
+          @click="toggleMenu('archivos')"
+        >
+          <span class="nav-icon">📁</span>
+          <span v-if="!isCollapsed" class="nav-text">Gestión de Archivos</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: activeMenu === 'archivos' }">▶</span>
+        </div>
+
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: activeMenu === 'archivos' }">
+          <!-- 🔥 CAMBIADO A RUTA DIRECTA PARA EVITAR PÁGINA EN BLANCO -->
+          <router-link to="/archivos" class="submenu-item" :class="{ active: $route.path.includes('/archivos') }">
+            <span class="submenu-icon">🗂️</span> Archivos
+          </router-link>
+        </div>
+      </div>
+
+      <!-- 4. GESTIÓN DOCUMENTAL -->
       <div class="menu-section">
         <div
           class="nav-item menu-toggle"
@@ -85,7 +98,6 @@
         </div>
 
         <div v-if="!isCollapsed" class="submenu" :class="{ open: activeMenu === 'documental' }">
-          <!-- Si los enlaces no tienen name, puedes usar to="/ruta" -->
           <router-link to="/documental/documentos" class="submenu-item" :class="{ active: $route.path.includes('/documental/documentos') }">
             <span class="submenu-icon">📄</span> Documentos
           </router-link>
@@ -98,9 +110,7 @@
         </div>
       </div>
 
-      <!-- ========================================== -->
-      <!-- 4. GESTIÓN DE RECURSOS HUMANOS             -->
-      <!-- ========================================== -->
+      <!-- 5. GESTIÓN DE RECURSOS HUMANOS -->
       <div class="menu-section">
         <div
           class="nav-item menu-toggle"
@@ -131,9 +141,7 @@
         </div>
       </div>
 
-      <!-- ========================================== -->
-      <!-- 5. GESTIÓN DE ACTIVOS FIJOS                -->
-      <!-- ========================================== -->
+      <!-- 6. GESTIÓN DE ACTIVOS FIJOS -->
       <div class="menu-section">
         <div
           class="nav-item menu-toggle"
@@ -177,65 +185,21 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useAuthStore } from '../../api/auth.js';
+import { ref } from 'vue';
 
-// Props
-const props = defineProps({
-  isCollapsed: {
-    type: Boolean,
-    default: false
-  },
-  user: {
-    type: Object,
-    default: null
-  }
-});
+const activeMenu = ref(null);
 
-// Store
-const authStore = useAuthStore();
-
-// ==========================================
-// 🟢 NUEVA LÓGICA: UNA SOLA VARIABLE PARA EL MENÚ ACTIVO 🟢
-// ==========================================
-const activeMenu = ref(null); // Puede ser: 'institucional', 'comunicacional', etc. o null
-
-// ==========================================
-// COMPUTED
-// ==========================================
-const userRoles = computed(() => {
-  if (!props.user?.roles) return 'Sin roles';
-  return props.user.roles.map(r => r.nombre).join(', ');
-});
-
-// ==========================================
-// 🟢 NUEVO MÉTODO TOGGLE 🟢
-// ==========================================
 const toggleMenu = (menu) => {
-  if (props.isCollapsed) return;
-
-  // Si el menú en el que hicimos clic ya está abierto, lo cerramos.
-  // Si estaba cerrado, lo abrimos (y esto cierra automáticamente cualquier otro).
   if (activeMenu.value === menu) {
     activeMenu.value = null;
   } else {
     activeMenu.value = menu;
   }
 };
-
-// ==========================================
-// VERIFICACIÓN DE PERMISOS
-// ==========================================
-const hasRole = (roleName) => {
-  const userRoles = authStore.user?.roles || [];
-  return userRoles.some(r => r.nombre === roleName);
-};
 </script>
 
 <style scoped>
-/* ==========================================
-   SIDEBAR - ESTILOS
-   ========================================== */
+/* Todos los estilos que ya tenías en tu archivo */
 .sidebar {
   position: fixed;
   top: 0;
@@ -256,9 +220,6 @@ const hasRole = (roleName) => {
   width: 70px;
 }
 
-/* ==========================================
-   HEADER DEL SIDEBAR (LOGO 80%)
-   ========================================== */
 .sidebar-header {
   padding: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -292,9 +253,6 @@ const hasRole = (roleName) => {
   font-size: 32px;
 }
 
-/* ==========================================
-   NAVEGACIÓN
-   ========================================== */
 .sidebar-nav {
   flex: 1;
   padding: 10px 12px;
@@ -302,9 +260,6 @@ const hasRole = (roleName) => {
   overflow-x: hidden;
 }
 
-/* ==========================================
-   ITEMS DEL MENÚ
-   ========================================== */
 .nav-item {
   display: flex;
   align-items: center;
@@ -343,16 +298,8 @@ const hasRole = (roleName) => {
   white-space: nowrap;
 }
 
-/* ==========================================
-   MENU TOGGLE
-   ========================================== */
 .menu-toggle {
   user-select: none;
-}
-
-.menu-toggle:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
 }
 
 .menu-arrow {
@@ -366,9 +313,6 @@ const hasRole = (roleName) => {
   transform: rotate(90deg);
 }
 
-/* ==========================================
-   SUBMENÚ
-   ========================================== */
 .submenu {
   max-height: 0;
   overflow: hidden;
@@ -412,16 +356,10 @@ const hasRole = (roleName) => {
   text-align: center;
 }
 
-/* ==========================================
-   SECCIÓN DEL MENÚ
-   ========================================== */
 .menu-section {
   margin-bottom: 4px;
 }
 
-/* ==========================================
-   SIDEBAR COLLAPSED
-   ========================================== */
 .sidebar.collapsed .nav-text {
   display: none;
 }
@@ -439,9 +377,6 @@ const hasRole = (roleName) => {
   display: none;
 }
 
-/* ==========================================
-   SCROLLBAR
-   ========================================== */
 .sidebar-nav::-webkit-scrollbar {
   width: 4px;
 }
@@ -459,9 +394,6 @@ const hasRole = (roleName) => {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* ==========================================
-   RESPONSIVE
-   ========================================== */
 @media (max-width: 768px) {
   .sidebar {
     width: 0;

@@ -89,7 +89,7 @@ class SuperAdministradorSeeder extends Seeder
 
             $this->command->info('✅ Super Administrador creado exitosamente!');
             $this->command->info('📋 Usuario: admin');
-            $this->command->info('🔑 Contraseña: Cmp@2026');
+            $this->command->info('🔑 Contraseña: CMP@2026');
 
         });
     }

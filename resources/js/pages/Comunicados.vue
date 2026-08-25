@@ -54,10 +54,25 @@
             :key="communication.id_noticia"
             class="communication-card"
           >
-            <!-- Imagen del comunicado -->
+            <!-- ========================================== -->
+            <!-- ⚠️ CAMBIO: Si es video, mostramos video     -->
+            <!-- ========================================== -->
             <div class="card-image-wrapper">
+              <!-- Si es video, se reproduce automáticamente -->
+              <video
+                v-if="getMainMedia(communication).type === 'video'"
+                :src="getMainMedia(communication).url"
+                autoplay
+                muted
+                loop
+                controls
+                class="card-video"
+              ></video>
+
+              <!-- Si es imagen, se muestra normalmente -->
               <img
-                :src="getMainImage(communication)"
+                v-else
+                :src="getMainMedia(communication).url"
                 :alt="communication.titulo"
                 class="card-image"
                 loading="lazy"
@@ -199,7 +214,7 @@ const props = defineProps({
 
 const store = useNoticiasStore()
 
-// 🔥 CAMBIA EL NÚMERO 2 POR EL ID REAL QUE VISTE EN LA CONSOLA
+// 🔥 CAMBIA EL NÚMERO POR EL ID REAL DE TU CATEGORÍA "COMUNICADOS"
 const CATEGORIA_COMUNICADOS_ID = 3
 
 // State
@@ -213,10 +228,8 @@ const expandedCommunications = ref({})
 const filteredCommunications = computed(() => {
   let filtered = store.noticias ? [...store.noticias] : []
 
-  // 🔥 FILTRO ACTIVADO
   filtered = filtered.filter(noticia => noticia.id_categoria === CATEGORIA_COMUNICADOS_ID)
 
-  // Búsqueda
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(comm =>
@@ -226,7 +239,6 @@ const filteredCommunications = computed(() => {
     )
   }
 
-  // Ordenamiento
   filtered.sort((a, b) => {
     const dateA = new Date(a.fecha_creacion || a.fecha_publicacion)
     const dateB = new Date(b.fecha_creacion || b.fecha_publicacion)
@@ -293,12 +305,29 @@ const getFileUrl = (ruta) => {
   return `/${ruta}`
 }
 
-const getMainImage = (comunicado) => {
-  if (comunicado.archivos && comunicado.archivos.length > 0) {
-    const img = comunicado.archivos.find(a => a.tipo_mime?.startsWith('image/'))
-    if (img) return getFileUrl(img.ruta_archivo)
+// ==========================================
+// 🔥 NUEVA FUNCIÓN: getMainMedia
+// ==========================================
+const getMainMedia = (comunicado) => {
+  // Si no tiene archivos, mostrar imagen por defecto
+  if (!comunicado.archivos || comunicado.archivos.length === 0) {
+    return { type: 'image', url: '/images/default-comunicado.jpg' }
   }
-  return '/images/default-comunicado.jpg'
+
+  // Buscar el primer video
+  const video = comunicado.archivos.find(a => a.tipo_mime?.startsWith('video/'))
+  if (video) {
+    return { type: 'video', url: getFileUrl(video.ruta_archivo) }
+  }
+
+  // Buscar la primera imagen
+  const img = comunicado.archivos.find(a => a.tipo_mime?.startsWith('image/'))
+  if (img) {
+    return { type: 'image', url: getFileUrl(img.ruta_archivo) }
+  }
+
+  // Si no hay ni imagen ni video, mostrar imagen por defecto
+  return { type: 'image', url: '/images/default-comunicado.jpg' }
 }
 
 const toggleExpand = (id) => {
@@ -493,6 +522,19 @@ onMounted(async () => {
   overflow: hidden;
   min-height: 200px;
 }
+
+/* 🎬 VIDEO AUTOMÁTICO */
+.card-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.communication-card:hover .card-video {
+  transform: scale(1.05);
+}
+
 .card-image {
   width: 100%;
   height: 100%;
@@ -752,6 +794,10 @@ onMounted(async () => {
     flex: 0 0 200px;
     width: 100%;
   }
+  .card-video {
+    width: 100%;
+    height: 200px;
+  }
   .card-image {
     width: 100%;
     height: 200px;
@@ -766,6 +812,7 @@ onMounted(async () => {
   .filters-group { flex-direction: column; }
   .filter-select { width: 100%; }
   .card-image-wrapper { flex: 0 0 180px; }
+  .card-video { height: 180px; }
   .card-image { height: 180px; }
   .card-title { font-size: 1.1rem; }
   .pagination { padding: 0.75rem; }
@@ -785,6 +832,7 @@ onMounted(async () => {
 @media (max-width: 480px) {
   .header-title { font-size: 1.5rem; }
   .card-image-wrapper { flex: 0 0 150px; }
+  .card-video { height: 150px; }
   .card-image { height: 150px; }
   .card-title { font-size: 1rem; }
   .card-meta { flex-direction: column; gap: 0.5rem; }

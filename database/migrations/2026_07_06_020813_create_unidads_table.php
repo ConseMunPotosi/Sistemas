@@ -16,6 +16,7 @@ return new class extends Migration
         DB::statement('CREATE SCHEMA IF NOT EXISTS documental');
         DB::statement('CREATE SCHEMA IF NOT EXISTS comunicacion');
         DB::statement('CREATE SCHEMA IF NOT EXISTS auditoria');
+        
 
         Schema::create('institucional.unidades', function (Blueprint $table) {
             $table->id('id_unidad');
