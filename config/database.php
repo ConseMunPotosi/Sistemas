@@ -95,7 +95,7 @@ return [
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            'search_path' => 'public,institucional,seguridad,documental,comunicacion,auditoria',
+            'search_path' => 'public,institucional,seguridad,documental,comunicacion,auditoria,gaceta',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 

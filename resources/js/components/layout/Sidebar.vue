@@ -69,17 +69,16 @@
       <div class="menu-section">
         <div
           class="nav-item menu-toggle"
-          :class="{ active: activeMenu === 'archivos' }"
-          @click="toggleMenu('archivos')"
+          :class="{ active: activeMenu === 'normas' }"
+          @click="toggleMenu('normas')"
         >
           <span class="nav-icon">📁</span>
-          <span v-if="!isCollapsed" class="nav-text">Gestión de Archivos</span>
-          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: activeMenu === 'archivos' }">▶</span>
+          <span v-if="!isCollapsed" class="nav-text">Gaceta</span>
+          <span v-if="!isCollapsed" class="menu-arrow" :class="{ open: activeMenu === 'normas' }">▶</span>
         </div>
 
-        <div v-if="!isCollapsed" class="submenu" :class="{ open: activeMenu === 'archivos' }">
-          <!-- 🔥 CAMBIADO A RUTA DIRECTA PARA EVITAR PÁGINA EN BLANCO -->
-          <router-link to="/archivos" class="submenu-item" :class="{ active: $route.path.includes('/archivos') }">
+        <div v-if="!isCollapsed" class="submenu" :class="{ open: activeMenu === 'normas' }">
+          <router-link to="/dashboard/gestion-normas" class="submenu-item" :class="{ active: $route.path.includes('/dashboard/gestion-normas') }">
             <span class="submenu-icon">🗂️</span> Archivos
           </router-link>
         </div>
@@ -186,6 +185,13 @@
 
 <script setup>
 import { ref } from 'vue';
+
+const props = defineProps({
+  isCollapsed: {
+    type: Boolean,
+    default: false
+  }
+});
 
 const activeMenu = ref(null);
 

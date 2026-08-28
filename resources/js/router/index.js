@@ -28,6 +28,8 @@ const Boletines = () => import('../pages/BoletinPrensa.vue');
 const Comunicados = () => import('../pages/Comunicados.vue');
 const Audiovisuales = () => import('../pages/AudioVisual.vue');
 
+const GestionNormas = () => import('@/components/gaceta/GestionNormas.vue');
+
 const routes = [
     // RUTAS PÚBLICAS
     {
@@ -66,9 +68,7 @@ const routes = [
             { path: 'settings', name: 'settings', component: Settings },
             { path: 'users', name: 'users', component: Users },
 
-            // ==========================================
-            // 🟢 NUEVAS RUTAS PARA EL SIDEBAR 🟢
-            // ==========================================
+            // === NUEVAS RUTAS PARA EL SIDEBAR ===
 
             // 1. GESTIÓN INSTITUCIONAL
             { path: 'institucional/funcionarios', name: 'funcionarios', component: () => import('@/components/institucional/FuncionariosList.vue') },
@@ -78,7 +78,10 @@ const routes = [
             { path: 'institucional/permisos', name: 'permisos', component: () => import('@/components/institucional/PermisosList.vue') },
 
             // 2. GESTIÓN COMUNICACIONAL
-            { path: 'comunicacion/informacion', name: 'informacion', component: Informacion }
+            { path: 'comunicacion/informacion', name: 'informacion', component: Informacion },
+
+            //3.GESTIÓN DE LA GACETA Y ARCHIVOS
+            { path: 'gestion-normas', name: 'gestionNormas', component: GestionNormas }
         ]
     },
     // 404

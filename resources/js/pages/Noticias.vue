@@ -1,6 +1,5 @@
 <template>
   <div class="noticias-container">
-    <!-- ========== HEADER ========== -->
     <div class="noticias-header">
       <h2 class="noticias-titulo">
         Noticias del<br>Concejo Municipal de Potosí
@@ -12,7 +11,6 @@
       </p>
     </div>
 
-    <!-- ========== FILTROS ========== -->
     <div class="noticias-filtros">
       <input
         v-model="searchQuery"
@@ -26,44 +24,51 @@
       </select>
     </div>
 
-    <!-- ========== ESTADO DE CARGA ========== -->
     <div v-if="store.loading" class="loading-state">
       <div class="spinner"></div>
       <p>Cargando noticias...</p>
     </div>
 
-    <!-- ========== CONTENIDO PRINCIPAL ========== -->
     <div v-else-if="filteredNoticias.length > 0" class="noticias-grid">
       <div
         v-for="noticia in paginatedNoticias"
         :key="noticia.id_noticia"
         class="noticia-card"
       >
-        <!-- Badge de tipo (basado en archivos) -->
         <div class="card-tipo-badge">
           <span>📰 Noticia</span>
           <span v-if="noticia.destacado" class="destacado-badge">⭐ Destacado</span>
         </div>
 
-        <!-- Imagen (Si tiene archivos, muestra el primero; si no, imagen por defecto) -->
         <div class="card-img-wrapper">
+          <video
+            v-if="isVideo(noticia)"
+            :src="getMainMedia(noticia)"
+            autoplay
+            muted
+            loop
+            controls
+            class="card-video"
+          ></video>
+
           <img
-            :src="getMainImage(noticia)"
+            v-else
+            :src="getMainMedia(noticia)"
             class="card-img"
             :alt="noticia.titulo"
             loading="lazy"
           />
+
           <span v-if="noticia.archivos && noticia.archivos.length > 1" class="multi-badge">
             📸 {{ noticia.archivos.length }}
           </span>
         </div>
 
-        <!-- Información -->
         <div class="card-body">
           <div class="card-meta">
             <span class="meta-fecha">
               <span class="meta-icon">📅</span>
-              {{ formatDate(noticia.fecha_creacion) }}
+              {{ formatDate(noticia.fecha_publicacion || noticia.fecha_creacion) }}
             </span>
           </div>
 
@@ -71,7 +76,6 @@
           <p class="card-resumen">{{ noticia.resumen || '-' }}</p>
         </div>
 
-        <!-- Footer -->
         <div class="card-footer">
           <button class="btn-leer-mas" @click="abrirModal(noticia)">
             Leer más
@@ -81,7 +85,6 @@
       </div>
     </div>
 
-    <!-- ========== ESTADO VACÍO ========== -->
     <div v-else class="empty-state">
       <div class="empty-icon">📭</div>
       <h3>No hay noticias disponibles</h3>
@@ -91,7 +94,6 @@
       </button>
     </div>
 
-    <!-- ========== PAGINACIÓN ========== -->
     <div v-if="totalPages > 1" class="pagination">
       <div class="pagination-info">
         <span class="info-text">
@@ -102,13 +104,9 @@
       </div>
 
       <div class="pagination-controls">
-        <!-- Primera página -->
         <button class="page-btn" :disabled="currentPage === 1" @click="goToPage(1)" title="Primera página">⟪</button>
-
-        <!-- Anterior -->
         <button class="page-btn" :disabled="currentPage === 1" @click="currentPage--" title="Página anterior">←</button>
 
-        <!-- Números de página -->
         <div class="page-numbers">
           <button
             v-for="page in pageNumbers"
@@ -122,18 +120,13 @@
           </button>
         </div>
 
-        <!-- Siguiente -->
         <button class="page-btn" :disabled="currentPage === totalPages" @click="currentPage++" title="Página siguiente">→</button>
-
-        <!-- Última página -->
         <button class="page-btn" :disabled="currentPage === totalPages" @click="goToPage(totalPages)" title="Última página">⟫</button>
       </div>
     </div>
 
-    <!-- ========== MODAL DETALLADO ========== -->
     <div class="modal-overlay" v-if="modalVisible" @click.self="cerrarModal">
       <div class="modal-contenedor">
-        <!-- Header -->
         <div class="modal-header-custom header-noticia">
           <h5 class="modal-titulo">
             <span class="modal-tipo-icon">📰</span>
@@ -143,8 +136,18 @@
         </div>
 
         <div class="modal-body-custom">
-          <!-- Galería de imágenes desde archivos -->
-          <div v-if="noticiaSeleccionada.archivos && noticiaSeleccionada.archivos.length" class="galeria-container">
+          <div v-if="isVideo(noticiaSeleccionada)" class="galeria-container">
+            <div class="modal-img-wrapper">
+              <video
+                :src="getMainMedia(noticiaSeleccionada)"
+                autoplay
+                controls
+                class="video-player"
+              ></video>
+            </div>
+          </div>
+
+          <div v-else-if="noticiaSeleccionada.archivos && noticiaSeleccionada.archivos.length" class="galeria-container">
             <div class="modal-img-wrapper">
               <img
                 :src="getFileUrl(imagenActual)"
@@ -182,13 +185,11 @@
             </div>
           </div>
 
-          <!-- Metadatos -->
           <div class="modal-meta">
             <span class="meta-badge" style="background-color: #6c757d;">
-              <span class="meta-icon">📅</span> {{ formatDate(noticiaSeleccionada.fecha_creacion) }}
+              <span class="meta-icon">📅</span> {{ formatDate(noticiaSeleccionada.fecha_publicacion || noticiaSeleccionada.fecha_creacion) }}
             </span>
           </div>
-          <!-- Contenido -->
           <div class="modal-contenido">
             <p class="contenido-texto">
               {{ noticiaSeleccionada.contenido || 'No hay contenido disponible.' }}
@@ -196,7 +197,6 @@
           </div>
         </div>
 
-        <!-- Footer -->
         <div class="modal-footer-custom">
           <button type="button" class="btn btn-secondary" @click="cerrarModal">✕ Cerrar</button>
           <button type="button" class="btn btn-compartir" @click="compartirNoticia">
@@ -210,19 +210,14 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { useNoticiasStore } from '@/stores/noticias.js' // Asegúrate de que esta ruta sea correcta
+import { useNoticiasStore } from '@/stores/noticias.js'
 
 export default {
   name: 'Noticias',
   setup() {
     const store = useNoticiasStore()
-
-    // 🔥 CAMBIO AQUÍ: ID de la categoría "Noticias" en tu base de datos.
-    // Si en tu tabla 'categorias_noticia' el id de la categoría Noticias es 1, déjalo así.
-    // Si es otro número, cámbialo aquí.
     const CATEGORIA_NOTICIAS_ID = 1;
 
-    // ===== STATE =====
     const searchQuery = ref('')
     const selectedCategory = ref('')
     const sortOrder = ref('desc')
@@ -237,18 +232,15 @@ export default {
       resumen: '',
       contenido: '',
       fecha_creacion: '',
+      fecha_publicacion: '',
       id_categoria: '',
       archivos: []
     })
 
-    // ===== COMPUTED =====
     const filteredNoticias = computed(() => {
       let filtered = store.noticias ? [...store.noticias] : []
-
-      // 🔥 FILTRO OBLIGATORIO: Solo mostrar noticias de la categoría "Noticias"
       filtered = filtered.filter(noticia => noticia.id_categoria === CATEGORIA_NOTICIAS_ID)
 
-      // Búsqueda
       if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
         filtered = filtered.filter(noticia =>
@@ -258,7 +250,6 @@ export default {
         )
       }
 
-      // Ordenamiento
       filtered.sort((a, b) => {
         const dateA = new Date(a.fecha_creacion || a.fecha_publicacion)
         const dateB = new Date(b.fecha_creacion || b.fecha_publicacion)
@@ -297,7 +288,6 @@ export default {
       return pages
     })
 
-    // ===== METHODS =====
     const formatDate = (dateString) => {
       if (!dateString) return 'Fecha no disponible'
       try {
@@ -318,20 +308,30 @@ export default {
       return cat ? cat.nombre : 'Sin categoría'
     }
 
-    // Obtener la URL de un archivo desde la ruta guardada en BD
     const getFileUrl = (ruta) => {
       if (!ruta) return ''
-      return `/${ruta}` // Ya que guardaste en public/archivos_noticia
+      return `/${ruta}`
     }
 
-    // Obtener la imagen principal de la noticia (prioriza archivos tipo imagen)
-    const getMainImage = (noticia) => {
-      if (noticia.archivos && noticia.archivos.length > 0) {
-        // Buscar la primera imagen en la lista de archivos
-        const img = noticia.archivos.find(a => a.tipo_mime?.startsWith('image/'))
-        if (img) return getFileUrl(img.ruta_archivo)
+    const isVideo = (noticia) => {
+      if (!noticia?.archivos || noticia.archivos.length === 0) return false
+      const primerArchivo = noticia.archivos[0]
+      return primerArchivo.tipo_mime?.startsWith('video/')
+    }
+
+    const getMainMedia = (noticia) => {
+      if (!noticia?.archivos || noticia.archivos.length === 0) {
+        return '/images/default-noticia.jpg'
       }
-      // Si no hay imagen, mostrar la imagen por defecto
+
+      const primerArchivo = noticia.archivos[0]
+      if (primerArchivo.tipo_mime?.startsWith('video/')) {
+        return getFileUrl(primerArchivo.ruta_archivo)
+      }
+
+      const img = noticia.archivos.find(a => a.tipo_mime?.startsWith('image/'))
+      if (img) return getFileUrl(img.ruta_archivo)
+
       return '/images/default-noticia.jpg'
     }
 
@@ -348,9 +348,7 @@ export default {
     const abrirModal = (noticia) => {
       noticiaSeleccionada.value = { ...noticia }
 
-      // Configurar galería desde archivos
       if (noticia.archivos && noticia.archivos.length > 0) {
-        // Solo mostramos imágenes en la galería pública
         const imagenes = noticia.archivos.filter(a => a.tipo_mime?.startsWith('image/'))
         if (imagenes.length > 0) {
           imagenActual.value = imagenes[0].ruta_archivo
@@ -408,9 +406,7 @@ export default {
       currentPage.value = 1
     }
 
-    // ===== LIFECYCLE =====
     onMounted(async () => {
-      // Cargar noticias al montar el componente
       await store.fetchNoticias()
     })
 
@@ -432,7 +428,8 @@ export default {
       formatDate,
       getCategoriaNombre,
       getFileUrl,
-      getMainImage,
+      isVideo,
+      getMainMedia,
       goToPage,
       abrirModal,
       cerrarModal,
@@ -446,7 +443,6 @@ export default {
 </script>
 
 <style scoped>
-/* (Mantén todos tus estilos CSS tal como los tenías, sin cambios) */
 .noticias-container {
   margin: 0 auto;
   padding: 2rem;
@@ -564,6 +560,17 @@ export default {
   justify-content: center;
 }
 
+.card-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.noticia-card:hover .card-video {
+  transform: scale(1.05);
+}
+
 .card-img {
   width: 100%;
   height: 100%;
@@ -619,6 +626,7 @@ export default {
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: 3rem;
@@ -632,6 +640,7 @@ export default {
   flex: 1;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -811,7 +820,6 @@ export default {
   border-color: transparent;
 }
 
-/* Loading Spinner */
 .loading-state {
   text-align: center;
   padding: 4rem 2rem;
@@ -835,7 +843,6 @@ export default {
   100% { transform: rotate(360deg); }
 }
 
-/* MODAL (Mantén tus estilos de modal igual) */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -949,6 +956,13 @@ export default {
   height: auto;
   max-height: 400px;
   object-fit: contain;
+}
+
+.video-player {
+  width: 100%;
+  max-height: 400px;
+  border-radius: 0.75rem;
+  background: #000;
 }
 
 .contador-imagenes {

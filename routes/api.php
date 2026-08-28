@@ -6,25 +6,18 @@ use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Api\comunicacion\CategoriaNoticiaController;
 use App\Http\Controllers\Api\comunicacion\NoticiaController;
+use App\Http\Controllers\Api\Gaceta\EstadoNormaController;
+use App\Http\Controllers\Api\Gaceta\NormaController;
+use App\Http\Controllers\Api\Gaceta\TipoNormaController;
+use App\Http\Controllers\Api\Gaceta\ArchivoNormaController;
 
-// ==========================================
-// RUTAS PÚBLICAS (sin autenticación)
-// ==========================================
-
-/**
- * Iniciar sesión
- * POST /api/login
- * Body: { "usuario": "admin", "password": "admin123" }
- * Response: { "success": true, "data": { "token": "...", "user": {...} } }
- */
+// === RUTAS PÚBLICAS (sin autenticación) ===
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-// ✅ RUTA DE LISTADO DE NOTICIAS (PÚBLICA - Sin autenticación)
+// RUTA DE LISTADO DE NOTICIAS (PÚBLICA - Sin autenticación)
 Route::get('/noticias', [NoticiaController::class, 'index']);
 
-// ==========================================
-// RUTAS PROTEGIDAS (requieren autenticación)
-// ==========================================
+// === RUTAS PROTEGIDAS (requieren autenticación) ===
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -35,15 +28,37 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/noticias/categorias/{id}', [CategoriaNoticiaController::class, 'destroy']);
 
     // RUTA DE NOTICIAS (CREAR, EDITAR, ELIMINAR - Solo para administradores)
-    // ✅ Se eliminó el 'get' duplicado. Solo quedan las rutas de escritura aquí.
     Route::post('/noticias', [NoticiaController::class, 'store']);
     Route::put('/noticias/{id}', [NoticiaController::class, 'update']);
     Route::delete('/noticias/{id}', [NoticiaController::class, 'destroy']);
 
+    // ==========================================
+    // 🔥 RUTAS DE LA GACETA (COMPLETO)
+    // ==========================================
+    Route::get('/gaceta/tipos-norma', [TipoNormaController::class, 'index']);
+    Route::post('/gaceta/tipos-norma', [TipoNormaController::class, 'store']);
+    Route::put('/gaceta/tipos-norma/{id}', [TipoNormaController::class, 'update']);
+    Route::delete('/gaceta/tipos-norma/{id}', [TipoNormaController::class, 'destroy']);
+
+    Route::get('/gaceta/estados-norma', [EstadoNormaController::class, 'index']);
+    Route::post('/gaceta/estados-norma', [EstadoNormaController::class, 'store']);
+    Route::put('/gaceta/estados-norma/{id}', [EstadoNormaController::class, 'update']);
+    Route::delete('/gaceta/estados-norma/{id}', [EstadoNormaController::class, 'destroy']);
+
+    Route::get('/gaceta/normas', [NormaController::class, 'index']);
+    Route::post('/gaceta/normas', [NormaController::class, 'store']);
+    Route::put('/gaceta/normas/{id}', [NormaController::class, 'update']);
+    Route::delete('/gaceta/normas/{id}', [NormaController::class, 'destroy']);
+
+    Route::post('/gaceta/archivos-norma', [ArchivoNormaController::class, 'store']);
+    Route::delete('/gaceta/archivos-norma/{id}', [ArchivoNormaController::class, 'destroy']);
+
+    // ==========================================
+
     Route::get('/cargos', function () {
         return response()->json([
             'success' => true,
-            'data' => \App\Models\Institucional\Cargo::all() // Asegúrate de importar tu modelo
+            'data' => \App\Models\Institucional\Cargo::all()
         ]);
     });
 
@@ -53,44 +68,15 @@ Route::middleware('auth:sanctum')->group(function () {
             'data' => \App\Models\Institucional\Unidad::all()
         ]);
     });
-    /**
-     * Obtener perfil completo del usuario logueado (con funcionario, cargo y unidad)
-     * GET /api/profile
-     * Header: Authorization: Bearer {token}
-     */
+
     Route::get('/profile', [AuthController::class, 'profile']);
 
-    /**
-     * Obtener usuario actual
-     * GET /api/user
-     * Header: Authorization: Bearer {token}
-     * Response: { "success": true, "data": { "user": {...}, "permissions": {...} } }
-     */
     Route::get('/user', [AuthController::class, 'user']);
 
-    /**
-     * Cerrar sesión
-     * POST /api/logout
-     * Header: Authorization: Bearer {token}
-     * Response: { "success": true, "message": "Sesión cerrada exitosamente" }
-     */
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    /**
-     * Cambiar contraseña
-     * POST /api/change-password
-     * Header: Authorization: Bearer {token}
-     * Body: { "current_password": "admin123", "new_password": "nueva123", "new_password_confirmation": "nueva123" }
-     * Response: { "success": true, "message": "Contraseña actualizada exitosamente" }
-     */
     Route::post('/change-password', [AuthController::class, 'changePassword']);
 
-    /**
-     * Verificar token (para mantener sesión activa)
-     * POST /api/verify-token
-     * Header: Authorization: Bearer {token}
-     * Response: { "success": true, "message": "Token válido" }
-     */
     Route::post('/verify-token', function () {
         return response()->json([
             'success' => true,
@@ -98,17 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
-    // ==========================================
-    // RUTAS DE ADMINISTRACIÓN (solo administradores)
-    // ==========================================
-
-    /**
-     * Ruta de prueba para administradores
-     * GET /api/admin-only
-     * Header: Authorization: Bearer {token}
-     * Response: { "success": true, "message": "Bienvenido administrador" }
-     * Si el usuario no es administrador: { "success": false, "message": "No tienes permisos" }
-     */
+    // === RUTAS DE ADMINISTRACIÓN ===
     Route::get('/admin-only', function () {
         $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
@@ -125,16 +101,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     })->middleware('can:admin');
 
-    // ==========================================
-    // RUTAS DE GESTIÓN DE USUARIOS (solo administradores)
-    // ==========================================
-
-    /**
-     * Listar todos los usuarios
-     * GET /api/users
-     * Header: Authorization: Bearer {token}
-     * Response: { "success": true, "data": [ { "user": {...}, "roles": [...] } ] }
-     */
+    // === RUTAS DE GESTIÓN DE USUARIOS ===
     Route::get('/users', function () {
         $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
@@ -154,11 +121,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
-    /**
-     * Obtener un usuario específico
-     * GET /api/users/{id}
-     * Header: Authorization: Bearer {token}
-     */
     Route::get('/users/{id}', function ($id) {
         $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
@@ -184,12 +146,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
-    /**
-     * Crear un nuevo usuario
-     * POST /api/users
-     * Header: Authorization: Bearer {token}
-     * Body: { "id_funcionario": 1, "usuario": "jperez", "password": "123456", "correo": "jperez@test.com", "roles": [1, 2] }
-     */
     Route::post('/users', function (Request $request) {
         $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
@@ -230,11 +186,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ], 201);
     });
 
-    /**
-     * Actualizar un usuario
-     * PUT /api/users/{id}
-     * Header: Authorization: Bearer {token}
-     */
     Route::put('/users/{id}', function (Request $request, $id) {
         $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
@@ -275,11 +226,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
-    /**
-     * Eliminar un usuario
-     * DELETE /api/users/{id}
-     * Header: Authorization: Bearer {token}
-     */
     Route::delete('/users/{id}', function ($id) {
         $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
@@ -312,15 +258,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
-    // ==========================================
-    // RUTAS DE ROLES Y PERMISOS (solo administradores)
-    // ==========================================
-
-    /**
-     * Listar todos los roles
-     * GET /api/roles
-     * Header: Authorization: Bearer {token}
-     */
+    // === RUTAS DE ROLES Y PERMISOS ===
     Route::get('/roles', function () {
         $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
@@ -338,11 +276,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
-    /**
-     * Listar todos los permisos
-     * GET /api/permisos
-     * Header: Authorization: Bearer {token}
-     */
     Route::get('/permisos', function () {
         $user = Auth::user();
         if (!$user->hasRole('Administrador')) {
