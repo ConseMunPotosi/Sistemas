@@ -147,12 +147,17 @@
             </div>
           </div>
           <div class="stat">
-            <i class="bi bi-person-standing"></i>
-            <div class="stat-info">
-              <span class="stat-number">218.702</span>
-              <span class="stat-label">Ciudadanos</span>
-              <span class="stat-fuente">Fuente: I.N.E.</span>
-            </div>
+            <a href="https://cpv2024.ine.gob.bo/index.php/principal/principales-resultados-v3/"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="stat-link">
+              <i class="bi bi-person-standing"></i>
+              <div class="stat-info">
+                <span class="stat-number">218.702</span>
+                <span class="stat-label">Ciudadanos</span>
+                <span class="stat-fuente">Fuente: I.N.E.</span>
+              </div>
+            </a>
           </div>
         </div>
         </div>
@@ -630,6 +635,18 @@ export default {
   background: #cc0000;
   transform: scale(1.25);
   box-shadow: 0 0 12px rgba(204, 0, 0, 0.3);
+}
+
+.stat-link {
+    text-decoration: none;
+    display: block;
+    color: inherit;
+}
+
+.stat-link:hover .stat {
+    cursor: pointer;
+    background-color: #f0f0f0;
+    transition: background-color 0.3s ease;
 }
 
 /* ========== MODAL ========== */
