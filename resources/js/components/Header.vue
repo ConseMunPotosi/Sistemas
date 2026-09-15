@@ -96,11 +96,11 @@
                                         <i class="bi bi-chat-left-text-fill"></i> Comunicados
                                     </router-link>
                                 </li>
-                                <li>
+                            <!--   <li>
                                     <router-link class="dropdown-item" to="/Audiovisuales">
                                         <i class="bi bi-play-circle-fill"></i> Material Audiovisual
                                     </router-link>
-                                </li>
+                                </li>-->
                             </ul>
                         </li>
 

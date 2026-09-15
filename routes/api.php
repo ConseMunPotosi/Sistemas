@@ -4,56 +4,153 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Auth;
+
 use App\Http\Controllers\Api\comunicacion\CategoriaNoticiaController;
 use App\Http\Controllers\Api\comunicacion\NoticiaController;
+
 use App\Http\Controllers\Api\Gaceta\EstadoNormaController;
 use App\Http\Controllers\Api\Gaceta\NormaController;
 use App\Http\Controllers\Api\Gaceta\TipoNormaController;
 use App\Http\Controllers\Api\Gaceta\ArchivoNormaController;
 
-// === RUTAS PÚBLICAS (sin autenticación) ===
+use App\Http\Controllers\Api\Comunicacion\SesionController;
+use App\Http\Controllers\Api\Institucional\ConcejalController;
+
+
+// ==========================================================
+// RUTAS PÚBLICAS (SIN AUTENTICACIÓN)
+// ==========================================================
+
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-// RUTA DE LISTADO DE NOTICIAS (PÚBLICA - Sin autenticación)
+
+// ==========================================================
+// NOTICIAS - PÚBLICO
+// ==========================================================
+
 Route::get('/noticias', [NoticiaController::class, 'index']);
 
-// === RUTAS PROTEGIDAS (requieren autenticación) ===
+
+// ==========================================================
+// ARCHIVOS / GACETA - PÚBLICO
+// ==========================================================
+
+Route::get('/public/gaceta/normas', [NormaController::class, 'publicIndex']);
+
+
+// ==========================================================
+// SESIONES - PÚBLICO
+// ==========================================================
+
+Route::get('/public/sesiones', [SesionController::class, 'publicIndex']);
+
+
+// ==========================================================
+// CONCEJALES - PÚBLICO
+// ==========================================================
+
+Route::get('/public/concejales', [ConcejalController::class, 'publicIndex']);
+
+
+// ==========================================================
+// RUTAS PROTEGIDAS
+// ==========================================================
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    // RUTA DE CATEGORÍAS
+    // ======================================================
+    // CATEGORÍAS DE NOTICIAS
+    // ======================================================
+
     Route::get('/noticias/categorias', [CategoriaNoticiaController::class, 'index']);
     Route::post('/noticias/categorias', [CategoriaNoticiaController::class, 'store']);
     Route::put('/noticias/categorias/{id}', [CategoriaNoticiaController::class, 'update']);
     Route::delete('/noticias/categorias/{id}', [CategoriaNoticiaController::class, 'destroy']);
 
-    // RUTA DE NOTICIAS (CREAR, EDITAR, ELIMINAR - Solo para administradores)
+
+    // ======================================================
+    // NOTICIAS
+    // ======================================================
+
     Route::post('/noticias', [NoticiaController::class, 'store']);
     Route::put('/noticias/{id}', [NoticiaController::class, 'update']);
     Route::delete('/noticias/{id}', [NoticiaController::class, 'destroy']);
 
-    // ==========================================
-    // 🔥 RUTAS DE LA GACETA (COMPLETO)
-    // ==========================================
+
+    // ======================================================
+    // GACETA
+    // ======================================================
+
+    // Tipos de norma
     Route::get('/gaceta/tipos-norma', [TipoNormaController::class, 'index']);
     Route::post('/gaceta/tipos-norma', [TipoNormaController::class, 'store']);
     Route::put('/gaceta/tipos-norma/{id}', [TipoNormaController::class, 'update']);
     Route::delete('/gaceta/tipos-norma/{id}', [TipoNormaController::class, 'destroy']);
 
+    // Estados de norma
     Route::get('/gaceta/estados-norma', [EstadoNormaController::class, 'index']);
     Route::post('/gaceta/estados-norma', [EstadoNormaController::class, 'store']);
     Route::put('/gaceta/estados-norma/{id}', [EstadoNormaController::class, 'update']);
     Route::delete('/gaceta/estados-norma/{id}', [EstadoNormaController::class, 'destroy']);
 
+    // Normas
     Route::get('/gaceta/normas', [NormaController::class, 'index']);
     Route::post('/gaceta/normas', [NormaController::class, 'store']);
     Route::put('/gaceta/normas/{id}', [NormaController::class, 'update']);
     Route::delete('/gaceta/normas/{id}', [NormaController::class, 'destroy']);
 
+    // Archivos de normas
     Route::post('/gaceta/archivos-norma', [ArchivoNormaController::class, 'store']);
     Route::delete('/gaceta/archivos-norma/{id}', [ArchivoNormaController::class, 'destroy']);
 
-    // ==========================================
+
+    // ======================================================
+    // SESIONES DEL CONCEJO
+    // ======================================================
+
+    // Listar sesiones para administración
+    Route::get('/sesiones', [SesionController::class, 'index']);
+
+    // Crear sesión y subir video
+    Route::post('/sesiones', [SesionController::class, 'store']);
+
+    // Mostrar una sesión
+    Route::get('/sesiones/{id}', [SesionController::class, 'show']);
+
+    // Actualizar sesión
+    Route::put('/sesiones/{id}', [SesionController::class, 'update']);
+
+    // Eliminar sesión y su video
+    Route::delete('/sesiones/{id}', [SesionController::class, 'destroy']);
+
+
+    // ======================================================
+    // INSTITUCIONAL
+    // ======================================================
+
+    // ======================================================
+    // CONCEJALES
+    // ======================================================
+
+    // Listar todos los concejales para el Dashboard
+    Route::get('/concejales', [ConcejalController::class, 'index']);
+
+    // Crear concejal
+    Route::post('/concejales', [ConcejalController::class, 'store']);
+
+    // Mostrar un concejal
+    Route::get('/concejales/{id}', [ConcejalController::class, 'show']);
+
+    // Actualizar concejal
+    Route::put('/concejales/{id}', [ConcejalController::class, 'update']);
+
+    // Eliminar concejal
+    Route::delete('/concejales/{id}', [ConcejalController::class, 'destroy']);
+
+
+    // ======================================================
+    // CARGOS
+    // ======================================================
 
     Route::get('/cargos', function () {
         return response()->json([
@@ -62,12 +159,22 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
+
+    // ======================================================
+    // UNIDADES
+    // ======================================================
+
     Route::get('/unidades', function () {
         return response()->json([
             'success' => true,
             'data' => \App\Models\Institucional\Unidad::all()
         ]);
     });
+
+
+    // ======================================================
+    // AUTENTICACIÓN
+    // ======================================================
 
     Route::get('/profile', [AuthController::class, 'profile']);
 
@@ -84,9 +191,14 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
-    // === RUTAS DE ADMINISTRACIÓN ===
+
+    // ======================================================
+    // ADMINISTRACIÓN
+    // ======================================================
+
     Route::get('/admin-only', function () {
         $user = Auth::user();
+
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -101,9 +213,14 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     })->middleware('can:admin');
 
-    // === RUTAS DE GESTIÓN DE USUARIOS ===
+
+    // ======================================================
+    // GESTIÓN DE USUARIOS
+    // ======================================================
+
     Route::get('/users', function () {
         $user = Auth::user();
+
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -121,8 +238,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
+
     Route::get('/users/{id}', function ($id) {
         $user = Auth::user();
+
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -130,8 +249,12 @@ Route::middleware('auth:sanctum')->group(function () {
             ], 403);
         }
 
-        $targetUser = \App\Models\Seguridad\Usuario::with(['funcionario', 'roles', 'funcionario.cargo', 'funcionario.unidad'])
-            ->find($id);
+        $targetUser = \App\Models\Seguridad\Usuario::with([
+            'funcionario',
+            'roles',
+            'funcionario.cargo',
+            'funcionario.unidad'
+        ])->find($id);
 
         if (!$targetUser) {
             return response()->json([
@@ -146,8 +269,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
+
     Route::post('/users', function (Request $request) {
         $user = Auth::user();
+
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -186,8 +311,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ], 201);
     });
 
+
     Route::put('/users/{id}', function (Request $request, $id) {
         $user = Auth::user();
+
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -196,6 +323,7 @@ Route::middleware('auth:sanctum')->group(function () {
         }
 
         $targetUser = \App\Models\Seguridad\Usuario::find($id);
+
         if (!$targetUser) {
             return response()->json([
                 'success' => false,
@@ -211,7 +339,10 @@ Route::middleware('auth:sanctum')->group(function () {
             'roles.*' => 'exists:seguridad.roles,id_rol'
         ]);
 
-        $targetUser->update($request->only(['usuario', 'correo', 'activo']));
+        $targetUser->update(
+            $request->only(['usuario', 'correo', 'activo'])
+        );
+
         $targetUser->fecha_actualizacion = now();
         $targetUser->save();
 
@@ -226,8 +357,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
+
     Route::delete('/users/{id}', function ($id) {
         $user = Auth::user();
+
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -236,6 +369,7 @@ Route::middleware('auth:sanctum')->group(function () {
         }
 
         $targetUser = \App\Models\Seguridad\Usuario::find($id);
+
         if (!$targetUser) {
             return response()->json([
                 'success' => false,
@@ -258,9 +392,14 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
-    // === RUTAS DE ROLES Y PERMISOS ===
+
+    // ======================================================
+    // ROLES Y PERMISOS
+    // ======================================================
+
     Route::get('/roles', function () {
         $user = Auth::user();
+
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -276,8 +415,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
+
     Route::get('/permisos', function () {
         $user = Auth::user();
+
         if (!$user->hasRole('Administrador')) {
             return response()->json([
                 'success' => false,
@@ -285,7 +426,8 @@ Route::middleware('auth:sanctum')->group(function () {
             ], 403);
         }
 
-        $permisos = \App\Models\Seguridad\Permiso::all()->groupBy('modulo');
+        $permisos = \App\Models\Seguridad\Permiso::all()
+            ->groupBy('modulo');
 
         return response()->json([
             'success' => true,
@@ -294,20 +436,26 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-// ==========================================
-// RUTAS DE PRUEBA (solo en desarrollo)
-// ==========================================
+
+// ==========================================================
+// RUTAS DE PRUEBA - SOLO DESARROLLO
+// ==========================================================
 
 if (app()->environment('local', 'development')) {
+
     Route::get('/test-db', function () {
         try {
+
             \DB::connection()->getPdo();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Conexión a base de datos exitosa',
                 'database' => \DB::connection()->getDatabaseName()
             ]);
+
         } catch (\Exception $e) {
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error de conexión a base de datos',
@@ -315,6 +463,7 @@ if (app()->environment('local', 'development')) {
             ], 500);
         }
     });
+
 
     Route::get('/test-auth', function () {
         return response()->json([

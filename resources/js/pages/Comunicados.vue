@@ -1,167 +1,514 @@
 <template>
   <div class="official-communications">
-    <!-- Header -->
+
+    <!-- =====================================================
+         ENCABEZADO
+    ====================================================== -->
     <header class="communications-header">
-      <div class="header-content">
-        <div class="header-left">
-          <h1 class="header-title">
-            <span class="icon">📢</span>
-            Comunicados Oficiales
-          </h1>
-          <p class="header-subtitle">Mantente informado con las últimas noticias y anuncios</p>
-        </div>
+
+      <div class="header-icon">
+        <i class="fas fa-bullhorn"></i>
       </div>
+
+      <h1 class="header-title">
+        Comunicados Oficiales
+      </h1>
+
+      <p class="header-subtitle">
+        Información oficial y anuncios del Concejo Municipal de Potosí.
+      </p>
+
     </header>
 
-    <!-- Filtros y Búsqueda -->
-    <section class="filters-section">
+
+    <!-- =====================================================
+         FILTROS
+    ====================================================== -->
+    <section
+      v-if="!store.loading && filteredCommunications.length > 0"
+      class="filters-section"
+    >
+
       <div class="filters-container">
+
         <div class="search-wrapper">
-          <span class="search-icon">🔍</span>
+
+          <span class="search-icon">
+            <i class="fas fa-search"></i>
+          </span>
+
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Buscar comunicados..."
             class="search-input"
           />
+
         </div>
+
 
         <div class="filters-group">
-          <select v-model="sortOrder" class="filter-select">
-            <option value="desc">Más recientes</option>
-            <option value="asc">Más antiguos</option>
+
+          <select
+            v-model="sortOrder"
+            class="filter-select"
+          >
+
+            <option value="desc">
+              Más recientes
+            </option>
+
+            <option value="asc">
+              Más antiguos
+            </option>
+
           </select>
+
         </div>
+
+
+        <div class="results-count">
+
+          <strong>
+            {{ filteredCommunications.length }}
+          </strong>
+
+          <span>
+            {{
+              filteredCommunications.length === 1
+                ? 'comunicado'
+                : 'comunicados'
+            }}
+          </span>
+
+        </div>
+
       </div>
+
     </section>
 
-    <!-- ========================================== -->
-    <!-- CONTENIDO CONDICIONAL                      -->
-    <!-- ========================================== -->
+
+    <!-- =====================================================
+         CONTENIDO
+    ====================================================== -->
     <div class="content-container">
 
-      <!-- Estado de Carga -->
-      <div v-if="store.loading" class="loading-state">
+
+      <!-- CARGANDO -->
+      <div
+        v-if="store.loading"
+        class="loading-state"
+      >
+
         <div class="spinner"></div>
-        <p>Cargando comunicados...</p>
+
+        <p>
+          Cargando comunicados...
+        </p>
+
       </div>
 
-      <!-- Lista de Comunicados -->
-      <section v-else-if="filteredCommunications.length > 0" class="communications-list">
+
+      <!-- ERROR -->
+      <div
+        v-else-if="store.error"
+        class="error-state"
+      >
+
+        <div class="error-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+
+        <h3>
+          No se pudieron cargar los comunicados
+        </h3>
+
+        <p>
+          {{ store.error }}
+        </p>
+
+        <button
+          class="btn-primary"
+          @click="cargarNuevamente"
+        >
+          <i class="fas fa-sync-alt me-2"></i>
+          Intentar nuevamente
+        </button>
+
+      </div>
+
+
+      <!-- LISTA -->
+      <section
+        v-else-if="filteredCommunications.length > 0"
+        class="communications-list"
+      >
+
         <div class="list-container">
-          <div
+
+          <article
             v-for="communication in paginatedCommunications"
             :key="communication.id_noticia"
             class="communication-card"
           >
-            <!-- ========================================== -->
-            <!-- ⚠️ CAMBIO: Si es video, mostramos video     -->
-            <!-- ========================================== -->
+
+            <!-- =================================================
+                 MEDIA
+            ================================================== -->
             <div class="card-image-wrapper">
-              <!-- Si es video, se reproduce automáticamente -->
+
+              <!-- VIDEO -->
               <video
                 v-if="getMainMedia(communication).type === 'video'"
                 :src="getMainMedia(communication).url"
-                autoplay
-                muted
-                loop
                 controls
+                preload="metadata"
                 class="card-video"
               ></video>
 
-              <!-- Si es imagen, se muestra normalmente -->
+
+              <!-- IMAGEN -->
               <img
                 v-else
                 :src="getMainMedia(communication).url"
                 :alt="communication.titulo"
                 class="card-image"
                 loading="lazy"
+                @error="handleImageError"
               />
+
             </div>
 
+
+            <!-- =================================================
+                 INFORMACIÓN
+            ================================================== -->
             <div class="card-content">
+
               <div class="card-header">
+
                 <div class="card-title-group">
-                  <h3 class="card-title">{{ communication.titulo }}</h3>
+
+                  <span class="category-badge">
+                    Comunicado Oficial
+                  </span>
+
+                  <h3 class="card-title">
+                    {{ communication.titulo || 'Sin título' }}
+                  </h3>
+
                 </div>
+
               </div>
 
+
+              <!-- FECHA -->
               <div class="card-meta">
+
                 <span class="meta-item">
-                  <span class="meta-icon">📅</span>
-                  {{ formatDate(communication.fecha_creacion) }}
+
+                  <span class="meta-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                  </span>
+
+                  {{ formatDate(
+                    communication.fecha_publicacion ||
+                    communication.fecha_creacion
+                  ) }}
+
                 </span>
+
               </div>
 
-              <p class="card-summary">{{ communication.resumen || '-' }}</p>
 
+              <!-- RESUMEN -->
+              <p class="card-summary">
+
+                {{
+                  communication.resumen ||
+                  'Sin resumen disponible.'
+                }}
+
+              </p>
+
+
+              <!-- ACCIONES -->
               <div class="card-footer">
+
                 <button
                   class="read-more-btn"
-                  @click="toggleExpand(communication.id_noticia)"
+                  @click="toggleExpand(
+                    communication.id_noticia
+                  )"
                 >
-                  {{ expandedCommunications[communication.id_noticia] ? '📖 Ver menos' : '📖 Leer más' }}
+
+                  {{
+                    expandedCommunications[
+                      communication.id_noticia
+                    ]
+                      ? 'Ver menos'
+                      : 'Leer más'
+                  }}
+
+                  <span class="btn-arrow">
+                    →
+                  </span>
+
                 </button>
+
+
+                <!-- PDF -->
+                <template v-if="getPdfFile(communication)">
+
+                  <button
+                    class="btn-pdf-outline"
+                    @click="openPdf(
+                      getPdfFile(communication).ruta_archivo
+                    )"
+                  >
+
+                    <i class="fas fa-eye me-1"></i>
+
+                    Ver PDF
+
+                  </button>
+
+
+                  <a
+                    class="btn-pdf"
+                    :href="getFileUrl(
+                      getPdfFile(communication).ruta_archivo
+                    )"
+                    :download="getPdfFile(
+                      communication
+                    ).nombre_archivo"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+
+                    <i class="fas fa-download me-1"></i>
+
+                    Descargar
+
+                  </a>
+
+                </template>
+
               </div>
 
-              <!-- Contenido expandido -->
-              <div v-if="expandedCommunications[communication.id_noticia]" class="card-expanded">
+
+              <!-- =================================================
+                   CONTENIDO EXPANDIDO
+              ================================================== -->
+              <div
+                v-if="
+                  expandedCommunications[
+                    communication.id_noticia
+                  ]
+                "
+                class="card-expanded"
+              >
+
                 <div class="expanded-content">
-                  <p class="contenido-texto" v-html="communication.contenido?.replace(/\n/g, '<br>')"></p>
+
+                  <p
+                    class="contenido-texto"
+                    v-html="formatContent(
+                      communication.contenido
+                    )"
+                  ></p>
+
+
+                  <!-- ARCHIVOS -->
+                  <div
+                    v-if="communication.archivos?.length"
+                    class="attachments"
+                  >
+
+                    <h4>
+                      <i class="fas fa-paperclip me-2"></i>
+                      Archivos adjuntos
+                    </h4>
+
+
+                    <ul class="attachment-list">
+
+                      <li
+                        v-for="archivo in communication.archivos"
+                        :key="archivo.id_archivo"
+                      >
+
+                        <a
+                          :href="getFileUrl(
+                            archivo.ruta_archivo
+                          )"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="attachment-link"
+                        >
+
+                          <i
+                            :class="getAttachmentIcon(
+                              archivo
+                            )"
+                            class="me-2"
+                          ></i>
+
+                          {{ archivo.nombre_archivo }}
+
+                        </a>
+
+
+                        <span
+                          v-if="archivo.peso_bytes"
+                          class="file-size"
+                        >
+                          {{
+                            formatFileSize(
+                              archivo.peso_bytes
+                            )
+                          }}
+                        </span>
+
+                      </li>
+
+                    </ul>
+
+                  </div>
+
                 </div>
+
               </div>
+
             </div>
-          </div>
+
+          </article>
+
         </div>
+
       </section>
 
-      <!-- Estado vacío -->
-      <div v-else class="empty-state">
-        <div class="empty-icon">📭</div>
-        <h3 class="empty-title">No hay comunicados</h3>
+
+      <!-- =====================================================
+           SIN RESULTADOS
+      ====================================================== -->
+      <div
+        v-else
+        class="empty-state"
+      >
+
+        <div class="empty-icon">
+
+          <i
+            :class="
+              searchQuery
+                ? 'fas fa-search'
+                : 'fas fa-bullhorn'
+            "
+          ></i>
+
+        </div>
+
+        <h3 class="empty-title">
+
+          {{
+            searchQuery
+              ? 'No se encontraron resultados'
+              : 'No hay comunicados'
+          }}
+
+        </h3>
+
         <p class="empty-description">
-          {{ searchQuery ? 'No se encontraron resultados para tu búsqueda' : 'No hay comunicados disponibles' }}
+
+          {{
+            searchQuery
+              ? 'No existen comunicados que coincidan con tu búsqueda.'
+              : 'Actualmente no hay comunicados oficiales disponibles.'
+          }}
+
         </p>
-        <button class="btn-primary" @click="resetFilters">
-          Limpiar filtros
+
+
+        <button
+          v-if="searchQuery"
+          class="btn-primary"
+          @click="resetFilters"
+        >
+          Limpiar búsqueda
         </button>
+
       </div>
 
     </div>
 
-    <!-- Paginación -->
-    <div v-if="totalPages > 1" class="pagination">
+
+    <!-- =====================================================
+         PAGINACIÓN
+    ====================================================== -->
+    <div
+      v-if="totalPages > 1"
+      class="pagination"
+    >
+
       <div class="pagination-info">
+
         <span class="info-text">
-          Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} -
-          {{ Math.min(currentPage * itemsPerPage, filteredCommunications.length) }}
-          de {{ filteredCommunications.length }} comunicados
+
+          Mostrando
+
+          {{
+            (currentPage - 1) *
+            itemsPerPage + 1
+          }}
+
+          -
+
+          {{
+            Math.min(
+              currentPage * itemsPerPage,
+              filteredCommunications.length
+            )
+          }}
+
+          de
+
+          {{ filteredCommunications.length }}
+
+          comunicados
+
         </span>
+
       </div>
 
+
       <div class="pagination-controls">
-        <!-- Primera página -->
+
+        <!-- Primera -->
         <button
           class="page-btn"
           :disabled="currentPage === 1"
           @click="goToPage(1)"
           title="Primera página"
         >
-          ⟪
+          «
         </button>
+
 
         <!-- Anterior -->
         <button
           class="page-btn"
           :disabled="currentPage === 1"
-          @click="currentPage--"
+          @click="goToPage(currentPage - 1)"
           title="Página anterior"
         >
-          ←
+          ‹
         </button>
 
-        <!-- Números de página -->
+
+        <!-- Números -->
         <div class="page-numbers">
+
           <button
             v-for="page in pageNumbers"
             :key="page"
@@ -171,671 +518,1943 @@
               dots: page === '...'
             }"
             :disabled="page === '...'"
-            @click="page !== '...' && (currentPage = page)"
+            @click="
+              page !== '...' &&
+              goToPage(page)
+            "
           >
+
             {{ page }}
+
           </button>
+
         </div>
+
 
         <!-- Siguiente -->
         <button
           class="page-btn"
-          :disabled="currentPage === totalPages"
-          @click="currentPage++"
+          :disabled="
+            currentPage === totalPages
+          "
+          @click="goToPage(currentPage + 1)"
           title="Página siguiente"
         >
-          →
+          ›
         </button>
 
-        <!-- Última página -->
+
+        <!-- Última -->
         <button
           class="page-btn"
-          :disabled="currentPage === totalPages"
+          :disabled="
+            currentPage === totalPages
+          "
           @click="goToPage(totalPages)"
           title="Última página"
         >
-          ⟫
+          »
         </button>
+
       </div>
+
     </div>
+
   </div>
 </template>
 
+
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useNoticiasStore } from '@/stores/noticias.js'
+
+import {
+  ref,
+  computed,
+  onMounted,
+  watch
+} from 'vue';
+
+import { useNoticiasStore }
+  from '@/stores/noticias.js';
+
+
+/*
+|--------------------------------------------------------------------------
+| Props
+|--------------------------------------------------------------------------
+*/
 
 const props = defineProps({
+
   initialCommunications: {
     type: Array,
     default: () => []
   }
-})
 
-const store = useNoticiasStore()
+});
 
-// 🔥 CAMBIA EL NÚMERO POR EL ID REAL DE TU CATEGORÍA "COMUNICADOS"
-const CATEGORIA_COMUNICADOS_ID = 3
 
-// State
-const searchQuery = ref('')
-const sortOrder = ref('desc')
-const currentPage = ref(1)
-const itemsPerPage = 5
-const expandedCommunications = ref({})
+/*
+|--------------------------------------------------------------------------
+| Store
+|--------------------------------------------------------------------------
+*/
 
-// Computed
-const filteredCommunications = computed(() => {
-  let filtered = store.noticias ? [...store.noticias] : []
+const store =
+  useNoticiasStore();
 
-  filtered = filtered.filter(noticia => noticia.id_categoria === CATEGORIA_COMUNICADOS_ID)
 
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(comm =>
-      comm.titulo.toLowerCase().includes(query) ||
-      comm.resumen?.toLowerCase().includes(query) ||
-      comm.contenido?.toLowerCase().includes(query)
-    )
-  }
+/*
+|--------------------------------------------------------------------------
+| Categoría Comunicados
+|--------------------------------------------------------------------------
+*/
 
-  filtered.sort((a, b) => {
-    const dateA = new Date(a.fecha_creacion || a.fecha_publicacion)
-    const dateB = new Date(b.fecha_creacion || b.fecha_publicacion)
-    return sortOrder.value === 'desc' ? dateB - dateA : dateA - dateB
-  })
+const CATEGORIA_COMUNICADOS_ID = 3;
 
-  return filtered
-})
 
-const totalPages = computed(() => {
-  return Math.ceil(filteredCommunications.value.length / itemsPerPage)
-})
+/*
+|--------------------------------------------------------------------------
+| Estado
+|--------------------------------------------------------------------------
+*/
 
-const paginatedCommunications = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  const end = start + itemsPerPage
-  return filteredCommunications.value.slice(start, end)
-})
+const searchQuery = ref('');
 
-const pageNumbers = computed(() => {
-  const pages = []
-  const total = totalPages.value
-  const current = currentPage.value
+const sortOrder = ref('desc');
 
-  if (total <= 5) {
-    for (let i = 1; i <= total; i++) pages.push(i)
-  } else {
-    if (current <= 3) {
-      pages.push(1, 2, 3, '...', total)
-    } else if (current >= total - 2) {
-      pages.push(1, '...', total - 2, total - 1, total)
-    } else {
-      pages.push(1, '...', current - 1, current, current + 1, '...', total)
+const currentPage = ref(1);
+
+const itemsPerPage = 5;
+
+const expandedCommunications =
+  ref({});
+
+
+/*
+|--------------------------------------------------------------------------
+| Filtrar comunicados
+|--------------------------------------------------------------------------
+*/
+
+const filteredCommunications =
+  computed(() => {
+
+    let filtered =
+      store.noticias
+        ? [...store.noticias]
+        : [];
+
+
+    /*
+     * Categoría = Comunicados
+     */
+    filtered =
+      filtered.filter(
+        (noticia) =>
+          Number(
+            noticia.id_categoria
+          ) ===
+          CATEGORIA_COMUNICADOS_ID
+      );
+
+
+    /*
+     * Solo activos
+     */
+    filtered =
+      filtered.filter(
+        (noticia) =>
+          noticia.estado !== false &&
+          noticia.estado !== 0
+      );
+
+
+    /*
+     * Solo publicados en web
+     */
+    filtered =
+      filtered.filter(
+        (noticia) =>
+          noticia.publicado_web !== false &&
+          noticia.publicado_web !== 0
+      );
+
+
+    /*
+     * Buscar
+     */
+    const query =
+      searchQuery.value
+        .trim()
+        .toLowerCase();
+
+
+    if (query) {
+
+      filtered =
+        filtered.filter(
+          (comunicado) => {
+
+            const titulo =
+              String(
+                comunicado.titulo || ''
+              )
+                .toLowerCase();
+
+            const resumen =
+              String(
+                comunicado.resumen || ''
+              )
+                .toLowerCase();
+
+            const contenido =
+              String(
+                comunicado.contenido || ''
+              )
+                .toLowerCase();
+
+
+            return (
+              titulo.includes(query) ||
+              resumen.includes(query) ||
+              contenido.includes(query)
+            );
+
+          }
+        );
+
     }
-  }
-  return pages
-})
 
-// Methods
+
+    /*
+     * Orden
+     */
+    filtered.sort(
+      (a, b) => {
+
+        const dateA =
+          new Date(
+            a.fecha_publicacion ||
+            a.fecha_creacion
+          );
+
+        const dateB =
+          new Date(
+            b.fecha_publicacion ||
+            b.fecha_creacion
+          );
+
+
+        return sortOrder.value === 'desc'
+          ? dateB - dateA
+          : dateA - dateB;
+
+      }
+    );
+
+
+    return filtered;
+
+  });
+
+
+/*
+|--------------------------------------------------------------------------
+| Paginación
+|--------------------------------------------------------------------------
+*/
+
+const totalPages =
+  computed(() => {
+
+    return Math.ceil(
+      filteredCommunications.value.length /
+      itemsPerPage
+    );
+
+  });
+
+
+const paginatedCommunications =
+  computed(() => {
+
+    const start =
+      (currentPage.value - 1) *
+      itemsPerPage;
+
+    const end =
+      start + itemsPerPage;
+
+
+    return filteredCommunications.value.slice(
+      start,
+      end
+    );
+
+  });
+
+
+const pageNumbers =
+  computed(() => {
+
+    const pages = [];
+
+    const total =
+      totalPages.value;
+
+    const current =
+      currentPage.value;
+
+
+    if (total <= 5) {
+
+      for (
+        let i = 1;
+        i <= total;
+        i++
+      ) {
+
+        pages.push(i);
+
+      }
+
+    } else {
+
+      if (current <= 3) {
+
+        pages.push(
+          1,
+          2,
+          3,
+          '...',
+          total
+        );
+
+      } else if (
+        current >= total - 2
+      ) {
+
+        pages.push(
+          1,
+          '...',
+          total - 2,
+          total - 1,
+          total
+        );
+
+      } else {
+
+        pages.push(
+          1,
+          '...',
+          current - 1,
+          current,
+          current + 1,
+          '...',
+          total
+        );
+
+      }
+
+    }
+
+
+    return pages;
+
+  });
+
+
+/*
+|--------------------------------------------------------------------------
+| Fecha
+|--------------------------------------------------------------------------
+*/
+
 const formatDate = (dateString) => {
-  if (!dateString) return 'Fecha no disponible'
-  try {
-    const date = new Date(dateString)
-    if (isNaN(date.getTime())) return 'Fecha inválida'
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const year = date.getFullYear()
-    return `${day}/${month}/${year}`
-  } catch {
-    return dateString
+
+  if (!dateString) {
+
+    return 'Fecha no disponible';
+
   }
-}
+
+
+  try {
+
+    const date =
+      new Date(dateString);
+
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+
+      return 'Fecha inválida';
+
+    }
+
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(2, '0');
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(2, '0');
+
+    const year =
+      date.getFullYear();
+
+
+    return `${day}/${month}/${year}`;
+
+  } catch {
+
+    return 'Fecha inválida';
+
+  }
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Tamaño archivo
+|--------------------------------------------------------------------------
+*/
 
 const formatFileSize = (bytes) => {
-  if (!bytes) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-}
+
+  if (!bytes) {
+
+    return '0 B';
+
+  }
+
+
+  const sizes =
+    [
+      'B',
+      'KB',
+      'MB',
+      'GB'
+    ];
+
+
+  const i =
+    Math.floor(
+      Math.log(bytes) /
+      Math.log(1024)
+    );
+
+
+  return (
+    parseFloat(
+      (
+        bytes /
+        Math.pow(
+          1024,
+          i
+        )
+      ).toFixed(2)
+    ) +
+    ' ' +
+    sizes[i]
+  );
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| URL archivo
+|--------------------------------------------------------------------------
+*/
 
 const getFileUrl = (ruta) => {
-  if (!ruta) return '#'
-  return `/${ruta}`
-}
 
-// ==========================================
-// 🔥 NUEVA FUNCIÓN: getMainMedia
-// ==========================================
+  if (!ruta) {
+
+    return '#';
+
+  }
+
+
+  return ruta.startsWith('/')
+    ? ruta
+    : `/${ruta}`;
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Obtener PDF principal
+|--------------------------------------------------------------------------
+*/
+
+const getPdfFile = (comunicado) => {
+
+  if (
+    !comunicado?.archivos ||
+    comunicado.archivos.length === 0
+  ) {
+
+    return null;
+
+  }
+
+
+  return (
+    comunicado.archivos.find(
+      (archivo) =>
+        archivo.extension?.toLowerCase() === 'pdf' ||
+        archivo.tipo_mime === 'application/pdf'
+    ) ||
+    null
+  );
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Obtener media principal
+|--------------------------------------------------------------------------
+*/
+
 const getMainMedia = (comunicado) => {
-  // Si no tiene archivos, mostrar imagen por defecto
-  if (!comunicado.archivos || comunicado.archivos.length === 0) {
-    return { type: 'image', url: '/images/default-comunicado.jpg' }
+
+  if (
+    !comunicado?.archivos ||
+    comunicado.archivos.length === 0
+  ) {
+
+    return {
+      type: 'image',
+      url: '/images/default-comunicado.jpg'
+    };
+
   }
 
-  // Buscar el primer video
-  const video = comunicado.archivos.find(a => a.tipo_mime?.startsWith('video/'))
+
+  /*
+   * Primero video
+   */
+  const video =
+    comunicado.archivos.find(
+      (archivo) =>
+        archivo.tipo_mime?.startsWith(
+          'video/'
+        )
+    );
+
+
   if (video) {
-    return { type: 'video', url: getFileUrl(video.ruta_archivo) }
+
+    return {
+
+      type: 'video',
+
+      url:
+        getFileUrl(
+          video.ruta_archivo
+        )
+
+    };
+
   }
 
-  // Buscar la primera imagen
-  const img = comunicado.archivos.find(a => a.tipo_mime?.startsWith('image/'))
-  if (img) {
-    return { type: 'image', url: getFileUrl(img.ruta_archivo) }
+
+  /*
+   * Luego imagen
+   */
+  const imagen =
+    comunicado.archivos.find(
+      (archivo) =>
+        archivo.tipo_mime?.startsWith(
+          'image/'
+        )
+    );
+
+
+  if (imagen) {
+
+    return {
+
+      type: 'image',
+
+      url:
+        getFileUrl(
+          imagen.ruta_archivo
+        )
+
+    };
+
   }
 
-  // Si no hay ni imagen ni video, mostrar imagen por defecto
-  return { type: 'image', url: '/images/default-comunicado.jpg' }
-}
+
+  /*
+   * Si solamente hay PDF
+   */
+  return {
+
+    type: 'image',
+
+    url: '/images/default-comunicado.jpg'
+
+  };
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Icono archivo
+|--------------------------------------------------------------------------
+*/
+
+const getAttachmentIcon = (archivo) => {
+
+  const mime =
+    archivo?.tipo_mime || '';
+
+  const extension =
+    archivo?.extension
+      ?.toLowerCase() || '';
+
+
+  if (
+    mime.startsWith('video/') ||
+    [
+      'mp4',
+      'avi',
+      'mov',
+      'mkv',
+      'webm'
+    ].includes(extension)
+  ) {
+
+    return 'fas fa-video';
+
+  }
+
+
+  if (
+    mime.startsWith('image/') ||
+    [
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'webp'
+    ].includes(extension)
+  ) {
+
+    return 'fas fa-image';
+
+  }
+
+
+  if (
+    mime.includes('pdf') ||
+    extension === 'pdf'
+  ) {
+
+    return 'fas fa-file-pdf';
+
+  }
+
+
+  return 'fas fa-file';
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Abrir PDF
+|--------------------------------------------------------------------------
+*/
+
+const openPdf = (ruta) => {
+
+  const url =
+    getFileUrl(ruta);
+
+
+  if (url && url !== '#') {
+
+    window.open(
+      url,
+      '_blank',
+      'noopener,noreferrer'
+    );
+
+  }
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Contenido
+|--------------------------------------------------------------------------
+*/
+
+const formatContent = (contenido) => {
+
+  if (!contenido) {
+
+    return 'Sin contenido disponible.';
+
+  }
+
+
+  return String(contenido)
+    .replace(
+      /&/g,
+      '&amp;'
+    )
+    .replace(
+      /</g,
+      '&lt;'
+    )
+    .replace(
+      />/g,
+      '&gt;'
+    )
+    .replace(
+      /"/g,
+      '&quot;'
+    )
+    .replace(
+      /'/g,
+      '&#039;'
+    )
+    .replace(
+      /\n/g,
+      '<br>'
+    );
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Expandir
+|--------------------------------------------------------------------------
+*/
 
 const toggleExpand = (id) => {
-  expandedCommunications.value[id] = !expandedCommunications.value[id]
-}
+
+  expandedCommunications.value[id] =
+    !expandedCommunications.value[id];
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Paginación
+|--------------------------------------------------------------------------
+*/
 
 const goToPage = (page) => {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
-    const container = document.querySelector('.list-container')
+
+  if (
+    page >= 1 &&
+    page <= totalPages.value
+  ) {
+
+    currentPage.value =
+      page;
+
+
+    const container =
+      document.querySelector(
+        '.communications-list'
+      );
+
+
     if (container) {
-      container.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
+      container.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+
     }
+
   }
-}
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Limpiar filtros
+|--------------------------------------------------------------------------
+*/
 
 const resetFilters = () => {
-  searchQuery.value = ''
-  sortOrder.value = 'desc'
-  currentPage.value = 1
-}
 
-watch([searchQuery, sortOrder], () => {
-  currentPage.value = 1
-})
+  searchQuery.value = '';
 
-onMounted(async () => {
-  if (props.initialCommunications && props.initialCommunications.length > 0) {
-    store.noticias = props.initialCommunications
-  } else {
-    await store.fetchNoticias()
+  sortOrder.value = 'desc';
+
+  currentPage.value = 1;
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Recargar
+|--------------------------------------------------------------------------
+*/
+
+const cargarNuevamente = async () => {
+
+  try {
+
+    await store.fetchNoticias();
+
+  } catch (error) {
+
+    console.error(
+      'Error:',
+      error
+    );
+
   }
-})
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Error imagen
+|--------------------------------------------------------------------------
+*/
+
+const handleImageError = (event) => {
+
+  event.target.src =
+    '/images/default-comunicado.jpg';
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Reiniciar página
+|--------------------------------------------------------------------------
+*/
+
+watch(
+  [
+    searchQuery,
+    sortOrder
+  ],
+  () => {
+
+    currentPage.value = 1;
+
+  }
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Cargar datos
+|--------------------------------------------------------------------------
+*/
+
+onMounted(
+  async () => {
+
+    if (
+      props.initialCommunications &&
+      props.initialCommunications.length > 0
+    ) {
+
+      store.noticias =
+        props.initialCommunications;
+
+    } else {
+
+      await store.fetchNoticias();
+
+    }
+
+  }
+);
+
 </script>
 
+
 <style scoped>
-/* Estilos Globales */
+
 .official-communications {
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
   min-height: 100vh;
-  background-image: url('/images/fondo.png');
+
+  padding: 2rem;
+
+  background-image:
+    url('/images/fondo.png');
+
   background-size: cover;
+
   background-position: center;
+
   background-attachment: fixed;
+
   background-repeat: no-repeat;
 }
 
-/* Loading Spinner */
-.loading-state {
-  text-align: center;
-  padding: 4rem 2rem;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 1rem;
-}
-.spinner {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #cc0000;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 
-/* Header */
+/* =========================================================
+   HEADER
+========================================================= */
+
 .communications-header {
-  padding: 0.5rem;
-  margin-bottom: 2rem;
+  max-width: 1200px;
+
+  margin:
+    0 auto
+    2rem;
+
   text-align: center;
 }
-.header-content {
+
+
+.header-icon {
+  width: 62px;
+  height: 62px;
+
+  margin:
+    0 auto
+    1rem;
+
   display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.header-left { text-align: center; }
-.header-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: #cc0000;
-  margin: 0 0 0.5rem 0;
-  display: flex;
+
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-  line-height: 1.2;
-}
-.header-title .icon { font-size: 2rem; }
-.header-subtitle {
-  color: #1a202c;
-  font-size: 1.1rem;
-  margin: 0;
+
+  border-radius: 50%;
+
+  background: #cc0000;
+
+  color: #fff;
+
+  font-size: 1.5rem;
+
+  box-shadow:
+    0 8px 20px
+    rgba(204, 0, 0, 0.18);
 }
 
-/* Filtros */
-.filters-section {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border-radius: 1rem;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+.header-title {
+  margin: 0;
+
+  color: #cc0000;
+
+  font-size: 2.4rem;
+
+  font-weight: 800;
 }
+
+
+.header-subtitle {
+  margin:
+    0.7rem auto 0;
+
+  color: #555;
+
+  font-size: 1rem;
+}
+
+
+/* =========================================================
+   FILTROS
+========================================================= */
+
+.filters-section {
+  max-width: 1200px;
+
+  margin:
+    0 auto
+    2rem;
+
+  padding: 1rem 1.2rem;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.94
+    );
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 4px 18px
+    rgba(0, 0, 0, 0.08);
+}
+
+
 .filters-container {
   display: flex;
+
+  align-items: center;
+
   gap: 1rem;
+
   flex-wrap: wrap;
 }
+
+
 .search-wrapper {
-  flex: 1;
-  min-width: 200px;
   position: relative;
+
+  flex: 1;
+
+  min-width: 240px;
 }
+
+
 .search-icon {
   position: absolute;
-  left: 1rem;
+
+  left: 15px;
+
   top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.1rem;
+
+  transform:
+    translateY(-50%);
+
+  color: #999;
 }
+
+
 .search-input {
   width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.8rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  background: white;
-}
-.search-input:focus {
+
+  padding:
+    0.75rem
+    1rem
+    0.75rem
+    2.7rem;
+
+  border:
+    1px solid #ddd;
+
+  border-radius: 8px;
+
   outline: none;
-  border-color: #cc0000;
-  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
-}
-.filters-group {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-.filter-select {
-  padding: 0.75rem 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
-  font-size: 0.95rem;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 140px;
-}
-.filter-select:focus {
-  outline: none;
-  border-color: #cc0000;
-  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
 }
 
-/* Lista de Comunicados */
-.communications-list { margin-top: 2rem; }
+
+.search-input:focus {
+  border-color: #cc0000;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(204, 0, 0, 0.08);
+}
+
+
+.filter-select {
+  min-width: 170px;
+
+  padding: 0.75rem 1rem;
+
+  border:
+    1px solid #ddd;
+
+  border-radius: 8px;
+
+  background: #fff;
+
+  cursor: pointer;
+}
+
+
+.results-count {
+  min-width: 140px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 0.4rem;
+
+  color: #666;
+}
+
+
+.results-count strong {
+  color: #cc0000;
+
+  font-size: 1.2rem;
+}
+
+
+/* =========================================================
+   LISTA
+========================================================= */
+
+.communications-list {
+  max-width: 1200px;
+
+  margin: 0 auto;
+}
+
+
 .list-container {
   display: flex;
+
   flex-direction: column;
-  gap: 1.5rem;
+
+  gap: 1.4rem;
 }
+
+
+/* =========================================================
+   TARJETA
+========================================================= */
+
 .communication-card {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  border: 2px solid #e2e8f0;
   display: flex;
-  flex-direction: row;
-  min-height: 200px;
-}
-.communication-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-  border-left-color: #ef4444;
-}
 
-/* Imagen del comunicado */
-.card-image-wrapper {
-  flex: 0 0 280px;
-  position: relative;
+  min-height: 240px;
+
   overflow: hidden;
-  min-height: 200px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.96
+    );
+
+  border:
+    1px solid
+    #e5e7eb;
+
+  border-left:
+    4px solid
+    #e5e7eb;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 4px 15px
+    rgba(0, 0, 0, 0.07);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 }
 
-/* 🎬 VIDEO AUTOMÁTICO */
+
+.communication-card:hover {
+  transform:
+    translateY(-3px);
+
+  box-shadow:
+    0 10px 26px
+    rgba(0, 0, 0, 0.11);
+
+  border-left-color:
+    #cc0000;
+}
+
+
+/* =========================================================
+   MEDIA
+========================================================= */
+
+.card-image-wrapper {
+  flex:
+    0 0 300px;
+
+  min-height: 240px;
+
+  overflow: hidden;
+
+  background: #111;
+}
+
+
+.card-image,
 .card-video {
+  display: block;
+
   width: 100%;
+
   height: 100%;
+
+  min-height: 240px;
+
   object-fit: cover;
-  transition: transform 0.5s ease;
 }
 
-.communication-card:hover .card-video {
-  transform: scale(1.05);
+
+.card-video {
+  background: #000;
+
+  object-fit: contain;
 }
 
-.card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-.communication-card:hover .card-image { transform: scale(1.05); }
 
-/* Contenido */
+/* =========================================================
+   CONTENIDO
+========================================================= */
+
 .card-content {
   flex: 1;
-  padding: 1.5rem;
+
   display: flex;
+
   flex-direction: column;
+
+  padding: 1.4rem;
 }
+
+
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
+
+
 .card-title-group {
-  flex: 1;
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  gap: 0.6rem;
 }
+
+
+.category-badge {
+  padding:
+    0.3rem
+    0.7rem;
+
+  border-radius: 20px;
+
+  background:
+    #fbeaea;
+
+  color:
+    #cc0000;
+
+  font-size:
+    0.75rem;
+
+  font-weight:
+    700;
+}
+
+
 .card-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1e293b;
   margin: 0;
-  line-height: 1.3;
+
+  color: #1e293b;
+
+  font-size: 1.3rem;
+
+  font-weight: 800;
+
+  line-height: 1.4;
 }
+
+
+/* =========================================================
+   META
+========================================================= */
+
 .card-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-bottom: 0.75rem;
+  margin-bottom:
+    0.8rem;
 }
+
+
 .meta-item {
-  display: flex;
+  display: inline-flex;
+
   align-items: center;
+
   gap: 0.5rem;
+
   color: #64748b;
-  font-size: 0.875rem;
+
+  font-size: 0.88rem;
 }
-.meta-icon { font-size: 1rem; }
+
+
+.meta-icon {
+  color:
+    #cc0000;
+}
+
+
+/* =========================================================
+   RESUMEN
+========================================================= */
+
 .card-summary {
+  margin: 0;
+
   color: #475569;
-  line-height: 1.6;
-  margin: 0 0 1rem 0;
-  flex: 1;
+
+  line-height: 1.65;
+
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+
+  -webkit-line-clamp: 4;
+
   -webkit-box-orient: vertical;
+
   overflow: hidden;
 }
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
 .card-footer {
   display: flex;
-  justify-content: flex-start;
+
   align-items: center;
+
+  gap: 0.65rem;
+
   flex-wrap: wrap;
-  gap: 1rem;
+
+  margin-top: auto;
+
+  padding-top: 1rem;
 }
+
+
 .read-more-btn {
+  padding: 0;
+
+  border: none;
+
   background: none;
-  border: none;
+
   color: #cc0000;
-  font-weight: 600;
+
+  font-weight: 700;
+
   cursor: pointer;
-  padding: 0;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
 }
+
+
 .read-more-btn:hover {
-  color: #8B0000;
-  text-decoration: underline;
+  text-decoration:
+    underline;
 }
-.card-expanded {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 2px solid #f1f5f9;
-  animation: slideDown 0.3s ease;
+
+
+.btn-arrow {
+  margin-left:
+    0.2rem;
 }
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.expanded-content p {
-  color: #334155;
-  line-height: 1.8;
-  margin-bottom: 1rem;
-}
-.attachments {
-  margin-top: 1.5rem;
-}
-.attachments h4 {
-  color: #1e293b;
-  font-size: 1rem;
-  margin-bottom: 0.75rem;
-}
-.attachment-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.attachment-list li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f1f5f9;
-}
-.attachment-list li:last-child { border-bottom: none; }
-.attachment-link {
-  color: #3b82f6;
+
+
+.btn-pdf-outline,
+.btn-pdf {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.2rem;
+
+  padding:
+    0.45rem
+    0.75rem;
+
+  border-radius: 6px;
+
+  font-size: 0.82rem;
+
   text-decoration: none;
-  font-weight: 500;
-  transition: all 0.3s ease;
+
+  cursor: pointer;
 }
+
+
+.btn-pdf-outline {
+  border:
+    1px solid
+    #cc0000;
+
+  background:
+    white;
+
+  color:
+    #cc0000;
+}
+
+
+.btn-pdf-outline:hover {
+  background:
+    #fbeaea;
+}
+
+
+.btn-pdf {
+  border:
+    1px solid
+    #cc0000;
+
+  background:
+    #cc0000;
+
+  color:
+    white;
+}
+
+
+.btn-pdf:hover {
+  background:
+    #a30000;
+
+  color:
+    white;
+}
+
+
+/* =========================================================
+   EXPANDIDO
+========================================================= */
+
+.card-expanded {
+  margin-top:
+    1rem;
+
+  padding-top:
+    1rem;
+
+  border-top:
+    1px solid
+    #eee;
+
+  animation:
+    slideDown
+    0.25s ease;
+}
+
+
+@keyframes slideDown {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+
+}
+
+
+.contenido-texto {
+  margin: 0;
+
+  color: #334155;
+
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   ADJUNTOS
+========================================================= */
+
+.attachments {
+  margin-top:
+    1.4rem;
+
+  padding-top:
+    1rem;
+
+  border-top:
+    1px solid
+    #eee;
+}
+
+
+.attachments h4 {
+  margin:
+    0 0
+    0.7rem;
+
+  color:
+    #333;
+
+  font-size:
+    0.95rem;
+}
+
+
+.attachment-list {
+  margin: 0;
+
+  padding: 0;
+
+  list-style: none;
+}
+
+
+.attachment-list li {
+  padding:
+    0.45rem
+    0;
+
+  border-bottom:
+    1px solid
+    #f1f5f9;
+}
+
+
+.attachment-list li:last-child {
+  border-bottom: none;
+}
+
+
+.attachment-link {
+  color:
+    #cc0000;
+
+  font-size:
+    0.88rem;
+
+  font-weight:
+    600;
+
+  text-decoration:
+    none;
+}
+
+
 .attachment-link:hover {
-  color: #2563eb;
-  text-decoration: underline;
+  text-decoration:
+    underline;
 }
+
+
 .file-size {
-  color: #94a3b8;
-  font-size: 0.8rem;
-  margin-left: 0.5rem;
+  margin-left:
+    0.4rem;
+
+  color:
+    #94a3b8;
+
+  font-size:
+    0.78rem;
 }
 
-/* Estado vacío */
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+.loading-state,
+.error-state,
 .empty-state {
-  text-align: center;
-  padding: 4rem 2rem;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: 1rem;
+  max-width:
+    850px;
+
+  margin:
+    2rem auto;
+
+  padding:
+    4rem 2rem;
+
+  text-align:
+    center;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.92
+    );
+
+  border-radius:
+    14px;
+
+  box-shadow:
+    0 4px 15px
+    rgba(
+      0,
+      0,
+      0,
+      0.06
+    );
 }
-.empty-icon { font-size: 4rem; margin-bottom: 1rem; }
+
+
+.spinner {
+  width:
+    42px;
+
+  height:
+    42px;
+
+  margin:
+    0 auto 1rem;
+
+  border:
+    4px solid
+    #eee;
+
+  border-top-color:
+    #cc0000;
+
+  border-radius:
+    50%;
+
+  animation:
+    spin
+    1s linear infinite;
+}
+
+
+@keyframes spin {
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+
+}
+
+
+.error-icon,
+.empty-icon {
+  margin-bottom:
+    1rem;
+
+  color:
+    #aaa;
+
+  font-size:
+    3.5rem;
+}
+
+
+.error-state h3,
 .empty-title {
-  font-size: 1.5rem;
-  color: #1e293b;
-  margin: 0 0 0.5rem 0;
+  margin-bottom:
+    0.5rem;
+
+  color:
+    #444;
 }
+
+
+.error-state p,
 .empty-description {
-  color: #64748b;
-  margin-bottom: 1.5rem;
+  margin-bottom:
+    1.3rem;
+
+  color:
+    #777;
 }
+
+
 .btn-primary {
-  background: linear-gradient(135deg, #cc0000 0%, #8B0000 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  padding:
+    0.7rem
+    1.2rem;
+
+  border:
+    none;
+
+  border-radius:
+    7px;
+
+  background:
+    #cc0000;
+
+  color:
+    white;
+
+  font-weight:
+    600;
+
+  cursor:
+    pointer;
 }
+
+
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(204, 0, 0, 0.3);
+  background:
+    #a30000;
 }
 
-/* Paginación */
+
+/* =========================================================
+   PAGINACIÓN
+========================================================= */
+
 .pagination {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 2rem;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(10px);
-  padding: 1rem 1.5rem;
-  border-radius: 1rem;
-  align-items: center;
-}
-.pagination-info {
-  width: 100%;
-  text-align: center;
-}
-.info-text {
-  color: #4a5568;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.page-btn {
-  padding: 0.5rem 0.75rem;
-  border: 2px solid #e2e8f0;
-  background: white;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  min-width: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.page-btn:hover:not(:disabled) {
-  background: #cc0000;
-  color: white;
-  border-color: #cc0000;
-  transform: translateY(-2px);
-}
-.page-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-}
-.page-numbers {
-  display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.page-num {
-  padding: 0.5rem 0.75rem;
-  border: 2px solid transparent;
-  background: transparent;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  min-width: 36px;
-  text-align: center;
-}
-.page-num:hover:not(.active):not(.dots) {
-  background: #f7fafc;
-  border-color: #e2e8f0;
-}
-.page-num.active {
-  background: #cc0000;
-  color: white;
-  border-color: #cc0000;
-  box-shadow: 0 2px 8px rgba(204, 0, 0, 0.3);
-}
-.page-num.dots {
-  cursor: default;
-  color: #a0aec0;
-  background: transparent;
-}
-.page-num.dots:hover {
-  background: transparent;
-  border-color: transparent;
+  max-width:
+    1200px;
+
+  margin:
+    2rem auto 0;
+
+  padding:
+    1rem;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.8
+    );
+
+  border-radius:
+    12px;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  gap:
+    0.8rem;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  .communication-card { flex-direction: column; }
-  .card-image-wrapper {
-    flex: 0 0 200px;
-    width: 100%;
-  }
-  .card-video {
-    width: 100%;
-    height: 200px;
-  }
-  .card-image {
-    width: 100%;
-    height: 200px;
-  }
+
+.info-text {
+  color:
+    #666;
+
+  font-size:
+    0.88rem;
 }
+
+
+.pagination-controls {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    0.3rem;
+
+  flex-wrap:
+    wrap;
+
+  justify-content:
+    center;
+}
+
+
+.page-numbers {
+  display:
+    flex;
+
+  gap:
+    0.2rem;
+}
+
+
+.page-btn,
+.page-num {
+  min-width:
+    36px;
+
+  height:
+    36px;
+
+  border:
+    1px solid
+    #ddd;
+
+  border-radius:
+    6px;
+
+  background:
+    white;
+
+  cursor:
+    pointer;
+
+  font-weight:
+    600;
+}
+
+
+.page-btn:hover:not(:disabled),
+.page-num:hover:not(:disabled) {
+  border-color:
+    #cc0000;
+
+  color:
+    #cc0000;
+}
+
+
+.page-num.active {
+  border-color:
+    #cc0000;
+
+  background:
+    #cc0000;
+
+  color:
+    white;
+}
+
+
+.page-btn:disabled,
+.page-num:disabled {
+  opacity:
+    0.4;
+
+  cursor:
+    not-allowed;
+}
+
+
+.page-num.dots {
+  cursor:
+    default;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .communication-card {
+    flex-direction:
+      column;
+  }
+
+
+  .card-image-wrapper {
+    flex:
+      0 0 220px;
+
+    width:
+      100%;
+
+    min-height:
+      220px;
+  }
+
+
+  .card-image,
+  .card-video {
+    min-height:
+      220px;
+  }
+
+}
+
 
 @media (max-width: 768px) {
-  .official-communications { padding: 1rem; }
-  .header-title { font-size: 1.8rem; }
-  .header-subtitle { font-size: 0.95rem; }
-  .filters-container { flex-direction: column; }
-  .filters-group { flex-direction: column; }
-  .filter-select { width: 100%; }
-  .card-image-wrapper { flex: 0 0 180px; }
-  .card-video { height: 180px; }
-  .card-image { height: 180px; }
-  .card-title { font-size: 1.1rem; }
-  .pagination { padding: 0.75rem; }
-  .pagination-controls { gap: 0.3rem; }
-  .page-btn {
-    padding: 0.35rem 0.5rem;
-    min-width: 32px;
-    font-size: 0.85rem;
+
+  .official-communications {
+    padding:
+      1rem;
   }
-  .page-num {
-    padding: 0.35rem 0.5rem;
-    min-width: 32px;
-    font-size: 0.85rem;
+
+
+  .header-title {
+    font-size:
+      1.9rem;
   }
+
+
+  .filters-container {
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+  }
+
+
+  .search-wrapper,
+  .filter-select,
+  .results-count {
+    width:
+      100%;
+  }
+
+
+  .results-count {
+    justify-content:
+      flex-start;
+  }
+
+
+  .card-image-wrapper {
+    min-height:
+      180px;
+  }
+
+
+  .card-image,
+  .card-video {
+    min-height:
+      180px;
+  }
+
+
+  .card-title {
+    font-size:
+      1.1rem;
+  }
+
 }
 
-@media (max-width: 480px) {
-  .header-title { font-size: 1.5rem; }
-  .card-image-wrapper { flex: 0 0 150px; }
-  .card-video { height: 150px; }
-  .card-image { height: 150px; }
-  .card-title { font-size: 1rem; }
-  .card-meta { flex-direction: column; gap: 0.5rem; }
-  .pagination-info .info-text { font-size: 0.8rem; }
-}
 </style>

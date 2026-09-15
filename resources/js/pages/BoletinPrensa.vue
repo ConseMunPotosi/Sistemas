@@ -1,914 +1,1795 @@
 <template>
   <div class="press-release-board">
-    <!-- Header -->
+
+    <!-- =====================================================
+         ENCABEZADO
+    ====================================================== -->
     <div class="press-header">
-      <h2 class="press-title">📰 Boletines de Prensa</h2>
+      <div>
+        <div class="press-icon">
+          <i class="fas fa-newspaper"></i>
+        </div>
+
+        <h2 class="press-title">
+          Boletines de Prensa
+        </h2>
+
+        <p class="press-subtitle">
+          Información oficial y comunicados de interés del Concejo Municipal
+          de Potosí.
+        </p>
+      </div>
     </div>
 
-    <!-- Lista de Boletines -->
-    <div v-if="filteredReleases.length > 0" class="press-list">
-      <div
+
+    <!-- =====================================================
+         FILTROS
+    ====================================================== -->
+    <div
+      v-if="!loading && releases.length > 0"
+      class="press-filters"
+    >
+
+      <div class="search-box">
+
+        <i class="fas fa-search"></i>
+
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Buscar boletín..."
+        >
+
+      </div>
+
+
+      <div class="filter-box">
+
+        <select v-model="sortOrder">
+
+          <option value="desc">
+            Más recientes
+          </option>
+
+          <option value="asc">
+            Más antiguos
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="results-count">
+
+        <strong>
+          {{ filteredReleases.length }}
+        </strong>
+
+        <span>
+          {{ filteredReleases.length === 1
+            ? 'boletín'
+            : 'boletines'
+          }}
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CARGANDO
+    ====================================================== -->
+    <div
+      v-if="loading"
+      class="state-container"
+    >
+
+      <div class="spinner-border text-danger"></div>
+
+      <p>
+        Cargando boletines...
+      </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         ERROR
+    ====================================================== -->
+    <div
+      v-else-if="error"
+      class="alert alert-danger"
+    >
+
+      <i class="fas fa-exclamation-triangle me-2"></i>
+
+      {{ error }}
+
+    </div>
+
+
+    <!-- =====================================================
+         SIN BOLETINES
+    ====================================================== -->
+    <div
+      v-else-if="filteredReleases.length === 0"
+      class="empty-state"
+    >
+
+      <div class="empty-icon">
+        <i class="fas fa-newspaper"></i>
+      </div>
+
+      <h3>
+        No se encontraron boletines
+      </h3>
+
+      <p>
+        Actualmente no existen boletines de prensa disponibles.
+      </p>
+
+      <button
+        v-if="searchQuery"
+        class="btn btn-outline-danger"
+        @click="searchQuery = ''"
+      >
+        Limpiar búsqueda
+      </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         LISTADO
+    ====================================================== -->
+    <div
+      v-else
+      class="press-list"
+    >
+
+      <article
         v-for="release in paginatedReleases"
         :key="release.id"
         class="press-release-item"
-        :class="{ featured: release.featured }"
       >
+
         <div class="release-main">
-          <!-- Miniatura del PDF -->
+
+
+          <!-- =================================================
+               PDF
+          ================================================== -->
           <div class="release-thumbnail">
-            <div v-if="release.pdfUrl" class="pdf-thumbnail" @click="openPdf(release.pdfUrl)">
+
+            <div
+              v-if="release.pdfUrl"
+              class="pdf-thumbnail"
+              @click="openPdf(release.pdfUrl)"
+            >
+
               <div class="pdf-icon-wrapper">
-                <svg class="pdf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
-                  <path d="M14 2v6h6" />
-                  <path d="M12 18v-4" />
-                  <path d="M12 10v.01" />
+
+                <svg
+                  class="pdf-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
+                  />
+
+                  <path
+                    d="M14 2v6h6"
+                  />
+
+                  <path
+                    d="M12 18v-4"
+                  />
+
+                  <path
+                    d="M12 10v.01"
+                  />
+
                 </svg>
-                <span class="pdf-badge">PDF</span>
+
+                <span class="pdf-badge">
+                  PDF
+                </span>
+
               </div>
+
+
               <div class="pdf-info">
-                <span class="pdf-name">{{ getPdfName(release.pdfUrl) }}</span>
-                <span class="pdf-size">{{ getPdfSize(release.pdfSize) }}</span>
+
+                <span class="pdf-name">
+                  {{ getPdfName(release.pdfUrl) }}
+                </span>
+
+                <span class="pdf-size">
+                  {{ getPdfSize(release.pdfSize) }}
+                </span>
+
               </div>
-              <button class="pdf-download-btn" @click.stop="downloadPdf(release.pdfUrl, release.title)">
-                <svg class="download-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
+
+
+              <button
+                class="pdf-download-btn"
+                @click.stop="downloadPdf(
+                  release.pdfUrl,
+                  release.title
+                )"
+                title="Descargar PDF"
+              >
+
+                <i class="fas fa-download"></i>
+
               </button>
+
             </div>
-            <div v-else class="no-pdf">
-              <span class="no-pdf-icon">📄</span>
-              <span class="no-pdf-text">Sin PDF</span>
+
+
+            <div
+              v-else
+              class="no-pdf"
+            >
+
+              <span class="no-pdf-icon">
+                <i class="fas fa-file-alt"></i>
+              </span>
+
+              <span class="no-pdf-text">
+                Sin PDF
+              </span>
+
             </div>
+
           </div>
 
-          <!-- Información del boletín -->
+
+          <!-- =================================================
+               INFORMACIÓN
+          ================================================== -->
           <div class="release-info">
+
             <div class="release-header">
+
               <div class="release-title-section">
-                <h3 class="release-title">{{ release.title }}</h3>
+
+                <span class="category-badge">
+                  Boletín de Prensa
+                </span>
+
+                <h3 class="release-title">
+                  {{ release.title }}
+                </h3>
+
               </div>
+
             </div>
 
+
+            <!-- FECHA -->
             <div class="release-meta">
+
               <span class="meta-item">
-                <span class="meta-icon">📅</span>
+
+                <i class="fas fa-calendar-alt"></i>
+
                 {{ formatDate(release.publishDate) }}
+
               </span>
+
             </div>
 
-            <p class="release-summary">{{ release.summary }}</p>
 
+            <!-- RESUMEN -->
+            <p class="release-summary">
+              {{ release.summary }}
+            </p>
+
+
+            <!-- LEER MÁS -->
             <button
               class="read-more-btn"
               @click="toggleExpand(release.id)"
             >
-              {{ expandedReleases[release.id] ? 'Leer menos' : 'Leer más' }}
-              <span class="btn-arrow">→</span>
+
+              {{
+                expandedReleases[release.id]
+                  ? 'Leer menos'
+                  : 'Leer más'
+              }}
+
+              <span class="btn-arrow">
+                →
+              </span>
+
             </button>
 
-            <div v-if="expandedReleases[release.id]" class="release-content">
-              <p>{{ release.content }}</p>
+
+            <!-- CONTENIDO -->
+            <div
+              v-if="expandedReleases[release.id]"
+              class="release-content"
+            >
+
+              <p>
+                {{ release.content }}
+              </p>
+
             </div>
+
+
+            <!-- ACCIONES -->
+            <div class="release-actions">
+
+              <button
+                v-if="release.pdfUrl"
+                class="btn btn-outline-danger btn-sm"
+                @click="openPdf(release.pdfUrl)"
+              >
+
+                <i class="fas fa-eye me-2"></i>
+
+                Ver PDF
+
+              </button>
+
+
+              <button
+                v-if="release.pdfUrl"
+                class="btn btn-danger btn-sm"
+                @click="downloadPdf(
+                  release.pdfUrl,
+                  release.title
+                )"
+              >
+
+                <i class="fas fa-download me-2"></i>
+
+                Descargar
+
+              </button>
+
+            </div>
+
           </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Paginación -->
-    <div v-if="totalPages > 1" class="pagination">
-      <div class="pagination-info">
-        <span class="info-text">
-          Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} -
-          {{ Math.min(currentPage * itemsPerPage, filteredReleases.length) }}
-          de {{ filteredReleases.length }} boletines
-        </span>
-      </div>
-
-      <div class="pagination-controls">
-        <!-- Primera página -->
-        <button
-          class="page-btn"
-          :disabled="currentPage === 1"
-          @click="goToPage(1)"
-          title="Primera página"
-        >
-          ⟪
-        </button>
-
-        <!-- Anterior -->
-        <button
-          class="page-btn"
-          :disabled="currentPage === 1"
-          @click="currentPage--"
-          title="Página anterior"
-        >
-          ←
-        </button>
-
-        <!-- Números de página -->
-        <div class="page-numbers">
-          <button
-            v-for="page in pageNumbers"
-            :key="page"
-            class="page-num"
-            :class="{
-              active: page === currentPage,
-              dots: page === '...'
-            }"
-            :disabled="page === '...'"
-            @click="page !== '...' && (currentPage = page)"
-          >
-            {{ page }}
-          </button>
         </div>
 
-        <!-- Siguiente -->
-        <button
-          class="page-btn"
-          :disabled="currentPage === totalPages"
-          @click="currentPage++"
-          title="Página siguiente"
-        >
-          →
-        </button>
+      </article>
 
-        <!-- Última página -->
-        <button
-          class="page-btn"
-          :disabled="currentPage === totalPages"
-          @click="goToPage(totalPages)"
-          title="Última página"
-        >
-          ⟫
-        </button>
-      </div>
     </div>
+
+
+    <!-- =====================================================
+         PAGINACIÓN
+    ====================================================== -->
+    <div
+      v-if="totalPages > 1"
+      class="pagination"
+    >
+
+      <button
+        class="page-btn"
+        :disabled="currentPage === 1"
+        @click="goToPage(1)"
+      >
+        «
+      </button>
+
+
+      <button
+        class="page-btn"
+        :disabled="currentPage === 1"
+        @click="goToPage(currentPage - 1)"
+      >
+        ‹
+      </button>
+
+
+      <button
+        v-for="page in pageNumbers"
+        :key="page"
+        class="page-num"
+        :class="{
+          active: page === currentPage,
+          dots: page === '...'
+        }"
+        :disabled="page === '...'"
+        @click="page !== '...' && goToPage(page)"
+      >
+        {{ page }}
+      </button>
+
+
+      <button
+        class="page-btn"
+        :disabled="currentPage === totalPages"
+        @click="goToPage(currentPage + 1)"
+      >
+        ›
+      </button>
+
+
+      <button
+        class="page-btn"
+        :disabled="currentPage === totalPages"
+        @click="goToPage(totalPages)"
+      >
+        »
+      </button>
+
+    </div>
+
   </div>
 </template>
 
+
 <script setup>
-import { ref, computed, onMounted } from 'vue'
 
-// Props
-const props = defineProps({
-  initialReleases: {
-    type: Array,
-    default: () => []
+import {
+  ref,
+  computed,
+  onMounted,
+  watch
+} from 'vue';
+
+import axios from 'axios';
+
+
+/*
+|--------------------------------------------------------------------------
+| Estado
+|--------------------------------------------------------------------------
+*/
+
+const releases = ref([]);
+
+const loading = ref(false);
+
+const error = ref('');
+
+const searchQuery = ref('');
+
+const sortOrder = ref('desc');
+
+const currentPage = ref(1);
+
+const itemsPerPage = 5;
+
+const expandedReleases = ref({});
+
+
+/*
+|--------------------------------------------------------------------------
+| Cargar noticias desde API
+|--------------------------------------------------------------------------
+*/
+
+const loadReleases = async () => {
+
+  loading.value = true;
+
+  error.value = '';
+
+  try {
+
+    const response = await axios.get(
+      '/api/noticias'
+    );
+
+
+    const noticias = response.data.data || [];
+
+
+    /*
+     * Categoría de Boletines de Prensa:
+     * id_categoria = 2
+     */
+    releases.value = noticias
+
+      .filter((noticia) => {
+
+        const categoriaId =
+          noticia.categoria?.id_categoria;
+
+        const publicadoWeb =
+          noticia.publicado_web !== false;
+
+        const estado =
+          noticia.estado !== false;
+
+
+        return (
+          Number(categoriaId) === 2 &&
+          publicadoWeb &&
+          estado
+        );
+
+      })
+
+
+      .map((noticia) => {
+
+        /*
+         * Buscar el primer archivo disponible.
+         */
+        const archivo =
+          noticia.archivos?.find(
+            (item) =>
+              item.estado === undefined ||
+              item.estado === true
+          ) ||
+          noticia.archivos?.[0] ||
+          null;
+
+
+        return {
+
+          id: noticia.id_noticia,
+
+          title:
+            noticia.titulo ||
+            'Sin título',
+
+          summary:
+            noticia.resumen ||
+            'Sin resumen disponible.',
+
+          content:
+            noticia.contenido ||
+            'Sin contenido disponible.',
+
+          publishDate:
+            noticia.fecha_publicacion ||
+            noticia.fecha_creacion,
+
+          pdfUrl:
+            archivo?.ruta_archivo
+              ? getFileUrl(archivo.ruta_archivo)
+              : null,
+
+          pdfSize:
+            archivo?.peso_bytes ||
+            null
+
+        };
+
+      });
+
+
+    currentPage.value = 1;
+
+  } catch (err) {
+
+    console.error(
+      'Error al cargar boletines:',
+      err
+    );
+
+    error.value =
+      'No se pudieron cargar los boletines de prensa.';
+
+  } finally {
+
+    loading.value = false;
+
   }
-})
 
-// State
-const releases = ref([])
-const searchQuery = ref('')
-const selectedCategory = ref('')
-const sortOrder = ref('desc')
-const currentPage = ref(1)
-const itemsPerPage = 5
-const expandedReleases = ref({})
+};
 
-// Computed
-const categories = computed(() => {
-  const cats = new Set()
-  releases.value.forEach(r => cats.add(r.category))
-  return Array.from(cats)
-})
+
+/*
+|--------------------------------------------------------------------------
+| Filtro y orden
+|--------------------------------------------------------------------------
+*/
 
 const filteredReleases = computed(() => {
-  let filtered = [...releases.value]
 
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(release =>
-      release.title.toLowerCase().includes(query) ||
-      release.summary.toLowerCase().includes(query) ||
-      release.content.toLowerCase().includes(query)
-    )
+  let filtered = [
+    ...releases.value
+  ];
+
+
+  if (searchQuery.value.trim()) {
+
+    const query =
+      searchQuery.value
+        .trim()
+        .toLowerCase();
+
+
+    filtered = filtered.filter(
+      (release) =>
+
+        release.title
+          .toLowerCase()
+          .includes(query)
+
+        ||
+
+        release.summary
+          .toLowerCase()
+          .includes(query)
+
+        ||
+
+        release.content
+          .toLowerCase()
+          .includes(query)
+    );
+
   }
 
-  if (selectedCategory.value) {
-    filtered = filtered.filter(release =>
-      release.category === selectedCategory.value
-    )
-  }
 
   filtered.sort((a, b) => {
-    const dateA = new Date(a.publishDate)
-    const dateB = new Date(b.publishDate)
-    return sortOrder.value === 'desc' ? dateB - dateA : dateA - dateB
-  })
 
-  return filtered
-})
+    const dateA =
+      new Date(a.publishDate);
+
+    const dateB =
+      new Date(b.publishDate);
+
+
+    return sortOrder.value === 'desc'
+      ? dateB - dateA
+      : dateA - dateB;
+
+  });
+
+
+  return filtered;
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Paginación
+|--------------------------------------------------------------------------
+*/
 
 const totalPages = computed(() => {
-  return Math.ceil(filteredReleases.value.length / itemsPerPage)
-})
+
+  return Math.ceil(
+    filteredReleases.value.length /
+    itemsPerPage
+  );
+
+});
+
 
 const paginatedReleases = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  const end = start + itemsPerPage
-  return filteredReleases.value.slice(start, end)
-})
+
+  const start =
+    (currentPage.value - 1) *
+    itemsPerPage;
+
+  const end =
+    start + itemsPerPage;
+
+
+  return filteredReleases.value.slice(
+    start,
+    end
+  );
+
+});
+
 
 const pageNumbers = computed(() => {
-  const pages = []
-  const total = totalPages.value
-  const current = currentPage.value
+
+  const pages = [];
+
+  const total = totalPages.value;
+
+  const current = currentPage.value;
+
 
   if (total <= 5) {
-    for (let i = 1; i <= total; i++) pages.push(i)
-  } else {
-    if (current <= 3) {
-      pages.push(1, 2, 3, '...', total)
-    } else if (current >= total - 2) {
-      pages.push(1, '...', total - 2, total - 1, total)
-    } else {
-      pages.push(1, '...', current - 1, current, current + 1, '...', total)
+
+    for (
+      let i = 1;
+      i <= total;
+      i++
+    ) {
+
+      pages.push(i);
+
     }
+
+  } else {
+
+    if (current <= 3) {
+
+      pages.push(
+        1,
+        2,
+        3,
+        '...',
+        total
+      );
+
+    } else if (current >= total - 2) {
+
+      pages.push(
+        1,
+        '...',
+        total - 2,
+        total - 1,
+        total
+      );
+
+    } else {
+
+      pages.push(
+        1,
+        '...',
+        current - 1,
+        current,
+        current + 1,
+        '...',
+        total
+      );
+
+    }
+
   }
-  return pages
-})
 
-// Methods
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
 
-const toggleExpand = (id) => {
-  expandedReleases.value[id] = !expandedReleases.value[id]
-}
+  return pages;
 
-const getPdfName = (url) => {
-  if (!url) return 'Documento'
-  const parts = url.split('/')
-  const filename = parts[parts.length - 1]
-  return filename.length > 20 ? filename.substring(0, 20) + '...' : filename
-}
+});
 
-const getPdfSize = (size) => {
-  if (!size) return 'Tamaño desconocido'
-  const bytes = parseInt(size)
-  if (bytes < 1024) return bytes + ' B'
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
-  if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
-  return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB'
-}
-
-const openPdf = (url) => {
-  if (url) {
-    window.open(url, '_blank')
-  }
-}
-
-const downloadPdf = (url, title) => {
-  if (url) {
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `${title || 'boletin'}.pdf`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
-}
 
 const goToPage = (page) => {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
-    const container = document.querySelector('.press-list')
+
+  if (
+    page >= 1 &&
+    page <= totalPages.value
+  ) {
+
+    currentPage.value = page;
+
+    const container =
+      document.querySelector(
+        '.press-list'
+      );
+
+
     if (container) {
-      container.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
+      container.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+
     }
+
   }
-}
 
-const resetFilters = () => {
-  searchQuery.value = ''
-  selectedCategory.value = ''
-  sortOrder.value = 'desc'
-  currentPage.value = 1
-}
+};
 
-// Datos de ejemplo - 8 boletines de prensa
-const loadReleases = () => {
-  releases.value = [
+
+/*
+|--------------------------------------------------------------------------
+| Reiniciar página cuando cambia búsqueda
+|--------------------------------------------------------------------------
+*/
+
+watch(
+  searchQuery,
+  () => {
+
+    currentPage.value = 1;
+
+  }
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Expandir contenido
+|--------------------------------------------------------------------------
+*/
+
+const toggleExpand = (id) => {
+
+  expandedReleases.value[id] =
+    !expandedReleases.value[id];
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Formato de fecha
+|--------------------------------------------------------------------------
+*/
+
+const formatDate = (dateString) => {
+
+  if (!dateString) {
+
+    return 'Fecha no disponible';
+
+  }
+
+
+  const date =
+    new Date(dateString);
+
+
+  if (Number.isNaN(date.getTime())) {
+
+    return dateString;
+
+  }
+
+
+  return date.toLocaleDateString(
+    'es-ES',
     {
-      id: '1',
-      title: 'Concejo Municipal Aprueba Presupuesto 2025 para Obras de Infraestructura',
-      summary: 'En sesión ordinaria, el Concejo Municipal aprobó el presupuesto anual para la gestión 2025, destinando más de Bs. 250 millones para proyectos de infraestructura y desarrollo urbano.',
-      content: 'En una sesión histórica, el Concejo Municipal de Potosí aprobó por mayoría absoluta el presupuesto general para la gestión 2025. El monto total asciende a Bs. 452.5 millones, de los cuales el 60% será destinado a proyectos de infraestructura vial, saneamiento básico y equipamiento urbano. Los concejales destacaron la importancia de esta inversión para el desarrollo sostenible del municipio, priorizando las zonas periféricas que históricamente han tenido menos acceso a servicios básicos. El presupuesto también incluye partidas específicas para la mejora de espacios públicos, parques y plazas, así como para la implementación de un sistema de transporte público eficiente.',
-      publishDate: '2025-01-20',
-      pdfUrl: '/pdfs/presupuesto-2025.pdf',
-      pdfSize: '2800000'
-    },
-    {
-      id: '2',
-      title: 'Lanzamiento del Programa de Emprendimiento Juvenil "Potosí Emprende 2025"',
-      summary: 'El Concejo Municipal en alianza con la Cámara de Comercio lanza el programa "Potosí Emprende 2025" para apoyar a jóvenes emprendedores con financiamiento y asesoría técnica.',
-      content: 'El programa "Potosí Emprende 2025" busca impulsar el talento emprendedor de los jóvenes potosinos de 18 a 35 años. Los participantes recibirán capacitación en gestión empresarial, marketing digital y finanzas. Además, los 20 mejores proyectos recibirán un capital semilla de hasta Bs. 15.000 y acompañamiento técnico durante los primeros 6 meses de operación. Las inscripciones estarán abiertas desde el 1 de febrero hasta el 15 de marzo de 2025. Los interesados podrán postular sus proyectos a través de la plataforma digital del Concejo Municipal.',
-      publishDate: '2025-01-18',
-      pdfUrl: '/pdfs/potosi-emprende-2025.pdf',
-      pdfSize: '1800000'
-    },
-    {
-      id: '3',
-      title: 'Concejo Municipal Declara Patrimonio Cultural la Festividad del Tinku',
-      summary: 'El pleno del Concejo Municipal aprobó por unanimidad declarar Patrimonio Cultural Inmaterial del municipio la tradicional Festividad del Tinku, que se celebra cada año en el mes de mayo.',
-      content: 'La Festividad del Tinku, una de las manifestaciones culturales más importantes de la región, ha sido reconocida oficialmente como Patrimonio Cultural Inmaterial del Municipio de Potosí. Esta declaración permitirá destinar recursos municipales para la preservación y promoción de esta tradición ancestral que combina danza, música y rituales andinos. El concejal presidente de la Comisión de Cultura destacó que esta medida contribuirá a fortalecer la identidad cultural potosina y atraerá turismo durante la celebración. Se prevé la realización de talleres, exposiciones y eventos especiales para difundir el significado histórico y cultural del Tinku.',
-      publishDate: '2025-01-15',
-      pdfUrl: '/pdfs/tinku-patrimonio-cultural.pdf',
-      pdfSize: '2200000'
-    },
-    {
-      id: '4',
-      title: 'Plan de Movilidad Urbana para el Centro Histórico de Potosí',
-      summary: 'El Concejo Municipal presenta el nuevo Plan de Movilidad Urbana que transformará el centro histórico con calles peatonales y ciclovías.',
-      content: 'El Plan de Movilidad Urbana para el Centro Histórico contempla la peatonalización de las principales calles del casco antiguo, la implementación de ciclovías y la mejora del transporte público. El proyecto, que se ejecutará en tres fases durante 2025 y 2026, incluye la instalación de señalética turística, mobiliario urbano y áreas de descanso. La inversión total asciende a Bs. 35 millones y se espera que beneficie a más de 50.000 personas que diariamente transitan por esta zona. El plan también considera la accesibilidad universal con rampas y señalización para personas con discapacidad.',
-      publishDate: '2025-01-12',
-      pdfUrl: '/pdfs/plan-movilidad-urbana.pdf',
-      pdfSize: '3200000'
-    },
-    {
-      id: '5',
-      title: 'Resultados de la Encuesta de Satisfacción Ciudadana 2024',
-      summary: 'El Concejo Municipal presenta los resultados de la Encuesta de Satisfacción Ciudadana 2024, que muestra un 78% de aprobación en la gestión municipal.',
-      content: 'La Encuesta de Satisfacción Ciudadana 2024, realizada a más de 5.000 ciudadanos de los diferentes distritos, reveló que el 78% de los encuestados aprueba la gestión municipal. Los aspectos mejor valorados fueron la transparencia en la gestión de recursos (85%), la ejecución de obras públicas (82%) y la atención a las demandas vecinales (76%). Las áreas de oportunidad identificadas incluyen la mejora del alumbrado público, la recolección de residuos y el mantenimiento de áreas verdes. El Concejo Municipal se comprometió a implementar acciones correctivas en estos aspectos durante el primer semestre de 2025.',
-      publishDate: '2025-01-10',
-      pdfUrl: '/pdfs/encuesta-satisfaccion-2024.pdf',
-      pdfSize: '1500000'
-    },
-    {
-      id: '6',
-      title: 'Concejo Municipal Conforma Comisión de Seguimiento al Proyecto del Tren Metropolitano',
-      summary: 'El Concejo Municipal ha conformado una comisión especial de seguimiento al proyecto del Tren Metropolitano, que conectará Potosí con las ciudades vecinas.',
-      content: 'La comisión especial estará integrada por 5 concejales y tendrá como función principal dar seguimiento al avance del proyecto del Tren Metropolitano, una iniciativa que busca conectar Potosí con las ciudades de Sucre, Oruro y Cochabamba. El proyecto, que contará con financiamiento del Banco Interamericano de Desarrollo (BID), prevé la construcción de 120 kilómetros de vía férrea y 5 estaciones intermedias. La comisión realizará reuniones mensuales con el Órgano Ejecutivo para evaluar los avances y garantizar la transparencia en la ejecución de este megaproyecto que transformará la región.',
-      publishDate: '2025-01-08',
-      pdfUrl: '/pdfs/tren-metropolitano-comision.pdf',
-      pdfSize: '1900000'
-    },
-    {
-      id: '7',
-      title: 'Campaña de Reforestación Urbana "Potosí Verde 2025"',
-      summary: 'El Concejo Municipal lanza la campaña de reforestación urbana "Potosí Verde 2025" con la meta de plantar 10.000 árboles en toda la ciudad.',
-      content: 'La campaña "Potosí Verde 2025" tiene como objetivo plantar 10.000 árboles nativos en diferentes zonas de la ciudad, con especial énfasis en áreas periurbanas y márgenes de ríos. La iniciativa, que cuenta con el apoyo de la Gobernación y organizaciones ambientales, se desarrollará durante los meses de febrero a abril. Los vecinos podrán participar solicitando árboles para sus barrios a través de las juntas vecinales. La campaña también contempla talleres de educación ambiental en escuelas y colegios para sensibilizar a los niños y jóvenes sobre la importancia de conservar el medio ambiente.',
-      publishDate: '2025-01-06',
-      pdfUrl: '/pdfs/potosi-verde-2025.pdf',
-      pdfSize: '1600000'
-    },
-    {
-      id: '8',
-      title: 'Acuerdo de Cooperación con la Universidad Autónoma Tomás Frías',
-      summary: 'El Concejo Municipal y la Universidad Autónoma Tomás Frías firman un acuerdo de cooperación para el desarrollo de proyectos de investigación y extensión universitaria.',
-      content: 'El acuerdo marco de cooperación entre el Concejo Municipal y la Universidad Autónoma Tomás Frías establece bases para la colaboración en áreas como investigación aplicada, pasantías estudiantiles, y proyectos de desarrollo comunitario. La alianza busca fortalecer el vínculo entre el gobierno municipal y la academia, generando espacios de diálogo y trabajo conjunto para abordar problemáticas urbanas desde un enfoque científico y técnico. En una primera fase, se implementarán proyectos piloto en los distritos 10 y 15, enfocados en temas de gestión de residuos sólidos y planificación urbana participativa.',
-      publishDate: '2025-01-03',
-      pdfUrl: '/pdfs/acuerdo-uatf-municipio.pdf',
-      pdfSize: '2100000'
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     }
-  ]
-}
+  );
 
-// Lifecycle
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Nombre del PDF
+|--------------------------------------------------------------------------
+*/
+
+const getPdfName = (url) => {
+
+  if (!url) {
+    return 'Documento';
+  }
+
+
+  const parts =
+    url.split('/');
+
+
+  const filename =
+    parts[parts.length - 1];
+
+
+  return filename.length > 28
+    ? filename.substring(0, 28) + '...'
+    : filename;
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Tamaño del PDF
+|--------------------------------------------------------------------------
+*/
+
+const getPdfSize = (size) => {
+
+  if (!size) {
+    return 'Tamaño desconocido';
+  }
+
+
+  const bytes =
+    parseInt(size);
+
+
+  if (Number.isNaN(bytes)) {
+
+    return 'Tamaño desconocido';
+
+  }
+
+
+  if (bytes < 1024) {
+
+    return `${bytes} B`;
+
+  }
+
+
+  if (bytes < 1024 * 1024) {
+
+    return `${(
+      bytes / 1024
+    ).toFixed(1)} KB`;
+
+  }
+
+
+  if (
+    bytes <
+    1024 * 1024 * 1024
+  ) {
+
+    return `${(
+      bytes /
+      (1024 * 1024)
+    ).toFixed(1)} MB`;
+
+  }
+
+
+  return `${(
+    bytes /
+    (1024 * 1024 * 1024)
+  ).toFixed(1)} GB`;
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| URL de archivo
+|--------------------------------------------------------------------------
+*/
+
+const getFileUrl = (ruta) => {
+
+  if (!ruta) {
+    return null;
+  }
+
+
+  return ruta.startsWith('/')
+    ? ruta
+    : `/${ruta}`;
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Abrir PDF
+|--------------------------------------------------------------------------
+*/
+
+const openPdf = (url) => {
+
+  if (url) {
+
+    window.open(
+      url,
+      '_blank',
+      'noopener,noreferrer'
+    );
+
+  }
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Descargar PDF
+|--------------------------------------------------------------------------
+*/
+
+const downloadPdf = (
+  url,
+  title
+) => {
+
+  if (!url) {
+    return;
+  }
+
+
+  const link =
+    document.createElement('a');
+
+
+  link.href = url;
+
+  link.download =
+    `${title || 'boletin'}.pdf`;
+
+  link.target = '_blank';
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Inicialización
+|--------------------------------------------------------------------------
+*/
+
 onMounted(() => {
-  if (props.initialReleases && props.initialReleases.length > 0) {
-    releases.value = props.initialReleases
-  } else {
-    loadReleases()
-  }
-})
+
+  loadReleases();
+
+});
+
 </script>
 
+
 <style scoped>
-/* Estilo principal del componente */
+
 .press-release-board {
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
+
   min-height: 100vh;
-  background-image: url('/images/fondo.png');
+
+  padding: 2rem;
+
+  background-image:
+    url('/images/fondo.png');
+
   background-size: cover;
+
   background-position: center;
+
   background-attachment: fixed;
+
   background-repeat: no-repeat;
 }
 
-/* Header */
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
 .press-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 2rem;
+  max-width: 1200px;
+
+  margin: 0 auto 2rem;
+
+  text-align: center;
 }
+
+
+.press-icon {
+  width: 60px;
+
+  height: 60px;
+
+  margin: 0 auto 1rem;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #cc0000;
+
+  color: white;
+
+  font-size: 1.5rem;
+
+  box-shadow:
+    0 8px 20px rgba(204, 0, 0, 0.2);
+}
+
 
 .press-title {
-  font-weight: 800;
+  margin: 0;
+
   color: #cc0000;
+
+  font-size: 2.3rem;
+
+  font-weight: 800;
 }
 
-/* Items de boletines */
-.press-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+
+.press-subtitle {
+  max-width: 850px;
+
+  margin: 0.75rem auto 0;
+
+  color: #666;
+
+  line-height: 1.6;
+
+  font-size: 1rem;
 }
+
+
+/* =========================================================
+   FILTROS
+========================================================= */
+
+.press-filters {
+  max-width: 1200px;
+
+  margin: 0 auto 1.5rem;
+
+  padding: 1rem;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 1rem;
+
+  flex-wrap: wrap;
+
+  background: rgba(
+    255,
+    255,
+    255,
+    0.95
+  );
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+
+.search-box {
+  flex: 1;
+
+  min-width: 250px;
+
+  position: relative;
+}
+
+
+.search-box i {
+  position: absolute;
+
+  left: 15px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #999;
+}
+
+
+.search-box input {
+  width: 100%;
+
+  padding: 0.7rem 1rem 0.7rem 2.7rem;
+
+  border: 1px solid #ddd;
+
+  border-radius: 8px;
+
+  outline: none;
+}
+
+
+.search-box input:focus {
+  border-color: #cc0000;
+
+  box-shadow:
+    0 0 0 3px rgba(
+      204,
+      0,
+      0,
+      0.08
+    );
+}
+
+
+.filter-box select {
+  min-width: 180px;
+
+  padding: 0.7rem 1rem;
+
+  border: 1px solid #ddd;
+
+  border-radius: 8px;
+
+  background: white;
+}
+
+
+.results-count {
+  min-width: 130px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 0.4rem;
+
+  color: #666;
+}
+
+
+.results-count strong {
+  color: #cc0000;
+
+  font-size: 1.2rem;
+}
+
+
+/* =========================================================
+   LISTADO
+========================================================= */
+
+.press-list {
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 1.5rem;
+}
+
 
 .press-release-item {
   background: white;
-  backdrop-filter: blur(10px);
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+  border-radius: 14px;
+
+  padding: 1.25rem;
+
+  box-shadow:
+    0 4px 15px rgba(
+      0,
+      0,
+      0,
+      0.08
+    );
+
   border-left: 4px solid #e2e8f0;
-  transition: all 0.3s ease;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 }
 
+
 .press-release-item:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.96);
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 10px 24px rgba(
+      0,
+      0,
+      0,
+      0.12
+    );
+
   border-left-color: #cc0000;
 }
 
-/* Layout principal */
+
 .release-main {
   display: flex;
+
   gap: 1.5rem;
+
   align-items: stretch;
 }
 
-/* Miniatura del PDF */
+
+/* =========================================================
+   PDF
+========================================================= */
+
 .release-thumbnail {
-  flex: 0 0 180px;
-  min-height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 0 0 190px;
+
+  min-height: 190px;
 }
+
+
+.pdf-thumbnail,
+.no-pdf {
+  width: 100%;
+
+  min-height: 190px;
+
+  border-radius: 10px;
+}
+
 
 .pdf-thumbnail {
-  width: 100%;
-  height: 100%;
-  min-height: 200px;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
-  border-radius: 0.75rem;
-  border: 2px solid #e2e8f0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
   position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 1rem;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f7f7f7,
+      #e9e9e9
+    );
+
+  border: 2px solid #e2e8f0;
+
+  cursor: pointer;
 }
 
+
 .pdf-thumbnail:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   border-color: #cc0000;
 }
 
+
 .pdf-icon-wrapper {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 0.5rem;
+
+  margin-bottom: 0.6rem;
 }
+
 
 .pdf-icon {
   width: 64px;
+
   height: 64px;
+
   color: #cc0000;
 }
 
+
 .pdf-badge {
   position: absolute;
-  top: -8px;
-  right: -24px;
-  background: #cc0000;
-  color: white;
-  font-size: 0.6rem;
-  font-weight: 700;
+
+  top: -5px;
+
+  right: -25px;
+
   padding: 0.15rem 0.5rem;
+
   border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+
+  background: #cc0000;
+
+  color: white;
+
+  font-size: 0.65rem;
+
+  font-weight: 700;
 }
 
+
 .pdf-info {
-  text-align: center;
   width: 100%;
+
+  text-align: center;
 }
+
 
 .pdf-name {
   display: block;
+
+  color: #333;
+
   font-size: 0.75rem;
+
   font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.2rem;
+
   word-break: break-all;
 }
 
+
 .pdf-size {
-  font-size: 0.65rem;
-  color: #718096;
+  color: #888;
+
+  font-size: 0.7rem;
 }
+
 
 .pdf-download-btn {
   position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
-  background: rgba(204, 0, 0, 0.9);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
+
+  right: 8px;
+
+  bottom: 8px;
+
+  width: 34px;
+
+  height: 34px;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #cc0000;
+
+  color: white;
+
   cursor: pointer;
-  transition: all 0.3s ease;
-  opacity: 0;
 }
 
-.pdf-thumbnail:hover .pdf-download-btn {
-  opacity: 1;
-}
-
-.pdf-download-btn:hover {
-  background: #8B0000;
-  transform: scale(1.1);
-}
-
-.download-icon {
-  width: 16px;
-  height: 16px;
-  stroke: white;
-}
 
 .no-pdf {
-  width: 100%;
-  height: 100%;
-  min-height: 200px;
-  background: #f7fafc;
-  border-radius: 0.75rem;
-  border: 2px dashed #e2e8f0;
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 0.5rem;
+
+  background: #f8f8f8;
+
+  border: 2px dashed #ddd;
+
+  color: #999;
 }
+
 
 .no-pdf-icon {
   font-size: 2.5rem;
 }
 
-.no-pdf-text {
-  font-size: 0.8rem;
-  color: #a0aec0;
-}
 
-/* Información del boletín */
+/* =========================================================
+   INFORMACIÓN
+========================================================= */
+
 .release-info {
   flex: 1;
+
   display: flex;
+
   flex-direction: column;
 }
 
-.release-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.75rem;
-}
 
 .release-title-section {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+
+  flex-direction: column;
+
+  gap: 0.6rem;
 }
+
+
+.category-badge {
+  align-self: flex-start;
+
+  padding: 0.3rem 0.7rem;
+
+  border-radius: 20px;
+
+  background: #fbeaea;
+
+  color: #cc0000;
+
+  font-size: 0.75rem;
+
+  font-weight: 700;
+}
+
 
 .release-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #2d3748;
   margin: 0;
-  line-height: 1.3;
+
+  color: #2d3748;
+
+  font-size: 1.25rem;
+
+  line-height: 1.4;
+
+  font-weight: 700;
 }
 
-.featured-badge {
-  background: #f6ad55;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
 
 .release-meta {
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 0.75rem;
-  flex-wrap: wrap;
+  margin:
+    0.8rem
+    0
+    0.5rem;
 }
+
 
 .meta-item {
-  display: flex;
+  display: inline-flex;
+
   align-items: center;
-  gap: 0.25rem;
-  color: #718096;
-  font-size: 0.875rem;
+
+  gap: 0.45rem;
+
+  color: #777;
+
+  font-size: 0.88rem;
 }
 
-.meta-icon {
-  font-size: 1rem;
+
+.meta-item i {
+  color: #cc0000;
 }
+
 
 .release-summary {
+  margin: 0 0 0.7rem;
+
   color: #4a5568;
-  line-height: 1.6;
-  margin: 0 0 0.75rem 0;
+
+  line-height: 1.65;
+
   font-size: 0.95rem;
 }
+
 
 .read-more-btn {
-  background: none;
-  border: none;
-  color: #cc0000;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  font-size: 0.95rem;
   align-self: flex-start;
+
+  padding: 0;
+
+  border: none;
+
+  background: none;
+
+  color: #cc0000;
+
+  font-weight: 600;
+
+  cursor: pointer;
 }
 
-.read-more-btn:hover {
-  text-decoration: underline;
+
+.btn-arrow {
+  margin-left: 0.2rem;
 }
+
 
 .release-content {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 2px solid #f7fafc;
+  margin-top: 0.8rem;
+
+  padding-top: 0.8rem;
+
+  border-top: 1px solid #eee;
 }
+
 
 .release-content p {
-  color: #2d3748;
-  line-height: 1.8;
-  font-size: 0.95rem;
+  margin: 0;
+
+  color: #444;
+
+  line-height: 1.75;
+
+  white-space: pre-line;
 }
 
-/* Estado vacío */
-.empty-state {
-  text-align: center;
-  padding: 4rem 2rem;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: 1rem;
+
+.release-actions {
+  display: flex;
+
+  gap: 0.5rem;
+
+  margin-top: auto;
+
+  padding-top: 1rem;
 }
+
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+.state-container {
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  padding: 5rem 1rem;
+
+  text-align: center;
+
+  color: #777;
+}
+
+
+.state-container p {
+  margin-top: 1rem;
+}
+
+
+.empty-state {
+  max-width: 700px;
+
+  margin: 2rem auto;
+
+  padding: 4rem 1rem;
+
+  text-align: center;
+
+  background: rgba(
+    255,
+    255,
+    255,
+    0.9
+  );
+
+  border-radius: 14px;
+}
+
 
 .empty-icon {
-  font-size: 4rem;
   margin-bottom: 1rem;
+
+  color: #bbb;
+
+  font-size: 3.5rem;
 }
 
+
 .empty-state h3 {
-  color: #2d3748;
+  color: #555;
+
   margin-bottom: 0.5rem;
 }
 
+
 .empty-state p {
-  color: #718096;
+  color: #888;
+
   margin-bottom: 1.5rem;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #cc0000 0%, #8B0000 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(204, 0, 0, 0.3);
-}
+/* =========================================================
+   PAGINACIÓN
+========================================================= */
 
-/* Paginación */
 .pagination {
+  max-width: 1200px;
+
+  margin: 2rem auto 0;
+
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 2rem;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(10px);
-  padding: 1rem 1.5rem;
-  border-radius: 1rem;
-  align-items: center;
-}
 
-.pagination-info {
-  width: 100%;
-  text-align: center;
-}
-
-.info-text {
-  color: #4a5568;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
   justify-content: center;
-}
 
-.page-btn {
-  padding: 0.5rem 0.75rem;
-  border: 2px solid #e2e8f0;
-  background: white;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  min-width: 36px;
-  display: flex;
   align-items: center;
-  justify-content: center;
+
+  gap: 0.35rem;
 }
 
-.page-btn:hover:not(:disabled) {
-  background: #cc0000;
-  color: white;
-  border-color: #cc0000;
-  transform: translateY(-2px);
-}
 
-.page-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.page-numbers {
-  display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
+.page-btn,
 .page-num {
-  padding: 0.5rem 0.75rem;
-  border: 2px solid transparent;
-  background: transparent;
-  border-radius: 0.5rem;
+  min-width: 38px;
+
+  height: 38px;
+
+  border-radius: 7px;
+
+  border: 1px solid #ddd;
+
+  background: white;
+
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  min-width: 36px;
-  text-align: center;
+
+  font-weight: 600;
 }
 
-.page-num:hover:not(.active):not(.dots) {
-  background: #f7fafc;
-  border-color: #e2e8f0;
+
+.page-btn:hover:not(:disabled),
+.page-num:hover:not(:disabled) {
+  border-color: #cc0000;
+
+  color: #cc0000;
 }
+
 
 .page-num.active {
-  background: #cc0000;
-  color: white;
   border-color: #cc0000;
-  box-shadow: 0 2px 8px rgba(204, 0, 0, 0.3);
+
+  background: #cc0000;
+
+  color: white;
 }
+
+
+.page-btn:disabled,
+.page-num:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+}
+
 
 .page-num.dots {
   cursor: default;
-  color: #a0aec0;
-  background: transparent;
 }
 
-.page-num.dots:hover {
-  background: transparent;
-  border-color: transparent;
-}
 
-/* Responsive */
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
 @media (max-width: 768px) {
+
   .press-release-board {
     padding: 1rem;
   }
 
-  .press-header {
-    flex-direction: column;
-    padding: 1rem;
+
+  .press-title {
+    font-size: 1.8rem;
   }
+
 
   .press-filters {
     flex-direction: column;
-    padding: 0.75rem;
+
+    align-items: stretch;
   }
 
-  .search-input,
-  .filter-select {
+
+  .search-box,
+  .filter-box,
+  .results-count {
     width: 100%;
+
+    min-width: 0;
   }
+
+
+  .results-count {
+    justify-content: flex-start;
+  }
+
 
   .release-main {
     flex-direction: column;
-    gap: 1rem;
   }
+
 
   .release-thumbnail {
-    flex: 1 1 auto;
-    min-height: 150px;
+    flex: none;
+
+    width: 100%;
   }
 
-  .pdf-thumbnail {
-    min-height: 150px;
-    max-height: 200px;
-  }
 
+  .pdf-thumbnail,
   .no-pdf {
-    min-height: 150px;
+    min-height: 160px;
   }
 
-  .release-header {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .release-meta {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .pagination {
-    padding: 0.75rem;
-  }
-
-  .pagination-controls {
-    gap: 0.3rem;
-  }
-
-  .page-btn {
-    padding: 0.35rem 0.5rem;
-    min-width: 32px;
-    font-size: 0.85rem;
-  }
-
-  .page-num {
-    padding: 0.35rem 0.5rem;
-    min-width: 32px;
-    font-size: 0.85rem;
-  }
 }
 
-@media (max-width: 480px) {
-  .press-title {
-    font-size: 1.5rem;
-  }
-
-  .release-title {
-    font-size: 1rem;
-  }
-
-  .release-thumbnail {
-    min-height: 120px;
-  }
-
-  .pdf-thumbnail {
-    min-height: 120px;
-    padding: 0.75rem;
-  }
-
-  .pdf-icon {
-    width: 40px;
-    height: 40px;
-  }
-
-  .no-pdf {
-    min-height: 120px;
-  }
-
-  .pagination-info .info-text {
-    font-size: 0.8rem;
-  }
-}
 </style>

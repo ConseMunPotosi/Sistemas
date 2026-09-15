@@ -1,29 +1,69 @@
 <template>
   <div class="directiva-container">
+
     <div class="directiva-header">
       <h2 class="directiva-titulo">Directiva del Concejo Municipal</h2>
       <p class="directiva-subtitulo">Periodo Constitucional 2026-2027</p>
     </div>
 
-    <!-- Tarjetas de la Directiva -->
-    <div class="directiva-grid">
-      <!-- Presidente (Arriba - Destacado) -->
-      <div class="directiva-card presidente" v-if="directiva.presidente">
+    <!-- Cargando -->
+    <div v-if="cargando" class="estado-mensaje">
+      Cargando información de la Directiva...
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="error" class="estado-mensaje error">
+      {{ error }}
+    </div>
+
+    <!-- Directiva -->
+    <div v-else class="directiva-grid">
+
+      <!-- PRESIDENTE -->
+      <div
+        class="directiva-card presidente"
+        v-if="directiva.presidente"
+      >
         <div class="card-image presidente-image">
-          <img :src="directiva.presidente.foto" :alt="directiva.presidente.nombre" />
-          <span class="cargo-badge presidente-badge">Presidente</span>
+
+          <img
+            :src="getImagenUrl(directiva.presidente.imagen)"
+            :alt="directiva.presidente.nombre"
+            @error="imagenFallback"
+          />
+
+          <span class="cargo-badge presidente-badge">
+            Presidente
+          </span>
         </div>
+
         <div class="card-content">
-          <h3 class="nombre">{{ directiva.presidente.nombre }}</h3>
-          <p class="cargo">{{ directiva.presidente.cargo }}</p>
-          <p class="descripcion">{{ directiva.presidente.descripcion }}</p>
+
+          <h3 class="nombre">
+            {{ directiva.presidente.nombre }}
+          </h3>
+
+          <p class="cargo">
+            {{ directiva.presidente.cargo }}
+          </p>
+
+          <p class="descripcion">
+            {{ directiva.presidente.descripcion || 'Información no disponible.' }}
+          </p>
+
           <div class="card-footer">
+
             <div class="social-icons-group">
+
               <!-- YouTube -->
               <button
                 class="social-icon youtube"
                 aria-label="Youtube"
-                @click="irARedSocial('https://www.youtube.com/@ConcejoMunicipalPotosi', 'YouTube')">
+                @click="irARedSocial(
+                  'https://www.youtube.com/@ConcejoMunicipalPotosi',
+                  'YouTube'
+                )"
+              >
                 <i class="bi bi-youtube"></i>
               </button>
 
@@ -31,7 +71,11 @@
               <button
                 class="social-icon facebook"
                 aria-label="Facebook"
-                @click="irARedSocial('https://www.facebook.com/profile.php?id=100068918032041', 'Facebook')">
+                @click="irARedSocial(
+                  'https://www.facebook.com/profile.php?id=100068918032041',
+                  'Facebook'
+                )"
+              >
                 <i class="bi bi-facebook"></i>
               </button>
 
@@ -39,7 +83,11 @@
               <button
                 class="social-icon instagram"
                 aria-label="Instagram"
-                @click="irARedSocial('https://www.instagram.com/concejomunicipalpotosi', 'Instagram')">
+                @click="irARedSocial(
+                  'https://www.instagram.com/concejomunicipalpotosi',
+                  'Instagram'
+                )"
+              >
                 <i class="bi bi-instagram"></i>
               </button>
 
@@ -47,208 +95,429 @@
               <button
                 class="social-icon twitter-x"
                 aria-label="Twitter"
-                @click="irARedSocial('https://twitter.com/ConcejoPotosi', 'Twitter')">
+                @click="irARedSocial(
+                  'https://twitter.com/ConcejoPotosi',
+                  'Twitter'
+                )"
+              >
                 <i class="bi bi-twitter-x"></i>
               </button>
 
-                <!-- WhatsApp -->
+              <!-- WhatsApp -->
               <button
                 class="social-icon whatsapp"
                 aria-label="WhatsApp"
-                @click="irARedSocial('https://wa.me/59170000000', 'WhatsApp')">
+                @click="irARedSocial(
+                  'https://wa.me/59170000000',
+                  'WhatsApp'
+                )"
+              >
                 <i class="bi bi-whatsapp"></i>
               </button>
 
               <!-- TikTok -->
               <button
                 class="social-icon tiktok"
-                aria-label="Tiktok"
-                @click="irARedSocial('https://www.tiktok.com/@concejomunicipaldepotosi', 'TikTok')">
+                aria-label="TikTok"
+                @click="irARedSocial(
+                  'https://www.tiktok.com/@concejomunicipaldepotosi',
+                  'TikTok'
+                )"
+              >
                 <i class="bi bi-tiktok"></i>
               </button>
+
             </div>
+
           </div>
         </div>
       </div>
 
-      <!-- Fila inferior: Vicepresidente y Secretario -->
+
+      <!-- VICEPRESIDENTE Y SECRETARIA -->
       <div class="directiva-secundarios">
-        <!-- Vicepresidente -->
-        <div class="directiva-card vicepresidente" v-if="directiva.vicepresidente">
+
+        <!-- VICEPRESIDENTE -->
+        <div
+          class="directiva-card vicepresidente"
+          v-if="directiva.vicepresidente"
+        >
+
           <div class="card-image">
-            <img :src="directiva.vicepresidente.foto" :alt="directiva.vicepresidente.nombre" />
-            <span class="cargo-badge">Vicepresidente</span>
+
+            <img
+              :src="getImagenUrl(directiva.vicepresidente.imagen)"
+              :alt="directiva.vicepresidente.nombre"
+              @error="imagenFallback"
+            />
+
+            <span class="cargo-badge">
+              Vicepresidente
+            </span>
+
           </div>
+
           <div class="card-content">
-            <h3 class="nombre">{{ directiva.vicepresidente.nombre }}</h3>
-            <p class="cargo">{{ directiva.vicepresidente.cargo }}</p>
-            <p class="descripcion">{{ directiva.vicepresidente.descripcion }}</p>
+
+            <h3 class="nombre">
+              {{ directiva.vicepresidente.nombre }}
+            </h3>
+
+            <p class="cargo">
+              {{ directiva.vicepresidente.cargo }}
+            </p>
+
+            <p class="descripcion">
+              {{ directiva.vicepresidente.descripcion || 'Información no disponible.' }}
+            </p>
+
             <div class="card-footer">
+
               <div class="social-icons-group">
+
                 <!-- YouTube -->
                 <button
-                    class="social-icon youtube"
-                    aria-label="Youtube"
-                    @click="irARedSocial('https://www.youtube.com/@ConcejoMunicipalPotosi', 'YouTube')">
-                    <i class="bi bi-youtube"></i>
+                  class="social-icon youtube"
+                  aria-label="Youtube"
+                  @click="irARedSocial(
+                    'https://www.youtube.com/@ConcejoMunicipalPotosi',
+                    'YouTube'
+                  )"
+                >
+                  <i class="bi bi-youtube"></i>
                 </button>
 
                 <!-- Facebook -->
                 <button
-                    class="social-icon facebook"
-                    aria-label="Facebook"
-                    @click="irARedSocial('https://www.facebook.com/profile.php?id=100068918032041', 'Facebook')">
-                    <i class="bi bi-facebook"></i>
+                  class="social-icon facebook"
+                  aria-label="Facebook"
+                  @click="irARedSocial(
+                    'https://www.facebook.com/profile.php?id=100068918032041',
+                    'Facebook'
+                  )"
+                >
+                  <i class="bi bi-facebook"></i>
                 </button>
 
                 <!-- Instagram -->
                 <button
-                    class="social-icon instagram"
-                    aria-label="Instagram"
-                    @click="irARedSocial('https://www.instagram.com/concejomunicipalpotosi', 'Instagram')">
-                    <i class="bi bi-instagram"></i>
+                  class="social-icon instagram"
+                  aria-label="Instagram"
+                  @click="irARedSocial(
+                    'https://www.instagram.com/concejomunicipalpotosi',
+                    'Instagram'
+                  )"
+                >
+                  <i class="bi bi-instagram"></i>
                 </button>
 
                 <!-- Twitter/X -->
                 <button
-                    class="social-icon twitter-x"
-                    aria-label="Twitter"
-                    @click="irARedSocial('https://twitter.com/ConcejoPotosi', 'Twitter')">
-                    <i class="bi bi-twitter-x"></i>
+                  class="social-icon twitter-x"
+                  aria-label="Twitter"
+                  @click="irARedSocial(
+                    'https://twitter.com/ConcejoPotosi',
+                    'Twitter'
+                  )"
+                >
+                  <i class="bi bi-twitter-x"></i>
                 </button>
 
-                    <!-- WhatsApp -->
+                <!-- WhatsApp -->
                 <button
-                    class="social-icon whatsapp"
-                    aria-label="WhatsApp"
-                    @click="irARedSocial('https://wa.me/59170000000', 'WhatsApp')">
-                    <i class="bi bi-whatsapp"></i>
+                  class="social-icon whatsapp"
+                  aria-label="WhatsApp"
+                  @click="irARedSocial(
+                    'https://wa.me/59170000000',
+                    'WhatsApp'
+                  )"
+                >
+                  <i class="bi bi-whatsapp"></i>
                 </button>
 
                 <!-- TikTok -->
                 <button
-                    class="social-icon tiktok"
-                    aria-label="Tiktok"
-                    @click="irARedSocial('https://www.tiktok.com/@concejomunicipaldepotosi', 'TikTok')">
-                    <i class="bi bi-tiktok"></i>
+                  class="social-icon tiktok"
+                  aria-label="TikTok"
+                  @click="irARedSocial(
+                    'https://www.tiktok.com/@concejomunicipaldepotosi',
+                    'TikTok'
+                  )"
+                >
+                  <i class="bi bi-tiktok"></i>
                 </button>
+
               </div>
+
             </div>
           </div>
         </div>
 
-        <!-- Concejal Secretario -->
-        <div class="directiva-card secretario" v-if="directiva.secretario">
+
+        <!-- SECRETARIA -->
+        <div
+          class="directiva-card secretario"
+          v-if="directiva.secretario"
+        >
+
           <div class="card-image">
-            <img :src="directiva.secretario.foto" :alt="directiva.secretario.nombre" />
-            <span class="cargo-badge">Concejal Secretaria</span>
+
+            <img
+              :src="getImagenUrl(directiva.secretario.imagen)"
+              :alt="directiva.secretario.nombre"
+              @error="imagenFallback"
+            />
+
+            <span class="cargo-badge">
+              Concejal Secretaria
+            </span>
+
           </div>
+
           <div class="card-content">
-            <h3 class="nombre">{{ directiva.secretario.nombre }}</h3>
-            <p class="cargo">{{ directiva.secretario.cargo }}</p>
-            <p class="descripcion">{{ directiva.secretario.descripcion }}</p>
+
+            <h3 class="nombre">
+              {{ directiva.secretario.nombre }}
+            </h3>
+
+            <p class="cargo">
+              {{ directiva.secretario.cargo }}
+            </p>
+
+            <p class="descripcion">
+              {{ directiva.secretario.descripcion || 'Información no disponible.' }}
+            </p>
+
             <div class="card-footer">
+
               <div class="social-icons-group">
+
                 <!-- YouTube -->
                 <button
-                    class="social-icon youtube"
-                    aria-label="Youtube"
-                    @click="irARedSocial('https://www.youtube.com/@ConcejoMunicipalPotosi', 'YouTube')">
-                    <i class="bi bi-youtube"></i>
+                  class="social-icon youtube"
+                  aria-label="Youtube"
+                  @click="irARedSocial(
+                    'https://www.youtube.com/@ConcejoMunicipalPotosi',
+                    'YouTube'
+                  )"
+                >
+                  <i class="bi bi-youtube"></i>
                 </button>
 
                 <!-- Facebook -->
                 <button
-                    class="social-icon facebook"
-                    aria-label="Facebook"
-                    @click="irARedSocial('https://www.facebook.com/profile.php?id=100068918032041', 'Facebook')">
-                    <i class="bi bi-facebook"></i>
+                  class="social-icon facebook"
+                  aria-label="Facebook"
+                  @click="irARedSocial(
+                    'https://www.facebook.com/profile.php?id=100068918032041',
+                    'Facebook'
+                  )"
+                >
+                  <i class="bi bi-facebook"></i>
                 </button>
 
                 <!-- Instagram -->
                 <button
-                    class="social-icon instagram"
-                    aria-label="Instagram"
-                    @click="irARedSocial('https://www.instagram.com/concejomunicipalpotosi', 'Instagram')">
-                    <i class="bi bi-instagram"></i>
+                  class="social-icon instagram"
+                  aria-label="Instagram"
+                  @click="irARedSocial(
+                    'https://www.instagram.com/concejomunicipalpotosi',
+                    'Instagram'
+                  )"
+                >
+                  <i class="bi bi-instagram"></i>
                 </button>
 
                 <!-- Twitter/X -->
                 <button
-                    class="social-icon twitter-x"
-                    aria-label="Twitter"
-                    @click="irARedSocial('https://twitter.com/ConcejoPotosi', 'Twitter')">
-                    <i class="bi bi-twitter-x"></i>
+                  class="social-icon twitter-x"
+                  aria-label="Twitter"
+                  @click="irARedSocial(
+                    'https://twitter.com/ConcejoPotosi',
+                    'Twitter'
+                  )"
+                >
+                  <i class="bi bi-twitter-x"></i>
                 </button>
 
-                    <!-- WhatsApp -->
+                <!-- WhatsApp -->
                 <button
-                    class="social-icon whatsapp"
-                    aria-label="WhatsApp"
-                    @click="irARedSocial('https://wa.me/59170000000', 'WhatsApp')">
-                    <i class="bi bi-whatsapp"></i>
+                  class="social-icon whatsapp"
+                  aria-label="WhatsApp"
+                  @click="irARedSocial(
+                    'https://wa.me/59170000000',
+                    'WhatsApp'
+                  )"
+                >
+                  <i class="bi bi-whatsapp"></i>
                 </button>
 
                 <!-- TikTok -->
                 <button
-                    class="social-icon tiktok"
-                    aria-label="Tiktok"
-                    @click="irARedSocial('https://www.tiktok.com/@concejomunicipaldepotosi', 'TikTok')">
-                    <i class="bi bi-tiktok"></i>
+                  class="social-icon tiktok"
+                  aria-label="TikTok"
+                  @click="irARedSocial(
+                    'https://www.tiktok.com/@concejomunicipaldepotosi',
+                    'TikTok'
+                  )"
+                >
+                  <i class="bi bi-tiktok"></i>
                 </button>
+
               </div>
+
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
 </template>
 
+
 <script setup>
-import { ref } from 'vue'
+
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
+
 const directiva = ref({
-  presidente: {
-    nombre: 'Abg. German Antonio Vidaurre Villanueva',
-    cargo: 'Presidente del Concejo Municipal',
-    foto: '/images/Concejales/Antonio_Vidaurre.png',
-    descripcion: 'Experiencia profesional en gestión municipal, 25 años de experiencia en medios de comunicación, 23 años los desempeñó en Radio Fides Potosí (Bolivia); Voz reconocida en el ámbito informativo local.',
-    facebook: 'https://www.facebook.com/profile.php?id=100064507628933',
-    twitter: 'https://twitter.com/AntonioVidaurre',
-    instagram: 'https://www.instagram.com/antoniovidaurre',
-    youtube: 'https://www.youtube.com/@AntonioVidaurre',
-    tiktok: 'https://www.tiktok.com/@antoniovidaurre',
-    web: 'https://concejomunicipalpotosi.gob.bo'
-  },
-  vicepresidente: {
-    nombre: 'Claudio German Clemente Vedia',
-    cargo: 'Vicepresidente del Concejo Municipal',
-    foto: '/images/concejales/Claudio_Clemente.png',
-    descripcion: 'Profesional con amplia experiencia en gestión pública y desarrollo municipal. Comprometido con el progreso de Potosí y la participación ciudadana.',
-    facebook: 'https://www.facebook.com/claudioclemente',
-    twitter: 'https://twitter.com/ClaudioClemente',
-    instagram: 'https://www.instagram.com/claudioclemente',
-    youtube: 'https://www.youtube.com/@ClaudioClemente',
-    web: ''
-  },
-  secretario: {
-    nombre: 'María del Carmen Michel Araujo',
-    cargo: 'Concejal Secretaria',
-    foto: '/images/Concejales/Carmen_Michel.png',
-    descripcion: 'Destacada lideresa social y defensora de los derechos de la mujer y la niñez. Con amplia trayectoria en organizaciones sociales y trabajo comunitario.',
-    facebook: 'https://www.facebook.com/carmenmichel',
-    twitter: 'https://twitter.com/CarmenMichel',
-    instagram: 'https://www.instagram.com/carmenmichel',
-    youtube: 'https://www.youtube.com/@CarmenMichel',
-    tiktok: 'https://www.tiktok.com/@carmenmichel',
-    web: ''
-  }
+  presidente: null,
+  vicepresidente: null,
+  secretario: null
 })
+
+const cargando = ref(true)
+const error = ref('')
+
+
+/*
+|--------------------------------------------------------------------------
+| Cargar Directiva desde la base de datos
+|--------------------------------------------------------------------------
+*/
+
+const cargarDirectiva = async () => {
+
+  cargando.value = true
+  error.value = ''
+
+  try {
+
+    const response = await axios.get('/api/public/concejales')
+
+    const concejales = response.data?.data || []
+
+    directiva.value = {
+      presidente: concejales.find(
+        concejal =>
+          concejal.cargo === 'Concejal - Presidente'
+      ) || null,
+
+      vicepresidente: concejales.find(
+        concejal =>
+          concejal.cargo === 'Concejal - Vicepresidente'
+      ) || null,
+
+      secretario: concejales.find(
+        concejal =>
+          concejal.cargo === 'Concejal - Secretaria'
+      ) || null
+    }
+
+  } catch (err) {
+
+    console.error(
+      'Error al cargar la Directiva:',
+      err
+    )
+
+    error.value =
+      'No se pudo cargar la información de la Directiva.'
+
+  } finally {
+
+    cargando.value = false
+
+  }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Imagen
+|--------------------------------------------------------------------------
+*/
+
+const getImagenUrl = (imagen) => {
+
+  if (!imagen) {
+    return '/images/concejales/A_designar.png'
+  }
+
+  if (
+    imagen.startsWith('http://') ||
+    imagen.startsWith('https://') ||
+    imagen.startsWith('/')
+  ) {
+    return imagen
+  }
+
+  return '/' + imagen.replace(/^\/+/, '')
+}
+
+
+const imagenFallback = (event) => {
+
+  if (
+    event.target.src.includes(
+      'A_designar.png'
+    )
+  ) {
+    return
+  }
+
+  event.target.src =
+    '/images/concejales/A_designar.png'
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Redes sociales institucionales
+|--------------------------------------------------------------------------
+*/
+
+const irARedSocial = (url, nombre) => {
+
+  window.open(
+    url,
+    '_blank',
+    'noopener,noreferrer'
+  )
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Cargar al entrar
+|--------------------------------------------------------------------------
+*/
+
+onMounted(() => {
+
+  cargarDirectiva()
+
+})
+
 </script>
 
+
 <style scoped>
+
 .directiva-container {
   margin: 0 auto;
   padding: 1rem;
@@ -309,7 +578,9 @@ const directiva = ref({
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
-/* ========== PRESIDENTE DESTACADO ========== */
+
+/* PRESIDENTE */
+
 .presidente {
   position: relative;
   border: 2px solid #cc0000;
@@ -323,28 +594,31 @@ const directiva = ref({
   left: 0;
   right: 0;
   height: 6px;
-  background: linear-gradient(90deg, #cc0000, #ff4444, #cc0000);
+  background: linear-gradient(
+    90deg,
+    #cc0000,
+    #ff4444,
+    #cc0000
+  );
   background-size: 200% 100%;
   animation: gradiente 3s ease-in-out infinite;
 }
 
 @keyframes gradiente {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
 }
 
-.presidente:hover {
-  border-color: #cc0000;
-  box-shadow: 0 12px 40px rgba(204, 0, 0, 0.3);
-  transform: translateY(-8px) scale(1.01);
-}
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1) rotate(-10deg); }
-  50% { transform: scale(1.2) rotate(10deg); }
-}
+/* IMAGEN */
 
-/* ========== IMAGEN - MISMO TAMAÑO PARA TODOS ========== */
 .card-image {
   position: relative;
   width: 100%;
@@ -363,20 +637,21 @@ const directiva = ref({
   transition: transform 0.5s ease;
 }
 
-/* Imagen del presidente - Mismo tamaño que las demás */
 .presidente-image {
-  padding-top: 100%; /* Mismo tamaño que las demás tarjetas */
+  padding-top: 100%;
 }
 
 .presidente-image img {
-  object-fit: cover; /* Mismo que las demás */
+  object-fit: cover;
 }
 
 .directiva-card:hover .card-image img {
   transform: scale(1.05);
 }
 
-/* ========== BADGE ========== */
+
+/* BADGE */
+
 .cargo-badge {
   position: absolute;
   bottom: 1rem;
@@ -393,13 +668,19 @@ const directiva = ref({
 }
 
 .presidente-badge {
-  background: linear-gradient(135deg, #cc0000, #990000);
+  background: linear-gradient(
+    135deg,
+    #cc0000,
+    #990000
+  );
   font-size: 0.85rem;
   padding: 0.5rem 1.2rem;
   box-shadow: 0 4px 15px rgba(204, 0, 0, 0.4);
 }
 
-/* ========== CONTENIDO ========== */
+
+/* CONTENIDO */
+
 .card-content {
   padding: 1.5rem;
   flex: 1;
@@ -428,6 +709,9 @@ const directiva = ref({
   margin: 0 0 1rem 0;
   flex: 1;
 }
+
+
+/* FOOTER */
 
 .card-footer {
   display: flex;
@@ -465,17 +749,53 @@ const directiva = ref({
   transform: scale(1.2);
 }
 
-.social-icon.facebook:hover i {color: #1877f2; }
-.social-icon.youtube:hover i {color: #ff0000;}
-.social-icon.instagram:hover i {color: #e4405f;}
-.social-icon.twitter-x:hover i {color: #1da1f2;}
-.social-icon.whatsapp:hover i {color: #25d366;}
-.social-icon.tiktok:hover i {color: #00f2ea;}
+.social-icon.facebook:hover i {
+  color: #1877f2;
+}
 
-/* ========== RESPONSIVE ========== */
+.social-icon.youtube:hover i {
+  color: #ff0000;
+}
 
-/* Móviles: Una columna */
+.social-icon.instagram:hover i {
+  color: #e4405f;
+}
+
+.social-icon.twitter-x:hover i {
+  color: #1da1f2;
+}
+
+.social-icon.whatsapp:hover i {
+  color: #25d366;
+}
+
+.social-icon.tiktok:hover i {
+  color: #00f2ea;
+}
+
+
+/* ESTADOS */
+
+.estado-mensaje {
+  max-width: 700px;
+  margin: 3rem auto;
+  padding: 2rem;
+  text-align: center;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  color: #555;
+}
+
+.estado-mensaje.error {
+  color: #cc0000;
+}
+
+
+/* RESPONSIVE */
+
 @media (max-width: 767px) {
+
   .directiva-grid {
     grid-template-columns: 1fr;
   }
@@ -483,10 +803,12 @@ const directiva = ref({
   .directiva-secundarios {
     grid-template-columns: 1fr;
   }
+
 }
 
-/* Tablets: 2 columnas para secundarios */
+
 @media (min-width: 768px) and (max-width: 1023px) {
+
   .directiva-grid {
     grid-template-columns: 1fr;
   }
@@ -494,10 +816,12 @@ const directiva = ref({
   .directiva-secundarios {
     grid-template-columns: 1fr 1fr;
   }
+
 }
 
-/* Desktop: Presidente arriba, secundarios abajo en 2 columnas */
+
 @media (min-width: 1024px) {
+
   .directiva-grid {
     grid-template-columns: 1fr;
     max-width: 1000px;
@@ -513,10 +837,12 @@ const directiva = ref({
     margin: 0 auto;
     width: 100%;
   }
+
 }
 
-/* Móviles pequeños */
+
 @media (max-width: 480px) {
+
   .directiva-container {
     padding: 1rem 0.5rem;
   }
@@ -541,31 +867,40 @@ const directiva = ref({
     font-size: 0.85rem;
   }
 
-  .enlace-social {
-    width: 30px;
-    height: 30px;
-    font-size: 0.8rem;
-  }
 }
 
-/* ========== ANIMACIONES ========== */
+
+/* ANIMACIONES */
+
 .directiva-card {
   animation: fadeInUp 0.6s ease forwards;
   opacity: 0;
 }
 
-.presidente { animation-delay: 0.2s; }
-.vicepresidente { animation-delay: 0.4s; }
-.secretario { animation-delay: 0.6s; }
+.presidente {
+  animation-delay: 0.2s;
+}
+
+.vicepresidente {
+  animation-delay: 0.4s;
+}
+
+.secretario {
+  animation-delay: 0.6s;
+}
 
 @keyframes fadeInUp {
+
   from {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
+
 }
+
 </style>

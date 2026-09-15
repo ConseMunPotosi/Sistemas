@@ -7,76 +7,129 @@ use App\Models\Gaceta\ArchivoNorma;
 use App\Models\Gaceta\Norma;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class ArchivoNormaController extends Controller
 {
+    /**
+     * Subir archivo PDF asociado a una norma
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'id_norma' => 'required|exists:gaceta.normas,id_norma',
-            'archivo' => 'required|file|mimes:pdf|max:10240', // Máximo 10MB
+            'id_norma' => 'required|integer',
+            'archivo' => 'required|file|mimes:pdf|max:10240',
         ]);
 
-        // 🔥 1. OBTENER EL ARCHIVO PRIMERO (Para evitar error de variable indefinida)
+        // Obtener el archivo subido
         $archivo = $request->file('archivo');
 
-        // 🔥 2. OBTENER LA NORMA PARA EXTRAER DATOS
+        // Obtener la norma
         $norma = Norma::find($request->id_norma);
+
         if (!$norma) {
-            return response()->json(['success' => false, 'message' => 'Norma no encontrada'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Norma no encontrada'
+            ], 404);
         }
 
-        // 🔥 3. OBTENER EL TIPO DE NORMA (desde la relación)
-        $tipoNorma = $norma->tipo ? $norma->tipo->nombre_tipo : 'SinTipo';
+        // Verificar que realmente llegó el archivo
+        if (!$archivo || !$archivo->isValid()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El archivo PDF no es válido o no se recibió correctamente.'
+            ], 422);
+        }
 
-        // Generar un nombre seguro sin espacios
-        $tipoNormaLimpio = str_replace(' ', '_', $tipoNorma);
+        // Obtener estos datos ANTES de mover el archivo
+        $peso = $archivo->getSize();
+        $tipoMime = $archivo->getMimeType();
+        $extension = strtolower($archivo->getClientOriginalExtension());
 
-        // 🔥 4. GENERAR EL NOMBRE: id_norma_numero_norma_tipo_norma.pdf
-        $extension = $archivo->getClientOriginalExtension();
-        $nombreLimpio = $norma->id_norma . '_' . $norma->numero . '_' . $tipoNormaLimpio . '.' . $extension;
+        // Obtener tipo de norma
+        $tipoNorma = $norma->tipo
+            ? $norma->tipo->nombre_tipo
+            : 'SinTipo';
 
-        // 🔥 5. GUARDAR EN public/archivosNorma
+        // Limpiar espacios del nombre
+        $tipoNormaLimpio = str_replace(' ', '_', trim($tipoNorma));
+
+        // Generar nombre del archivo
+        $nombreLimpio =
+            $norma->id_norma . '_' .
+            $norma->numero . '_' .
+            $tipoNormaLimpio . '.' .
+            $extension;
+
+        // Carpeta de destino
         $carpetaDestino = public_path('archivosNorma');
-        if (!file_exists($carpetaDestino)) {
+
+        if (!is_dir($carpetaDestino)) {
             mkdir($carpetaDestino, 0777, true);
         }
 
+        // Ruta física final
+        $rutaFisica = $carpetaDestino . DIRECTORY_SEPARATOR . $nombreLimpio;
+
+        // Si ya existe un archivo con el mismo nombre,
+        // lo eliminamos para permitir reemplazar el PDF.
+        if (file_exists($rutaFisica)) {
+            unlink($rutaFisica);
+        }
+
+        // Mover archivo a la carpeta definitiva
         $archivo->move($carpetaDestino, $nombreLimpio);
 
+        // Ruta pública que se guardará en PostgreSQL
         $rutaArchivo = 'archivosNorma/' . $nombreLimpio;
 
-        // 🔥 6. GUARDAR EN LA BASE DE DATOS
+        // Registrar en la base de datos
         $nuevoArchivo = ArchivoNorma::create([
             'id_norma' => $norma->id_norma,
-            'nombre_archivo' => $nombreLimpio, // Guardamos el nombre renombrado
+            'nombre_archivo' => $nombreLimpio,
             'ruta_archivo' => $rutaArchivo,
             'extension' => $extension,
-            'peso' => $archivo->getSize(),
+            'peso' => $peso,
             'estado' => true,
-            'tipo_mime' => $archivo->getMimeType(),
+            'tipo_mime' => $tipoMime,
             'subidor_por' => Auth::id(),
             'fecha_subida' => now(),
         ]);
 
         return response()->json([
             'success' => true,
+            'message' => 'Archivo PDF subido correctamente.',
             'data' => $nuevoArchivo
         ], 201);
     }
 
+    /**
+     * Eliminar archivo asociado a una norma
+     */
     public function destroy(int $id)
     {
         $archivo = ArchivoNorma::find($id);
-        if (!$archivo) return response()->json(['success' => false], 404);
 
-        // Eliminar archivo físico
-        if (file_exists(public_path($archivo->ruta_archivo))) {
-            unlink(public_path($archivo->ruta_archivo));
+        if (!$archivo) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Archivo no encontrado.'
+            ], 404);
         }
 
+        // Eliminar archivo físico
+        $rutaFisica = public_path($archivo->ruta_archivo);
+
+        if (file_exists($rutaFisica)) {
+            unlink($rutaFisica);
+        }
+
+        // Eliminar registro
         $archivo->delete();
-        return response()->json(['success' => true]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Archivo eliminado correctamente.'
+        ]);
     }
 }
