@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\Gaceta\ArchivoNormaController;
 
 use App\Http\Controllers\Api\Comunicacion\SesionController;
 use App\Http\Controllers\Api\Institucional\ConcejalController;
+use App\Http\Controllers\Api\Institucional\ConfiguracionController;
 
 
 // ==========================================================
@@ -50,6 +51,8 @@ Route::get('/public/sesiones', [SesionController::class, 'publicIndex']);
 // ==========================================================
 
 Route::get('/public/concejales', [ConcejalController::class, 'publicIndex']);
+Route::get('/public/configuracion', [ConfiguracionController::class, 'index']);
+Route::get('/public/configuracion/{clave}', [ConfiguracionController::class, 'show']);
 
 
 // ==========================================================
@@ -66,6 +69,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/noticias/categorias', [CategoriaNoticiaController::class, 'store']);
     Route::put('/noticias/categorias/{id}', [CategoriaNoticiaController::class, 'update']);
     Route::delete('/noticias/categorias/{id}', [CategoriaNoticiaController::class, 'destroy']);
+
+    Route::put('/configuracion/{clave}', [ConfiguracionController::class, 'update']);
 
 
     // ======================================================

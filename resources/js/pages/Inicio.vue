@@ -7,6 +7,7 @@
         alt="Concejo"
         class="desktop-image"
       />
+
       <img
         src="../../../public/images/concejo-mobile.png"
         alt="Concejo Mobile"
@@ -16,326 +17,934 @@
 
     <!-- Contenido derecho (detrás) -->
     <div class="right-content">
+
       <div class="top">
         <!-- Carrusel -->
         <div class="carousel-wrapper">
           <div class="carousel-container">
+
             <div
               class="carousel-track"
-              :style="{ transform: `translateX(-${currentSlide * 100}%)` }"
+              :style="{
+                transform: `translateX(-${currentSlide * 100}%)`
+              }"
             >
+
               <div
                 v-for="(slide, index) in slides"
                 :key="index"
                 class="carousel-slide"
               >
+
                 <div class="slide-image-wrapper">
-                <!-- Si es una imagen, mostramos el img -->
-                <img
+
+                  <!-- Imagen -->
+                  <img
                     v-if="slide.type === 'image'"
                     :src="slide.image"
                     :alt="slide.title"
                     class="slide-img"
-                />
+                  />
 
-                <!-- Si es un video, mostramos el video con autoplay y muted -->
-                <video
+                  <!-- Video -->
+                  <video
                     v-else-if="slide.type === 'video'"
                     :src="slide.video"
                     autoplay
                     muted
                     loop
                     class="slide-img"
-                ></video>
+                  ></video>
+
                 </div>
 
-                <!-- Bloque Derecho: Texto (Fondo blanco) -->
+                <!-- Texto -->
                 <div class="slide-content">
                   <div class="text-container">
-                    <h2 class="slide-title">{{ slide.title }}</h2>
-                    <p class="slide-description">{{ slide.description }}</p>
-                    <p class="slide-date">📅 {{ slide.date }}</p>
+
+                    <h2 class="slide-title">
+                      {{ slide.title }}
+                    </h2>
+
+                    <p class="slide-description">
+                      {{ slide.description }}
+                    </p>
+
+                    <p class="slide-date">
+                      📅 {{ slide.date }}
+                    </p>
+
                   </div>
                 </div>
+
               </div>
+
             </div>
 
-            <!-- ===== CONTROLES UNIFICADOS ===== -->
+            <!-- CONTROLES -->
             <div class="carousel-controls-group">
 
-              <!-- Botones -->
               <div class="carousel-buttons">
-                <button class="carousel-btn" @click="prevSlide">
-                  <svg viewBox="0 0 24 24" width="20" height="20">
-                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="white"/>
+
+                <button
+                  class="carousel-btn"
+                  @click="prevSlide"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                  >
+                    <path
+                      d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"
+                      fill="white"
+                    />
                   </svg>
                 </button>
-                <!-- Indicadores (Puntos) -->
+
+                <!-- Indicadores -->
                 <div class="carousel-dots">
-                    <span
+
+                  <span
                     v-for="(slide, index) in slides"
                     :key="index"
                     class="dot"
-                    :class="{ active: currentSlide === index }"
+                    :class="{
+                      active: currentSlide === index
+                    }"
                     @click="goToSlide(index)"
-                    ></span>
+                  ></span>
+
                 </div>
-                <button class="carousel-btn" @click="nextSlide">
-                  <svg viewBox="0 0 24 24" width="20" height="20">
-                    <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" fill="white"/>
+
+                <button
+                  class="carousel-btn"
+                  @click="nextSlide"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                  >
+                    <path
+                      d="M8.59 16.59L10 18l-6-6 6-6 1.41 1.41L13.17 12z"
+                      fill="white"
+                    />
                   </svg>
                 </button>
+
               </div>
+
             </div>
-            <!-- ===== FIN CONTROLES UNIFICADOS ===== -->
 
           </div>
         </div>
       </div>
+
+      <!-- PARTE INFERIOR -->
       <div class="bottom">
+
         <div class="bottom-content">
+
           <div class="imagenLogo">
-            <img src="../../../public/images/Logo_negativo.png" alt="Logo Concejo Municipal" />
+            <img
+              src="../../../public/images/Logo_negativo.png"
+              alt="Logo Concejo Municipal"
+            />
           </div>
+
           <div class="texto">
-            <h1 class="titulo">Concejo Municipal de Potosí</h1>
+
+            <!-- Nombre institucional dinámico -->
+            <h1 class="titulo">
+              {{ nombreInstitucion }}
+            </h1>
+
+            <!-- Descripción dinámica -->
             <p class="descripcion">
-                El Concejo Municipal de Potosí constituye el Órgano Legislativo,
-                Deliberativo y Fiscalizador del Gobierno Autónomo Municipal de
-                Potosí. Está conformado por once (11) concejalas y concejales,
-                elegidos mediante sufragio universal, directo y secreto, para
-                un periodo de gestión de cinco años. Actualmente, la institución
-                se encuentra en el ejercicio del periodo constitucional 2026–2031.
+
+              {{ descripcionInstitucional }}
+
+              Actualmente, la institución se encuentra en el ejercicio
+              del periodo constitucional
+              {{ periodoConstitucional }}.
+
             </p>
+
             <div class="hero-botones">
-                <button class="btn-primario" @click="abrirModal">
+
+              <button
+                class="btn-primario"
+                @click="abrirModal"
+              >
                 Ver más
                 <i class="bi bi-arrow-right"></i>
-                </button>
+              </button>
+
             </div>
+
           </div>
+
         </div>
+
+        <!-- INFORMACIÓN -->
         <div class="informacion">
-          <div class="inf_titulo">Información Importante</div>
+
+          <div class="inf_titulo">
+            Información Importante
+          </div>
+
           <div class="bienvenida-stats">
-          <div class="stat">
-            <i class="bi bi-people-fill"></i>
-            <div class="stat-info">
-              <span class="stat-number">11</span>
-              <span class="stat-label">Concejales</span>
-            </div>
-          </div>
-          <div class="stat">
-            <i class="bi bi-diagram-3"></i>
-            <div class="stat-info">
-              <span class="stat-number">10</span>
-              <span class="stat-label">Comisiones</span>
-            </div>
-          </div>
-          <div class="stat">
-            <i class="bi bi-geo-alt"></i>
-            <div class="stat-info">
-              <span class="stat-number">21</span>
-              <span class="stat-label">Distritos</span>
-            </div>
-          </div>
-          <div class="stat">
-            <i class="bi bi-flag"></i>
-            <div class="stat-info">
-              <span class="stat-number">233</span>
-              <span class="stat-label">Juntas Vecinales</span>
-            </div>
-          </div>
-          <div class="stat">
-            <a href="https://cpv2024.ine.gob.bo/index.php/principal/principales-resultados-v3/"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="stat-link">
-              <i class="bi bi-person-standing"></i>
+
+            <!-- CONCEJALES DINÁMICOS -->
+            <div class="stat">
+
+              <i class="bi bi-people-fill"></i>
+
               <div class="stat-info">
-                <span class="stat-number">218.702</span>
-                <span class="stat-label">Ciudadanos</span>
-                <span class="stat-fuente">Fuente: I.N.E.</span>
+
+                <span class="stat-number">
+                  {{ cantidadConcejales }}
+                </span>
+
+                <span class="stat-label">
+                  Concejales
+                </span>
+
               </div>
-            </a>
+
+            </div>
+
+            <!-- Comisiones -->
+            <div class="stat">
+
+              <i class="bi bi-diagram-3"></i>
+
+              <div class="stat-info">
+
+                <span class="stat-number">
+                  10
+                </span>
+
+                <span class="stat-label">
+                  Comisiones
+                </span>
+
+              </div>
+
+            </div>
+
+            <!-- Distritos -->
+            <div class="stat">
+
+              <i class="bi bi-geo-alt"></i>
+
+              <div class="stat-info">
+
+                <span class="stat-number">
+                  21
+                </span>
+
+                <span class="stat-label">
+                  Distritos
+                </span>
+
+              </div>
+
+            </div>
+
+            <!-- Juntas Vecinales -->
+            <div class="stat">
+
+              <i class="bi bi-flag"></i>
+
+              <div class="stat-info">
+
+                <span class="stat-number">
+                  233
+                </span>
+
+                <span class="stat-label">
+                  Juntas Vecinales
+                </span>
+
+              </div>
+
+            </div>
+
+            <!-- Ciudadanos -->
+            <div class="stat">
+
+              <a
+                href="https://cpv2024.ine.gob.bo/index.php/principal/principales-resultados-v3/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="stat-link"
+              >
+
+                <i class="bi bi-person-standing"></i>
+
+                <div class="stat-info">
+
+                  <span class="stat-number">
+                    218.702
+                  </span>
+
+                  <span class="stat-label">
+                    Ciudadanos
+                  </span>
+
+                  <span class="stat-fuente">
+                    Fuente: I.N.E.
+                  </span>
+
+                </div>
+
+              </a>
+
+            </div>
+
           </div>
+
         </div>
-        </div>
+
       </div>
+
     </div>
-    <!-- Modal -->
-    <div v-if="modalVisible" class="modal-overlay" @click.self="cerrarModal">
+
+    <!-- MODAL -->
+    <div
+      v-if="modalVisible"
+      class="modal-overlay"
+      @click.self="cerrarModal"
+    >
+
       <div class="modal-container modal-pdf">
-        <button class="modal-close" @click="cerrarModal">
-         <i class="bi bi-x-lg"></i>
+
+        <button
+          class="modal-close"
+          @click="cerrarModal"
+        >
+          <i class="bi bi-x-lg"></i>
         </button>
+
         <div class="modal-content">
+
           <h2 class="modal-titulo">
-           Concejo Municipal de Potosí - Ley Municipal 067/2015
+            {{ nombreInstitucion }} - Ley Municipal 067/2015
           </h2>
+
           <div class="modal-cuerpo pdf-container">
-            <iframe src="/pdf/LeyMunicipal_067-2015.pdf" type="application/pdf"></iframe>
+
+            <iframe
+              src="/pdf/LeyMunicipal_067-2015.pdf"
+              type="application/pdf"
+            ></iframe>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
+
   </div>
 </template>
 
+
 <script>
+
 import 'bootstrap-icons/font/bootstrap-icons.css'
+
+import axios from 'axios'
+
 import { useNoticiasStore } from '@/stores/noticias.js'
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+
+import {
+  computed,
+  ref,
+  onMounted,
+  onBeforeUnmount
+} from 'vue'
+
 
 export default {
+
   name: 'RightAlignedCarousel',
+
   setup() {
+
     const store = useNoticiasStore()
+
     const currentSlide = ref(0)
+
     const modalVisible = ref(false)
+
     const autoplayInterval = ref(null)
 
-    // Función para obtener el tipo de archivo (image o video)
-    const getTipoArchivo = (noticia) => {
-    if (noticia.archivos && noticia.archivos.length > 0) {
-        const primerArchivo = noticia.archivos[0];
-        if (primerArchivo.tipo_mime?.startsWith('video/')) {
-        return 'video';
-        }
-    }
-    return 'image';
-    };
-    const slides = computed(() => {
-  const todas = store.noticias || [];
-  // Cambia el 1 por el ID real de tu categoría "Noticias"
-  const noticiasFiltradas = todas.filter(n => n.id_categoria === 1);
 
-  const ordenadas = [...noticiasFiltradas].sort((a, b) =>
-    new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
-  );
+    // =========================================================
+    // CONFIGURACIÓN INSTITUCIONAL
+    // =========================================================
 
-  const ultimas5 = ordenadas.slice(0, 5);
+    const nombreInstitucion = ref(
+      'Concejo Municipal de Potosí'
+    )
 
-  return ultimas5.map(noticia => {
-    // Obtener el primer archivo (puede ser imagen o video)
-    const primerArchivo = noticia.archivos?.[0];
+    const periodoConstitucional = ref(
+      '2026–2031'
+    )
 
-    return {
-      title: noticia.titulo,
-      description: noticia.resumen || '',
-      date: formatDate(noticia.fecha_creacion),
+    const descripcionInstitucional = ref(
+      'El Concejo Municipal de Potosí constituye el Órgano Legislativo, Deliberativo y Fiscalizador del Gobierno Autónomo Municipal de Potosí. Está conformado por once (11) concejalas y concejales, elegidos mediante sufragio universal, directo y secreto, para un periodo de gestión de cinco años. '
+    )
 
-      // 🔥 Para imágenes:
-      type: getTipoArchivo(noticia),
-      image: getMainImage(noticia),
 
-      // 🔥 Para videos:
-      video: primerArchivo && primerArchivo.tipo_mime?.startsWith('video/')
-        ? getFileUrl(primerArchivo.ruta_archivo)
-        : null
-    };
-  });
-});
+    // =========================================================
+    // CANTIDAD DE CONCEJALES
+    // =========================================================
 
-    const formatDate = (dateString) => {
-      if (!dateString) return 'Fecha no disponible'
+    const cantidadConcejales = ref(0)
+
+
+    const cargarCantidadConcejales = async () => {
+
       try {
-        const date = new Date(dateString)
-        if (isNaN(date.getTime())) return 'Fecha inválida'
-        const day = String(date.getDate()).padStart(2, '0')
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const year = date.getFullYear()
+
+        const response = await axios.get(
+          '/api/public/concejales'
+        )
+
+        if (
+          response.data?.success
+        ) {
+
+          cantidadConcejales.value =
+            response.data.data?.length || 0
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          'Error al cargar la cantidad de concejales:',
+          error
+        )
+
+        cantidadConcejales.value = 0
+
+      }
+
+    }
+
+
+    // =========================================================
+    // CARGAR CONFIGURACIÓN INSTITUCIONAL
+    // =========================================================
+
+    const cargarConfiguracionInstitucional = async () => {
+
+      try {
+
+        const response = await axios.get(
+          '/api/public/configuracion'
+        )
+
+        if (!response.data?.success) {
+          return
+        }
+
+        const configuraciones =
+          response.data.data || []
+
+
+        configuraciones.forEach(
+          (configuracion) => {
+
+            switch (configuracion.clave) {
+
+              case 'nombre_institucion':
+
+                if (configuracion.valor) {
+
+                  nombreInstitucion.value =
+                    configuracion.valor
+
+                }
+
+                break
+
+
+              case 'periodo_constitucional':
+
+                if (configuracion.valor) {
+
+                  periodoConstitucional.value =
+                    configuracion.valor
+
+                }
+
+                break
+
+
+              case 'descripcion_institucional':
+
+                if (configuracion.valor) {
+
+                  descripcionInstitucional.value =
+                    configuracion.valor
+
+                }
+
+                break
+
+            }
+
+          }
+        )
+
+      } catch (error) {
+
+        console.error(
+          'Error al cargar la configuración institucional:',
+          error
+        )
+
+      }
+
+    }
+
+
+    // =========================================================
+    // OBTENER TIPO DE ARCHIVO
+    // =========================================================
+
+    const getTipoArchivo = (noticia) => {
+
+      if (
+        noticia.archivos &&
+        noticia.archivos.length > 0
+      ) {
+
+        const primerArchivo =
+          noticia.archivos[0]
+
+        if (
+          primerArchivo.tipo_mime?.startsWith(
+            'video/'
+          )
+        ) {
+
+          return 'video'
+
+        }
+
+      }
+
+      return 'image'
+
+    }
+
+
+    // =========================================================
+    // CARRUSEL
+    // =========================================================
+
+    const slides = computed(() => {
+
+      const todas =
+        store.noticias || []
+
+
+      // Categoría Noticias
+      const noticiasFiltradas =
+        todas.filter(
+          n => n.id_categoria === 1
+        )
+
+
+      const ordenadas =
+        [...noticiasFiltradas].sort(
+          (a, b) =>
+            new Date(b.fecha_creacion) -
+            new Date(a.fecha_creacion)
+        )
+
+
+      const ultimas5 =
+        ordenadas.slice(0, 5)
+
+
+      return ultimas5.map(
+        noticia => {
+
+          const primerArchivo =
+            noticia.archivos?.[0]
+
+
+          return {
+
+            title:
+              noticia.titulo,
+
+            description:
+              noticia.resumen || '',
+
+            date:
+              formatDate(
+                noticia.fecha_creacion
+              ),
+
+            type:
+              getTipoArchivo(
+                noticia
+              ),
+
+            image:
+              getMainImage(
+                noticia
+              ),
+
+            video:
+              primerArchivo &&
+              primerArchivo.tipo_mime?.startsWith(
+                'video/'
+              )
+                ? getFileUrl(
+                    primerArchivo.ruta_archivo
+                  )
+                : null
+
+          }
+
+        }
+      )
+
+    })
+
+
+    // =========================================================
+    // FORMATO DE FECHA
+    // =========================================================
+
+    const formatDate = (
+      dateString
+    ) => {
+
+      if (!dateString)
+        return 'Fecha no disponible'
+
+
+      try {
+
+        const date =
+          new Date(dateString)
+
+
+        if (
+          isNaN(
+            date.getTime()
+          )
+        ) {
+
+          return 'Fecha inválida'
+
+        }
+
+
+        const day =
+          String(
+            date.getDate()
+          ).padStart(2, '0')
+
+
+        const month =
+          String(
+            date.getMonth() + 1
+          ).padStart(2, '0')
+
+
+        const year =
+          date.getFullYear()
+
+
         return `${day}/${month}/${year}`
+
       } catch {
+
         return dateString
+
       }
+
     }
 
-    const getMainImage = (noticia) => {
-      if (noticia.archivos && noticia.archivos.length > 0) {
-        const img = noticia.archivos.find(a => a.tipo_mime?.startsWith('image/'))
-        if (img) return getFileUrl(img.ruta_archivo)
+
+    // =========================================================
+    // IMAGEN PRINCIPAL
+    // =========================================================
+
+    const getMainImage = (
+      noticia
+    ) => {
+
+      if (
+        noticia.archivos &&
+        noticia.archivos.length > 0
+      ) {
+
+        const img =
+          noticia.archivos.find(
+            a =>
+              a.tipo_mime?.startsWith(
+                'image/'
+              )
+          )
+
+
+        if (img) {
+
+          return getFileUrl(
+            img.ruta_archivo
+          )
+
+        }
+
       }
+
+
       return 'https://picsum.photos/seed/default/1200/800'
+
     }
 
-    const getFileUrl = (ruta) => {
-      if (!ruta) return '#'
+
+    // =========================================================
+    // URL ARCHIVOS
+    // =========================================================
+
+    const getFileUrl = (
+      ruta
+    ) => {
+
+      if (!ruta)
+        return '#'
+
       return `/${ruta}`
+
     }
+
+
+    // =========================================================
+    // SIGUIENTE SLIDE
+    // =========================================================
 
     const nextSlide = () => {
-      if (slides.value.length > 0) {
-        currentSlide.value = (currentSlide.value + 1) % slides.value.length
+
+      if (
+        slides.value.length > 0
+      ) {
+
+        currentSlide.value =
+          (
+            currentSlide.value + 1
+          ) %
+          slides.value.length
+
       }
+
     }
+
+
+    // =========================================================
+    // SLIDE ANTERIOR
+    // =========================================================
 
     const prevSlide = () => {
-      if (slides.value.length > 0) {
-        currentSlide.value = (currentSlide.value - 1 + slides.value.length) % slides.value.length
+
+      if (
+        slides.value.length > 0
+      ) {
+
+        currentSlide.value =
+          (
+            currentSlide.value - 1 +
+            slides.value.length
+          ) %
+          slides.value.length
+
       }
+
     }
 
-    const goToSlide = (index) => {
-      currentSlide.value = index
+
+    // =========================================================
+    // IR A SLIDE
+    // =========================================================
+
+    const goToSlide = (
+      index
+    ) => {
+
+      currentSlide.value =
+        index
+
     }
+
+
+    // =========================================================
+    // AUTOPLAY
+    // =========================================================
 
     const startAutoplay = () => {
-      if (autoplayInterval.value) clearInterval(autoplayInterval.value)
-      autoplayInterval.value = setInterval(() => {
-        if (slides.value.length > 0) {
-          nextSlide()
-        }
-      }, 4000)
+
+      if (
+        autoplayInterval.value
+      ) {
+
+        clearInterval(
+          autoplayInterval.value
+        )
+
+      }
+
+
+      autoplayInterval.value =
+        setInterval(() => {
+
+          if (
+            slides.value.length > 0
+          ) {
+
+            nextSlide()
+
+          }
+
+        }, 4000)
+
     }
+
 
     const stopAutoplay = () => {
-      if (autoplayInterval.value) {
-        clearInterval(autoplayInterval.value)
-        autoplayInterval.value = null
+
+      if (
+        autoplayInterval.value
+      ) {
+
+        clearInterval(
+          autoplayInterval.value
+        )
+
+        autoplayInterval.value =
+          null
+
       }
+
     }
+
+
+    // =========================================================
+    // MODAL PDF
+    // =========================================================
 
     const abrirModal = () => {
-      modalVisible.value = true
-      document.body.style.overflow = 'hidden'
+
+      modalVisible.value =
+        true
+
+      document.body.style.overflow =
+        'hidden'
+
     }
+
 
     const cerrarModal = () => {
-      modalVisible.value = false
-      document.body.style.overflow = ''
+
+      modalVisible.value =
+        false
+
+      document.body.style.overflow =
+        ''
+
     }
+
+
+    // =========================================================
+    // AL MONTAR
+    // =========================================================
 
     onMounted(async () => {
-      await store.fetchNoticias()
+
+      await Promise.all([
+
+        store.fetchNoticias(),
+
+        cargarConfiguracionInstitucional(),
+
+        cargarCantidadConcejales()
+
+      ])
+
       startAutoplay()
+
     })
+
+
+    // =========================================================
+    // AL SALIR
+    // =========================================================
 
     onBeforeUnmount(() => {
+
       stopAutoplay()
+
     })
 
+
     return {
+
       store,
+
       currentSlide,
+
       modalVisible,
+
       slides,
+
+      nombreInstitucion,
+
+      periodoConstitucional,
+
+      descripcionInstitucional,
+
+      cantidadConcejales,
+
       nextSlide,
+
       prevSlide,
+
       goToSlide,
+
       abrirModal,
+
       cerrarModal
+
     }
+
   }
+
 }
+
 </script>
 
+
 <style scoped>
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 
 .page-container {
   position: relative;
@@ -345,7 +954,11 @@ export default {
   background-image: url('/images/fondo.png');
 }
 
-/* ===== CONTENIDO IZQUIERDO ===== */
+
+/* ========================================================= */
+/* CONTENIDO IZQUIERDO */
+/* ========================================================= */
+
 .left-content {
   position: absolute;
   top: 0;
@@ -356,6 +969,7 @@ export default {
   overflow: hidden;
 }
 
+
 .left-content img {
   width: 100%;
   height: 100%;
@@ -363,17 +977,25 @@ export default {
   display: block;
 }
 
-/* Imagen mobile oculta por defecto */
+
+/* Imagen mobile */
+
 .mobile-image {
   display: none;
 }
 
-/* Imagen desktop visible por defecto */
+
+/* Imagen desktop */
+
 .desktop-image {
   display: block;
 }
 
-/* ===== CONTENIDO DERECHO ===== */
+
+/* ========================================================= */
+/* CONTENIDO DERECHO */
+/* ========================================================= */
+
 .right-content {
   position: absolute;
   top: 0;
@@ -385,11 +1007,13 @@ export default {
   flex-direction: column;
 }
 
+
 .top {
   height: 30%;
   position: relative;
   overflow: hidden;
 }
+
 
 .bottom {
   height: 70%;
@@ -398,6 +1022,7 @@ export default {
   align-items: center;
   padding: 0.5rem;
 }
+
 
 .bottom-content {
   text-align: center;
@@ -408,6 +1033,11 @@ export default {
   width: 100%;
 }
 
+
+/* ========================================================= */
+/* LOGO */
+/* ========================================================= */
+
 .imagenLogo {
   max-width: 300px;
   width: 100%;
@@ -417,17 +1047,23 @@ export default {
   margin-bottom: 1rem;
 }
 
+
 .imagenLogo img {
   width: 100%;
   height: auto;
 }
 
-/* Texto */
+
+/* ========================================================= */
+/* TEXTO */
+/* ========================================================= */
+
 .texto {
   max-width: 90%;
   animation: entrarDerecha 1.8s ease-out forwards;
   margin-left: 10%;
 }
+
 
 .titulo {
   font-size: 2rem;
@@ -436,6 +1072,7 @@ export default {
   margin-bottom: 1rem;
   line-height: 1.2;
 }
+
 
 .descripcion {
   font-size: 1rem;
@@ -448,12 +1085,14 @@ export default {
   text-align: justify;
 }
 
+
 .hero-botones {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
   margin-left: 2%;
 }
+
 
 .btn-primario {
   background: #cc0000;
@@ -470,21 +1109,28 @@ export default {
   transition: all 0.3s ease;
 }
 
+
 .btn-primario:hover {
   background: #990000;
   transform: translateY(-3px);
   box-shadow: 0 10px 20px rgba(204, 0, 0, 0.3);
 }
 
+
 .btn-primario:hover i {
   transform: translateX(5px);
 }
+
 
 .btn-primario i {
   transition: transform 0.3s ease;
 }
 
-/* ===== CARRUSEL ===== */
+
+/* ========================================================= */
+/* CARRUSEL */
+/* ========================================================= */
+
 .carousel-wrapper {
   position: absolute;
   top: 0;
@@ -494,6 +1140,7 @@ export default {
   overflow: hidden;
 }
 
+
 .carousel-container {
   margin-left: 13%;
   position: relative;
@@ -502,13 +1149,22 @@ export default {
   overflow: hidden;
 }
 
+
 .carousel-track {
   display: flex;
   width: 100%;
   height: 100%;
-  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition:
+    transform 0.6s
+    cubic-bezier(
+      0.25,
+      0.46,
+      0.45,
+      0.94
+    );
   will-change: transform;
 }
+
 
 .carousel-slide {
   flex: 0 0 100%;
@@ -518,12 +1174,15 @@ export default {
   flex-direction: row;
 }
 
-/* 📸 Bloque Izquierdo: Imagen (30%) */
+
+/* Imagen */
+
 .slide-image-wrapper {
   width: 30%;
   height: 100%;
   overflow: hidden;
 }
+
 
 .slide-img {
   width: 100%;
@@ -532,20 +1191,24 @@ export default {
   display: block;
 }
 
-/* 📝 Bloque Derecho: Texto (70%) */
+
+/* Texto */
+
 .slide-content {
   width: 70%;
   height: 100%;
   display: flex;
-  align-items: flex-start; /* Corregido: flex-start en lugar de left */
+  align-items: flex-start;
   justify-content: center;
   padding: 2rem;
 }
+
 
 .text-container {
   max-width: 100%;
   text-align: left;
 }
+
 
 .slide-title {
   font-size: 1.2rem;
@@ -555,6 +1218,7 @@ export default {
   line-height: 1.2;
 }
 
+
 .slide-description {
   font-size: 1.1rem;
   color: #4a5568;
@@ -563,13 +1227,18 @@ export default {
   text-align: justify;
 }
 
+
 .slide-date {
   font-size: 1rem;
   font-weight: 500;
   color: #cc0000;
 }
 
-/* ===== CONTROLES UNIFICADOS (DERECHA, ABAJO) ===== */
+
+/* ========================================================= */
+/* CONTROLES */
+/* ========================================================= */
+
 .carousel-controls-group {
   position: absolute;
   bottom: 20px;
@@ -581,10 +1250,12 @@ export default {
   z-index: 10;
 }
 
+
 .carousel-buttons {
   display: flex;
   gap: 8px;
 }
+
 
 .carousel-btn {
   background: rgba(0, 0, 0, 0.5);
@@ -600,22 +1271,26 @@ export default {
   backdrop-filter: blur(4px);
 }
 
+
 .carousel-btn:hover {
   background: rgba(0, 0, 0, 0.7);
   transform: scale(1.1);
   border-color: white;
 }
 
+
 .carousel-btn svg {
   width: 20px;
   height: 20px;
 }
+
 
 .carousel-dots {
   display: flex;
   gap: 8px;
   align-items: center;
 }
+
 
 .dot {
   width: 10px;
@@ -626,30 +1301,45 @@ export default {
   transition: all 0.3s ease;
 }
 
+
 .dot:hover {
   background: rgba(0, 0, 0, 0.4);
   transform: scale(1.2);
 }
 
+
 .dot.active {
   background: #cc0000;
   transform: scale(1.25);
-  box-shadow: 0 0 12px rgba(204, 0, 0, 0.3);
+  box-shadow:
+    0 0 12px
+    rgba(204, 0, 0, 0.3);
 }
+
+
+/* ========================================================= */
+/* ENLACE ESTADÍSTICA */
+/* ========================================================= */
 
 .stat-link {
-    text-decoration: none;
-    display: block;
-    color: inherit;
+  text-decoration: none;
+  display: block;
+  color: inherit;
 }
+
 
 .stat-link:hover .stat {
-    cursor: pointer;
-    background-color: #f0f0f0;
-    transition: background-color 0.3s ease;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  transition:
+    background-color 0.3s ease;
 }
 
-/* ========== MODAL ========== */
+
+/* ========================================================= */
+/* MODAL */
+/* ========================================================= */
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -665,17 +1355,27 @@ export default {
   animation: fadeIn 0.3s ease;
 }
 
+
 .modal-container {
   position: relative;
   max-width: 800px;
   width: 90%;
   max-height: 65vh;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f8f9fa 100%
+    );
   border-radius: 20px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-  animation: entrarAbajo 0.4s ease;
+  box-shadow:
+    0 25px 50px
+    rgba(0, 0, 0, 0.1);
+  animation:
+    entrarAbajo 0.4s ease;
   overflow: hidden;
 }
+
 
 .modal-close {
   position: absolute;
@@ -694,23 +1394,28 @@ export default {
   z-index: 10;
 }
 
+
 .modal-close i {
   font-size: 1.2rem;
   color: #cc0000;
 }
+
 
 .modal-close:hover {
   background: #cc0000;
   transform: rotate(90deg);
 }
 
+
 .modal-close:hover i {
   color: white;
 }
 
+
 .modal-content {
   padding: 2rem;
 }
+
 
 .modal-titulo {
   font-size: 1.8rem;
@@ -722,7 +1427,11 @@ export default {
   padding-bottom: 0.8rem;
 }
 
-/* ========== PDF ========== */
+
+/* ========================================================= */
+/* PDF */
+/* ========================================================= */
+
 .modal-container.modal-pdf {
   width: 95%;
   max-width: 1000px;
@@ -731,12 +1440,14 @@ export default {
   flex-direction: column;
 }
 
+
 .modal-container.modal-pdf .modal-content {
   height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
+
 
 .pdf-container {
   flex: 1;
@@ -745,6 +1456,7 @@ export default {
   overflow: hidden;
 }
 
+
 .pdf-container iframe {
   width: 100%;
   height: 100%;
@@ -752,14 +1464,20 @@ export default {
   border-radius: 0 0 20px 20px;
 }
 
-.informacion{
+
+/* ========================================================= */
+/* INFORMACIÓN */
+/* ========================================================= */
+
+.informacion {
   max-width: 90%;
   animation: entrarDerecha 1.8s ease-out forwards;
   margin-left: 10%;
   margin-top: 2rem;
 }
 
-.inf_titulo{
+
+.inf_titulo {
   font-size: 1.2rem;
   font-weight: 600;
   color: #cc0000;
@@ -767,7 +1485,11 @@ export default {
   line-height: 1.2;
 }
 
-/* ========== DATOS ========== */
+
+/* ========================================================= */
+/* ESTADÍSTICAS */
+/* ========================================================= */
+
 .bienvenida-stats {
   align-items: center;
   margin-top: 2%;
@@ -776,6 +1498,7 @@ export default {
   flex-wrap: wrap;
   animation: entrarAbajo 2s ease-out forwards;
 }
+
 
 .stat {
   display: flex;
@@ -788,21 +1511,27 @@ export default {
   transition: all 0.3s ease;
 }
 
+
 .stat:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 5px 15px
+    rgba(0, 0, 0, 0.2);
   background: white;
 }
+
 
 .stat i {
   font-size: 2rem;
   color: #cc0000;
 }
 
+
 .stat-info {
   display: flex;
   flex-direction: column;
 }
+
 
 .stat-number {
   font-size: 1.5rem;
@@ -810,50 +1539,68 @@ export default {
   color: #2c3e50;
 }
 
+
 .stat-label {
   font-size: 0.85rem;
   color: #666;
 }
-.stat-fuente{
+
+
+.stat-fuente {
   font-size: 0.75rem;
   color: #c00000;
   font-style: italic;
 }
 
-/* ============================================================ */
-/* ===== RESPONSIVE: TABLET (1024px) ===== */
-/* ============================================================ */
+
+/* ========================================================= */
+/* RESPONSIVE TABLET */
+/* ========================================================= */
+
 @media (max-width: 1024px) {
+
   .right-content {
     left: 45%;
     width: 55%;
   }
 
+
   .slide-title {
     font-size: 1.8rem;
   }
+
+
   .slide-description {
     font-size: 1rem;
   }
+
+
   .carousel-btn {
     width: 40px;
     height: 40px;
   }
+
+
   .carousel-btn svg {
     width: 20px;
     height: 20px;
   }
+
 }
 
-/* ============================================================ */
-/* ===== RESPONSIVE: MOBILE (768px) ===== */
-/* ============================================================ */
+
+/* ========================================================= */
+/* RESPONSIVE MOBILE */
+/* ========================================================= */
+
 @media (max-width: 768px) {
+
   .page-container {
     height: auto;
     min-height: 100vh;
     overflow-y: auto;
   }
+
 
   .left-content {
     position: relative;
@@ -862,8 +1609,16 @@ export default {
     min-height: 300px;
   }
 
-  .desktop-image { display: none !important; }
-  .mobile-image { display: block !important; }
+
+  .desktop-image {
+    display: none !important;
+  }
+
+
+  .mobile-image {
+    display: block !important;
+  }
+
 
   .right-content {
     position: relative;
@@ -873,10 +1628,12 @@ export default {
     min-height: 60vh;
   }
 
+
   .top {
     height: 40vh;
     min-height: 250px;
   }
+
 
   .bottom {
     height: auto;
@@ -884,46 +1641,135 @@ export default {
     padding: 2rem 1.5rem;
   }
 
-  .slide-image-wrapper { width: 30%; }
-  .slide-content { width: 70%; padding: 1rem; }
 
-  .slide-title { font-size: 1.2rem; }
-  .slide-description { font-size: 0.9rem; }
-  .slide-date { font-size: 0.8rem; }
+  .slide-image-wrapper {
+    width: 30%;
+  }
+
+
+  .slide-content {
+    width: 70%;
+    padding: 1rem;
+  }
+
+
+  .slide-title {
+    font-size: 1.2rem;
+  }
+
+
+  .slide-description {
+    font-size: 0.9rem;
+  }
+
+
+  .slide-date {
+    font-size: 0.8rem;
+  }
+
 
   .carousel-btn {
     width: 36px;
     height: 36px;
   }
-  .carousel-btn svg { width: 18px; height: 18px; }
+
+
+  .carousel-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
 }
 
-/* ============================================================ */
-/* ===== RESPONSIVE: MOBILE PEQUEÑO (480px) ===== */
-/* ============================================================ */
+
+/* ========================================================= */
+/* RESPONSIVE MOBILE PEQUEÑO */
+/* ========================================================= */
+
 @media (max-width: 480px) {
-  .left-content { height: 30vh; min-height: 200px; }
-  .top { height: 35vh; min-height: 200px; }
 
-  .slide-image-wrapper { width: 30%; }
-  .slide-content { width: 70%; padding: 0.5rem; }
+  .left-content {
+    height: 30vh;
+    min-height: 200px;
+  }
 
-  .slide-title { font-size: 1rem; }
-  .slide-description { font-size: 0.8rem; }
-  .slide-date { font-size: 0.7rem; }
 
-  .carousel-btn { width: 30px; height: 30px; }
-  .carousel-btn svg { width: 16px; height: 16px; }
+  .top {
+    height: 35vh;
+    min-height: 200px;
+  }
+
+
+  .slide-image-wrapper {
+    width: 30%;
+  }
+
+
+  .slide-content {
+    width: 70%;
+    padding: 0.5rem;
+  }
+
+
+  .slide-title {
+    font-size: 1rem;
+  }
+
+
+  .slide-description {
+    font-size: 0.8rem;
+  }
+
+
+  .slide-date {
+    font-size: 0.7rem;
+  }
+
+
+  .carousel-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+
+  .carousel-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
 }
 
-/* ============================================================ */
-/* ===== RESPONSIVE: LANDSCAPE ===== */
-/* ============================================================ */
-@media (max-height: 600px) and (orientation: landscape) {
-  .left-content { width: 40%; }
-  .right-content { left: 40%; width: 60%; }
 
-  .slide-title { font-size: 1.2rem; }
-  .slide-description { font-size: 0.9rem; }
+/* ========================================================= */
+/* LANDSCAPE */
+/* ========================================================= */
+
+@media (
+  max-height: 600px
+) and (
+  orientation: landscape
+) {
+
+  .left-content {
+    width: 40%;
+  }
+
+
+  .right-content {
+    left: 40%;
+    width: 60%;
+  }
+
+
+  .slide-title {
+    font-size: 1.2rem;
+  }
+
+
+  .slide-description {
+    font-size: 0.9rem;
+  }
+
 }
+
 </style>

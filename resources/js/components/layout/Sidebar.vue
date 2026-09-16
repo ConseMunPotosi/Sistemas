@@ -1,4 +1,3 @@
-```vue
 <template>
   <aside class="sidebar" :class="{ collapsed: isCollapsed }">
 
@@ -53,6 +52,17 @@
             <span class="submenu-icon">ℹ️</span>
             Información institucional
           </div>
+
+          <router-link
+            :to="{ name: 'gestionConfiguracion' }"
+            class="submenu-item"
+            :class="{
+              active: $route.name === 'gestionConfiguracion'
+            }"
+          >
+            <span class="submenu-icon">⚙️</span>
+            Configuración Institucional
+          </router-link>
         </div>
 
       </div>
@@ -98,6 +108,7 @@
             <span class="submenu-icon">👥</span>
             Concejales
           </router-link>
+
         </div>
 
       </div>

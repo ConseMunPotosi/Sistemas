@@ -43,6 +43,8 @@ const GestionSesiones = () =>
 const GestionConcejales = () =>
     import('@/components/institucional/GestionConcejales.vue');
 
+const GestionConfiguracion = () =>
+    import('@/components/institucional/GestionConfiguracion.vue');
 
 // ==========================================================
 // RUTAS
@@ -128,7 +130,6 @@ const routes = [
         ]
     },
 
-
     // ======================================================
     // LOGIN
     // ======================================================
@@ -138,7 +139,6 @@ const routes = [
         name: 'loginCMP',
         component: LoginCMP
     },
-
 
     // ======================================================
     // DASHBOARD PROTEGIDO
@@ -165,7 +165,6 @@ const routes = [
                 component: Dashboard
             },
 
-
             // ------------------------------------------------
             // PERFIL
             // ------------------------------------------------
@@ -175,7 +174,6 @@ const routes = [
                 name: 'profile',
                 component: Profile
             },
-
 
             // ------------------------------------------------
             // CONFIGURACIÓN
@@ -187,7 +185,6 @@ const routes = [
                 component: Settings
             },
 
-
             // ------------------------------------------------
             // USUARIOS
             // ------------------------------------------------
@@ -197,7 +194,6 @@ const routes = [
                 name: 'users',
                 component: Users
             },
-
 
             // =================================================
             // GESTIÓN COMUNICACIONAL
@@ -209,7 +205,6 @@ const routes = [
                 component: Informacion
             },
 
-
             // =================================================
             // GACETA Y ARCHIVOS
             // =================================================
@@ -219,7 +214,6 @@ const routes = [
                 name: 'gestionNormas',
                 component: GestionNormas
             },
-
 
             // =================================================
             // SESIONES
@@ -231,7 +225,6 @@ const routes = [
                 component: GestionSesiones
             },
 
-
             // =================================================
             // CONCEJALES
             // =================================================
@@ -240,11 +233,19 @@ const routes = [
                 path: 'gestion-concejales',
                 name: 'gestionConcejales',
                 component: GestionConcejales
-            }
+            },
 
+            // =================================================
+            // CONFIGURACIÓN INSTITUCIONAL
+            // =================================================
+
+            {
+                path: 'gestion-configuracion',
+                name: 'gestionConfiguracion',
+                component: GestionConfiguracion
+            }
         ]
     },
-
 
     // ======================================================
     // 404
@@ -255,7 +256,6 @@ const routes = [
         redirect: '/'
     }
 ];
-
 
 // ==========================================================
 // CREAR ROUTER
@@ -268,7 +268,6 @@ const router = createRouter({
     routes
 
 });
-
 
 // ==========================================================
 // GUARDIA DE NAVEGACIÓN
@@ -296,7 +295,6 @@ router.beforeEach((to, from, next) => {
         authStore.clearAuth();
     }
 
-
     // ------------------------------------------------------
     // RUTAS PÚBLICAS
     // ------------------------------------------------------
@@ -323,7 +321,6 @@ router.beforeEach((to, from, next) => {
         '/loginCMP'
     ];
 
-
     // ------------------------------------------------------
     // PERMITIR RUTAS PÚBLICAS
     // ------------------------------------------------------
@@ -334,7 +331,6 @@ router.beforeEach((to, from, next) => {
 
         return;
     }
-
 
     // ------------------------------------------------------
     // RUTAS DEL DASHBOARD
@@ -357,13 +353,11 @@ router.beforeEach((to, from, next) => {
         return;
     }
 
-
     // ------------------------------------------------------
     // CUALQUIER OTRA RUTA
     // ------------------------------------------------------
 
     next();
 });
-
 
 export default router;
